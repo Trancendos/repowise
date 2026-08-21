@@ -84,7 +84,9 @@ def _group_choices(plan: Plan, preticked: frozenset[Group]) -> list:
         if size:
             detail = f"{detail}, {_human_size(size)}"
         choices.append(
-            AgentChoice(id=group.value, display_name=name, detail=detail, enabled=group in preticked)
+            AgentChoice(
+                id=group.value, display_name=name, detail=detail, enabled=group in preticked
+            )
         )
     return choices
 

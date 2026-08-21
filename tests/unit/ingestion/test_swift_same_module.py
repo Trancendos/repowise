@@ -20,9 +20,7 @@ class TestSwiftSameModule:
     def test_same_target_type_reference(self) -> None:
         texts = {
             "Sources/Core/Engine.swift": "public final class Engine {}\n",
-            "Sources/Core/Runner.swift": (
-                "struct Runner {\n  let engine = Engine()\n}\n"
-            ),
+            "Sources/Core/Runner.swift": ("struct Runner {\n  let engine = Engine()\n}\n"),
         }
         g = _graph(list(texts))
         added = resolve_swift_same_module_refs(g, {"Core": "Sources/Core"}, texts)
@@ -70,8 +68,7 @@ class TestSwiftSameModule:
                 "protocol Drawable {}\nenum Mode { case a }\nactor Store {}\n"
             ),
             "Sources/Core/Use.swift": (
-                "struct Canvas: Drawable {\n"
-                "  var mode: Mode = .a\n  let store = Store()\n}\n"
+                "struct Canvas: Drawable {\n" "  var mode: Mode = .a\n  let store = Store()\n}\n"
             ),
         }
         g = _graph(list(texts))
@@ -120,9 +117,7 @@ class TestSwiftSameModule:
         # references Engine too — also → Engine.
         assert added == 2
         assert g.has_edge("Sources/Core/Use.swift", "Sources/Core/Engine.swift")
-        assert g.has_edge(
-            "Sources/Core/Engine+Extras.swift", "Sources/Core/Engine.swift"
-        )
+        assert g.has_edge("Sources/Core/Engine+Extras.swift", "Sources/Core/Engine.swift")
 
 
 class TestSwiftEntryWarmup:

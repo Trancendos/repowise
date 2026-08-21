@@ -102,9 +102,7 @@ def test_a_bus_factor_of_zero_is_taken_at_face_value_here() -> None:
     that a 0 arriving is not silently reinterpreted, because that is what
     makes the caller's filter the single place the decision is made.
     """
-    signals = build_box_signals(
-        FILES, file_bus_factors={"pkg/a.py": 0, "pkg/b.py": 3}
-    )
+    signals = build_box_signals(FILES, file_bus_factors={"pkg/a.py": 0, "pkg/b.py": 3})
     assert signals["box:one"].min_bus_factor == 0
 
 

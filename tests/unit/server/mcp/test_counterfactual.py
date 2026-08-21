@@ -207,9 +207,10 @@ def test_generate_refactoring_code_is_grounded_in_the_spans_it_read() -> None:
     assert cf.replaced_tokens_for("generate_refactoring_code", {"spans": [{"source": "x"}]}) == (
         cf.REFACTOR_FLOOR
     )
-    assert cf.replaced_tokens_for(
-        "generate_refactoring_code", {"spans": [{"source": "x" * 900_000}]}
-    ) == cf.REFACTOR_MAX
+    assert (
+        cf.replaced_tokens_for("generate_refactoring_code", {"spans": [{"source": "x" * 900_000}]})
+        == cf.REFACTOR_MAX
+    )
     assert cf.replaced_tokens_for("generate_refactoring_code", {"spans": []}) == 0
     assert cf.replaced_tokens_for("generate_refactoring_code", {"spans": [{"file": "a.py"}]}) == 0
     assert cf.replaced_tokens_for("generate_refactoring_code", {"error": "disabled"}) == 0

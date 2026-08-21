@@ -104,9 +104,7 @@ _PY_ANNOTATED = re.compile(
 # is otherwise read as declaring ``logger``, which then answers for a
 # ``logger`` that came from somewhere else entirely. The C family is safe from
 # that shape only because its equivalent needs the ``var`` keyword.
-_PY_CONSTRUCTED = re.compile(
-    r"(?m)^[ \t]*(?P<name>[a-z_]\w*)\s*=\s*(?P<type>[A-Z]\w*)\s*\("
-)
+_PY_CONSTRUCTED = re.compile(r"(?m)^[ \t]*(?P<name>[a-z_]\w*)\s*=\s*(?P<type>[A-Z]\w*)\s*\(")
 
 # Go writes the name before the type, so none of the C-family shapes above
 # match a line of it. Two further differences decide these patterns.
@@ -138,9 +136,7 @@ _GO_TYPE = r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)?"
 #
 # ``a * b`` is not matched because gofmt spaces a binary operator on both
 # sides while a pointer type binds tight, and Go source is gofmt'd.
-_GO_PARAM = re.compile(
-    rf"(?<![\w.])(?P<name>{_GO_NAME})\s+\*?(?P<type>{_GO_TYPE})\s*(?=[,)])"
-)
+_GO_PARAM = re.compile(rf"(?<![\w.])(?P<name>{_GO_NAME})\s+\*?(?P<type>{_GO_TYPE})\s*(?=[,)])")
 
 # ``x := Foo{}``, ``x := &Foo{}``, ``x := y.(Foo)`` and ``x, ok := y.(Foo)``.
 # One scan rather than two: both shapes are a short declaration whose type is
@@ -330,8 +326,7 @@ _TARGETS = r"[\w.\[\]]+(?:\s*,\s*[\w.\[\]]+)*"
 _PY_TARGET_LISTS = (
     # An assignment, plain or augmented, at the start of a statement.
     re.compile(
-        rf"(?m)^[ \t]*(?P<lhs>{_TARGETS})\s*(?::[^=\n]*)?"
-        r"(?:[-+*/%|&^@]|//|\*\*|>>|<<)?=(?!=)"
+        rf"(?m)^[ \t]*(?P<lhs>{_TARGETS})\s*(?::[^=\n]*)?" r"(?:[-+*/%|&^@]|//|\*\*|>>|<<)?=(?!=)"
     ),
     # A `for` target, statement or comprehension.
     re.compile(rf"\bfor\s+(?P<lhs>{_TARGETS})\s+in\b"),
@@ -398,6 +393,7 @@ def framework_decorated_type(decorators: Iterable[str], language: str) -> str | 
             if pattern.match(decorator):
                 return type_name
     return None
+
 
 _LANGUAGE_BLOCK_COMMENTS: dict[str, re.Pattern[str]] = {
     "kotlin": _BLOCK_COMMENT,

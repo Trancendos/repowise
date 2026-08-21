@@ -138,9 +138,9 @@ def test_every_builtin_provider_has_a_deliberate_budget():
         "codex_cli": 180.0,
         "opencode": 180.0,
     }
-    assert set(expected) == set(_BUILTIN_PROVIDERS), (
-        "a provider was added or removed; decide its interactive budget here"
-    )
+    assert set(expected) == set(
+        _BUILTIN_PROVIDERS
+    ), "a provider was added or removed; decide its interactive budget here"
     actual = {name: _load_provider_class(name).interactive_timeout_s for name in expected}
     assert actual == expected
 

@@ -246,9 +246,7 @@ async def get_architecture_view(
     include_symbols: bool = Query(False, description="Include symbol-level nodes"),
     session: AsyncSession = Depends(get_db_session),
 ) -> ArchitectureViewResponse:
-    return await build_architecture_view_response(
-        session, repo_id, include_symbols=include_symbols
-    )
+    return await build_architecture_view_response(session, repo_id, include_symbols=include_symbols)
 
 
 @router.get("/{repo_id}/zoom-map", response_model=ZoomMapResponse)

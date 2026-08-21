@@ -38,9 +38,7 @@ class AnalysisIndexStore(ABC):
     ) -> GitMetadata: ...
 
     @abstractmethod
-    async def get_git_metadata(
-        self, repository_id: str, file_path: str
-    ) -> GitMetadata | None: ...
+    async def get_git_metadata(self, repository_id: str, file_path: str) -> GitMetadata | None: ...
 
     @abstractmethod
     async def get_git_metadata_bulk(
@@ -48,9 +46,7 @@ class AnalysisIndexStore(ABC):
     ) -> dict[str, GitMetadata]: ...
 
     @abstractmethod
-    async def get_all_git_metadata(
-        self, repository_id: str
-    ) -> dict[str, GitMetadata]: ...
+    async def get_all_git_metadata(self, repository_id: str) -> dict[str, GitMetadata]: ...
 
     @abstractmethod
     async def upsert_git_metadata_bulk(
@@ -65,9 +61,7 @@ class AnalysisIndexStore(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def save_dead_code_findings(
-        self, repository_id: str, findings: list[dict]
-    ) -> None: ...
+    async def save_dead_code_findings(self, repository_id: str, findings: list[dict]) -> None: ...
 
     @abstractmethod
     async def get_dead_code_findings(
@@ -95,9 +89,7 @@ class AnalysisIndexStore(ABC):
     async def upsert_decision(self, **kwargs: Any) -> DecisionRecord: ...
 
     @abstractmethod
-    async def bulk_upsert_decisions(
-        self, repository_id: str, decisions: list[dict]
-    ) -> None: ...
+    async def bulk_upsert_decisions(self, repository_id: str, decisions: list[dict]) -> None: ...
 
     @abstractmethod
     async def get_decision(self, decision_id: str) -> DecisionRecord | None: ...
@@ -160,14 +152,10 @@ class AnalysisIndexStore(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def save_health_findings(
-        self, repository_id: str, findings: list[Any]
-    ) -> None: ...
+    async def save_health_findings(self, repository_id: str, findings: list[Any]) -> None: ...
 
     @abstractmethod
-    async def save_health_metrics(
-        self, repository_id: str, metrics: list[Any]
-    ) -> None: ...
+    async def save_health_metrics(self, repository_id: str, metrics: list[Any]) -> None: ...
 
     @abstractmethod
     async def upsert_health_findings(
@@ -179,9 +167,7 @@ class AnalysisIndexStore(ABC):
     ) -> None: ...
 
     @abstractmethod
-    async def upsert_health_metrics(
-        self, repository_id: str, metrics: list[Any]
-    ) -> None: ...
+    async def upsert_health_metrics(self, repository_id: str, metrics: list[Any]) -> None: ...
 
     @abstractmethod
     async def get_health_findings(

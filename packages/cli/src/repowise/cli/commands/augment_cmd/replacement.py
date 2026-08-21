@@ -116,8 +116,10 @@ def _as_read_output(tool_response: dict, text: str) -> dict | None:
     if not isinstance(file_block, dict) or "content" not in file_block:
         return None
     lines = text.count("\n") + (0 if text.endswith("\n") else 1)
-    return {**tool_response, "file": {**file_block, "content": text, "numLines": lines,
-                                      "startLine": 1}}
+    return {
+        **tool_response,
+        "file": {**file_block, "content": text, "numLines": lines, "startLine": 1},
+    }
 
 
 def _as_grep_output(tool_response: dict, text: str) -> dict | None:

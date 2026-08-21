@@ -147,39 +147,25 @@ class TestFingerprintDeterminism:
         return gb
 
     def test_same_graph_same_fingerprint(self):
-        gb1 = self._make_graph_builder(
-            ["a.py", "b.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0}
-        )
-        gb2 = self._make_graph_builder(
-            ["a.py", "b.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0}
-        )
+        gb1 = self._make_graph_builder(["a.py", "b.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0})
+        gb2 = self._make_graph_builder(["a.py", "b.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0})
         assert compute_kg_fingerprint(gb1) == compute_kg_fingerprint(gb2)
 
     def test_different_nodes_different_fingerprint(self):
-        gb1 = self._make_graph_builder(
-            ["a.py", "b.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0}
-        )
+        gb1 = self._make_graph_builder(["a.py", "b.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0})
         gb2 = self._make_graph_builder(
             ["a.py", "b.py", "c.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0, "c.py": 1}
         )
         assert compute_kg_fingerprint(gb1) != compute_kg_fingerprint(gb2)
 
     def test_different_edges_different_fingerprint(self):
-        gb1 = self._make_graph_builder(
-            ["a.py", "b.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0}
-        )
-        gb2 = self._make_graph_builder(
-            ["a.py", "b.py"], [], {"a.py": 0, "b.py": 0}
-        )
+        gb1 = self._make_graph_builder(["a.py", "b.py"], [("a.py", "b.py")], {"a.py": 0, "b.py": 0})
+        gb2 = self._make_graph_builder(["a.py", "b.py"], [], {"a.py": 0, "b.py": 0})
         assert compute_kg_fingerprint(gb1) != compute_kg_fingerprint(gb2)
 
     def test_different_communities_different_fingerprint(self):
-        gb1 = self._make_graph_builder(
-            ["a.py", "b.py"], [], {"a.py": 0, "b.py": 0}
-        )
-        gb2 = self._make_graph_builder(
-            ["a.py", "b.py"], [], {"a.py": 0, "b.py": 1}
-        )
+        gb1 = self._make_graph_builder(["a.py", "b.py"], [], {"a.py": 0, "b.py": 0})
+        gb2 = self._make_graph_builder(["a.py", "b.py"], [], {"a.py": 0, "b.py": 1})
         assert compute_kg_fingerprint(gb1) != compute_kg_fingerprint(gb2)
 
     def test_builder_version_changes_the_fingerprint(self, monkeypatch):

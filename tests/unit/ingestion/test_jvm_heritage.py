@@ -32,10 +32,7 @@ def _fi(rel: str, abs_: Path, lang: str) -> FileInfo:
 
 class TestSealedPermits:
     def test_permits_emits_subclass_edges(self, tmp_path: Path) -> None:
-        src = (
-            "package com.foo;\n"
-            "public sealed class Shape permits Circle, Square {}\n"
-        )
+        src = "package com.foo;\n" "public sealed class Shape permits Circle, Square {}\n"
         rel = "Shape.java"
         abs_ = tmp_path / rel
         abs_.write_text(src)
@@ -47,10 +44,7 @@ class TestSealedPermits:
         assert ("Square", "Shape", "extends") in kinds, kinds
 
     def test_sealed_interface_permits(self, tmp_path: Path) -> None:
-        src = (
-            "package com.foo;\n"
-            "public sealed interface IFace permits A, B {}\n"
-        )
+        src = "package com.foo;\n" "public sealed interface IFace permits A, B {}\n"
         rel = "IFace.java"
         abs_ = tmp_path / rel
         abs_.write_text(src)
@@ -82,11 +76,7 @@ class TestJpmsProvides:
 
     def test_module_info_merges_with_meta_inf_services(self, tmp_path: Path) -> None:
         mi = tmp_path / "module-info.java"
-        mi.write_text(
-            "module com.foo {\n"
-            "  provides com.foo.Plugin with com.foo.impl.A;\n"
-            "}\n"
-        )
+        mi.write_text("module com.foo {\n" "  provides com.foo.Plugin with com.foo.impl.A;\n" "}\n")
         sdir = tmp_path / "src/main/resources/META-INF/services"
         sdir.mkdir(parents=True)
         (sdir / "com.foo.Plugin").write_text("com.foo.impl.B\n")

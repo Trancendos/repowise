@@ -117,12 +117,30 @@ def test_commit_sink_since_ts_drops_old_commits() -> None:
     """``since_ts`` filters the sink to commits strictly newer than the bound —
     the incremental capture path's freshness guarantee."""
     commits = [
-        {"sha": "new", "an": "A", "ae": "a@x", "ct": 3000, "subj": "new",
-         "files": [(1, 0, "src/a.py")]},
-        {"sha": "mid", "an": "A", "ae": "a@x", "ct": 2000, "subj": "mid",
-         "files": [(1, 0, "src/a.py")]},
-        {"sha": "old", "an": "A", "ae": "a@x", "ct": 1000, "subj": "old",
-         "files": [(1, 0, "src/a.py")]},
+        {
+            "sha": "new",
+            "an": "A",
+            "ae": "a@x",
+            "ct": 3000,
+            "subj": "new",
+            "files": [(1, 0, "src/a.py")],
+        },
+        {
+            "sha": "mid",
+            "an": "A",
+            "ae": "a@x",
+            "ct": 2000,
+            "subj": "mid",
+            "files": [(1, 0, "src/a.py")],
+        },
+        {
+            "sha": "old",
+            "an": "A",
+            "ae": "a@x",
+            "ct": 1000,
+            "subj": "old",
+            "files": [(1, 0, "src/a.py")],
+        },
     ]
     repo = _mock_repo(commits)
     sink: list[dict] = []
@@ -144,8 +162,14 @@ def test_since_ts_bounds_the_numstat_walk_to_the_surviving_prefix() -> None:
     above: the returned rows are identical either way.
     """
     commits = [
-        {"sha": f"c{i}", "an": "A", "ae": "a@x", "ct": 5000 - i * 100, "subj": f"c{i}",
-         "files": [(1, 0, "src/a.py")]}
+        {
+            "sha": f"c{i}",
+            "an": "A",
+            "ae": "a@x",
+            "ct": 5000 - i * 100,
+            "subj": f"c{i}",
+            "files": [(1, 0, "src/a.py")],
+        }
         for i in range(20)
     ]
     repo = _mock_repo(commits)
@@ -161,8 +185,14 @@ def test_since_ts_bounds_the_numstat_walk_to_the_surviving_prefix() -> None:
 
 def test_since_ts_newer_than_every_commit_skips_the_numstat_walk() -> None:
     commits = [
-        {"sha": "only", "an": "A", "ae": "a@x", "ct": 1000, "subj": "x",
-         "files": [(1, 0, "src/a.py")]}
+        {
+            "sha": "only",
+            "an": "A",
+            "ae": "a@x",
+            "ct": 1000,
+            "subj": "x",
+            "files": [(1, 0, "src/a.py")],
+        }
     ]
     repo = _mock_repo(commits)
     sink: list[dict] = []

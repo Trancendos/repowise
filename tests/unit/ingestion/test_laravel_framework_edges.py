@@ -45,15 +45,11 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 def _make_composer(repo: Path, psr4: dict[str, str]) -> None:
-    (repo / "composer.json").write_text(
-        json.dumps({"autoload": {"psr-4": psr4}})
-    )
+    (repo / "composer.json").write_text(json.dumps({"autoload": {"psr-4": psr4}}))
 
 
 class TestLaravelRoutes:
@@ -76,9 +72,7 @@ class TestLaravelRoutes:
             graph.add_node(p)
         ctx = _ctx(tmp_path, parsed)
         add_framework_edges(graph, parsed, ctx, tech_stack=["laravel"])
-        assert graph.has_edge(
-            "routes/web.php", "src/Http/Controllers/UsersController.php"
-        )
+        assert graph.has_edge("routes/web.php", "src/Http/Controllers/UsersController.php")
 
     def test_legacy_string_route_to_controller(self, tmp_path: Path) -> None:
         _make_composer(tmp_path, {"App\\": "src/"})
@@ -127,12 +121,8 @@ class TestLaravelServiceProvider:
             graph.add_node(p)
         ctx = _ctx(tmp_path, parsed)
         add_framework_edges(graph, parsed, ctx, tech_stack=[])
-        assert graph.has_edge(
-            "src/AppServiceProvider.php", "src/PaymentInterface.php"
-        )
-        assert graph.has_edge(
-            "src/AppServiceProvider.php", "src/StripePayment.php"
-        )
+        assert graph.has_edge("src/AppServiceProvider.php", "src/PaymentInterface.php")
+        assert graph.has_edge("src/AppServiceProvider.php", "src/StripePayment.php")
 
 
 class TestLaravelEloquent:
@@ -146,9 +136,7 @@ class TestLaravelEloquent:
             "  public function orders() { return $this->hasMany(Order::class); }\n"
             "}\n"
         )
-        (models / "Order.php").write_text(
-            "<?php\nnamespace App\\Models;\nclass Order {}\n"
-        )
+        (models / "Order.php").write_text("<?php\nnamespace App\\Models;\nclass Order {}\n")
         (tmp_path / "routes").mkdir()
         (tmp_path / "routes" / "web.php").write_text("<?php\n")
         parsed = _build_parsed(tmp_path)

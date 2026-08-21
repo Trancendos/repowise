@@ -286,9 +286,7 @@ def _merged_body(prior_body: str, prior_birth_at: float | None, fold: _Fold) -> 
     if not prior_body:
         return fresh
     rewound = (
-        fold.first_ts is not None
-        and prior_birth_at is not None
-        and fold.first_ts <= prior_birth_at
+        fold.first_ts is not None and prior_birth_at is not None and fold.first_ts <= prior_birth_at
     )
     if rewound:
         if fresh.startswith(prior_body):
@@ -383,8 +381,6 @@ def _prior_rows(store: EpisodeStore, subjects: Sequence[str]) -> dict[str, dict]
     rows: dict[str, dict] = {}
     for start in range(0, len(subjects), _MERGE_CHUNK):
         batch = subjects[start : start + _MERGE_CHUNK]
-        for row in store.list_episodes(
-            tier=TIER_TRANSCRIPT, kind=KIND_SESSION, subjects=batch
-        ):
+        for row in store.list_episodes(tier=TIER_TRANSCRIPT, kind=KIND_SESSION, subjects=batch):
             rows[row["subject"]] = row
     return rows

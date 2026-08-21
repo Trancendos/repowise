@@ -72,18 +72,14 @@ async def test_late_symbol_named_by_the_question_survives_the_cap(
     session, repo_id, tmp_path
 ) -> None:
     """The routing code is at the end of the file; the question asks about it."""
-    served = await _hydrate(
-        session, repo_id, tmp_path, _ROUTING_NAMES, _ROUTING_QUESTION
-    )
+    served = await _hydrate(session, repo_id, tmp_path, _ROUTING_NAMES, _ROUTING_QUESTION)
     names = [s["name"] for s in served]
 
     assert "find_route" in names, "document order buried the symbol the question named"
     assert len(names) <= _MAX_SYMBOLS_TOP_HIT, "the budget itself must not grow"
 
 
-async def test_no_content_term_falls_back_to_document_order(
-    session, repo_id, tmp_path
-) -> None:
+async def test_no_content_term_falls_back_to_document_order(session, repo_id, tmp_path) -> None:
     """With nothing to score, the served slice is the old start_line prefix."""
     names = [f"helper{i}" for i in range(_SYMBOL_COUNT)]
     served = await _hydrate(session, repo_id, tmp_path, names, "How does it work?")
@@ -93,24 +89,18 @@ async def test_no_content_term_falls_back_to_document_order(
 
 async def test_served_slice_stays_in_reading_order(session, repo_id, tmp_path) -> None:
     """Relevance decides what is kept, never what order consumers read it in."""
-    served = await _hydrate(
-        session, repo_id, tmp_path, _ROUTING_NAMES, _ROUTING_QUESTION
-    )
+    served = await _hydrate(session, repo_id, tmp_path, _ROUTING_NAMES, _ROUTING_QUESTION)
     names = [s["name"] for s in served]
 
     assert names == sorted(names, key=_ROUTING_NAMES.index)
 
 
-async def test_prose_question_still_earns_a_source_body(
-    session, repo_id, tmp_path
-) -> None:
+async def test_prose_question_still_earns_a_source_body(session, repo_id, tmp_path) -> None:
     """A prose question matches no identifier, so nothing would carry code."""
-    served = await _hydrate(
-        session, repo_id, tmp_path, _ROUTING_NAMES, _ROUTING_QUESTION
-    )
+    served = await _hydrate(session, repo_id, tmp_path, _ROUTING_NAMES, _ROUTING_QUESTION)
     scored = [s for s in served if s["name"] == "find_route"]
 
-    assert scored and scored[0].get("source_excerpt"), (
-        "the symbol the question scored against was served without its body"
-    )
+    assert scored and scored[0].get(
+        "source_excerpt"
+    ), "the symbol the question scored against was served without its body"
     assert not any(s["_matched"] for s in served), "prose names no identifier"

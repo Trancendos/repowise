@@ -48,16 +48,10 @@ def test_resolve_links_for_file_reference():
     attach_wiki_links_and_backlinks(pages, parsed_files=None)
 
     service_links = pages[0].metadata["wiki_links"]
-    assert any(
-        link["target_page_id"] == "file_page:src/auth/utils.py"
-        for link in service_links
-    )
+    assert any(link["target_page_id"] == "file_page:src/auth/utils.py" for link in service_links)
 
     utils_backlinks = pages[1].metadata["backlinks"]
-    assert any(
-        bl["source_page_id"] == "file_page:src/auth/service.py"
-        for bl in utils_backlinks
-    )
+    assert any(bl["source_page_id"] == "file_page:src/auth/service.py" for bl in utils_backlinks)
 
 
 def test_dedup_same_target_referenced_multiple_times():
@@ -117,9 +111,7 @@ def test_index_resolves_basename_when_unique():
     attach_wiki_links_and_backlinks(pages)
 
     main_links = pages[1].metadata["wiki_links"]
-    assert any(
-        link["target_page_id"] == "file_page:src/lib/utils.py" for link in main_links
-    )
+    assert any(link["target_page_id"] == "file_page:src/lib/utils.py" for link in main_links)
 
 
 def test_prior_page_ids_widen_forward_resolution():

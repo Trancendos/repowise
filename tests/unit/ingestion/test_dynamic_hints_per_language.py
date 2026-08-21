@@ -50,9 +50,7 @@ class TestRubyHints:
 
     def test_const_get(self, tmp_path: Path) -> None:
         (tmp_path / "user.rb").write_text("class User\nend\n")
-        (tmp_path / "loader.rb").write_text(
-            "klass = Object.const_get(:User)\n"
-        )
+        (tmp_path / "loader.rb").write_text("klass = Object.const_get(:User)\n")
         edges = RubyDynamicHints().extract(tmp_path)
         targets = {e.target for e in edges if e.hint_source == "ruby:const_get"}
         assert "user.rb" in targets
@@ -70,9 +68,7 @@ class TestPhpHints:
 
     def test_reflection_class(self, tmp_path: Path) -> None:
         (tmp_path / "Foo.php").write_text("<?php\nclass Foo {}\n")
-        (tmp_path / "Use.php").write_text(
-            "<?php\n$r = new ReflectionClass(Foo::class);\n"
-        )
+        (tmp_path / "Use.php").write_text("<?php\n$r = new ReflectionClass(Foo::class);\n")
         edges = PhpDynamicHints().extract(tmp_path)
         targets = {e.target for e in edges if e.hint_source == "php:reflection_class"}
         assert "Foo.php" in targets
@@ -82,7 +78,7 @@ class TestScalaHints:
     def test_class_forname(self, tmp_path: Path) -> None:
         (tmp_path / "Foo.scala").write_text("package x\nclass Foo\n")
         (tmp_path / "Loader.scala").write_text(
-            "package x\nobject Loader { val c = Class.forName(\"x.Foo\") }\n"
+            'package x\nobject Loader { val c = Class.forName("x.Foo") }\n'
         )
         edges = ScalaDynamicHints().extract(tmp_path)
         targets = {e.target for e in edges if e.hint_source == "scala:class_forname"}
@@ -90,9 +86,7 @@ class TestScalaHints:
 
     def test_given(self, tmp_path: Path) -> None:
         (tmp_path / "Ord.scala").write_text("package x\ntrait Ord\n")
-        (tmp_path / "Use.scala").write_text(
-            "package x\nobject Use { given intOrd: Ord = ??? }\n"
-        )
+        (tmp_path / "Use.scala").write_text("package x\nobject Use { given intOrd: Ord = ??? }\n")
         edges = ScalaDynamicHints().extract(tmp_path)
         targets = {e.target for e in edges if e.hint_source == "scala:given"}
         assert "Ord.scala" in targets
@@ -101,16 +95,14 @@ class TestScalaHints:
 class TestSwiftHints:
     def test_nsclass_from_string(self, tmp_path: Path) -> None:
         (tmp_path / "MyClass.swift").write_text("class MyClass {}\n")
-        (tmp_path / "Use.swift").write_text(
-            "let c = NSClassFromString(\"MyClass\")\n"
-        )
+        (tmp_path / "Use.swift").write_text('let c = NSClassFromString("MyClass")\n')
         edges = SwiftDynamicHints().extract(tmp_path)
         targets = {e.target for e in edges if e.hint_source == "swift:nsclass_from_string"}
         assert "MyClass.swift" in targets
 
     def test_selector(self, tmp_path: Path) -> None:
         (tmp_path / "A.swift").write_text("func myAction() {}\n")
-        (tmp_path / "B.swift").write_text("let s = Selector(\"myAction\")\n")
+        (tmp_path / "B.swift").write_text('let s = Selector("myAction")\n')
         edges = SwiftDynamicHints().extract(tmp_path)
         targets = {e.target for e in edges if e.hint_source == "swift:selector"}
         assert "A.swift" in targets
@@ -118,9 +110,7 @@ class TestSwiftHints:
 
 class TestCHints:
     def test_function_pointer_assignment(self, tmp_path: Path) -> None:
-        (tmp_path / "ops.c").write_text(
-            "int do_thing(int x) { return x; }\n"
-        )
+        (tmp_path / "ops.c").write_text("int do_thing(int x) { return x; }\n")
         (tmp_path / "main.c").write_text(
             "extern int do_thing(int);\nint main(){\n  int (*fp)(int);\n  fp = do_thing;\n  return 0;\n}\n"
         )
@@ -130,7 +120,7 @@ class TestCHints:
 
     def test_dlopen_emits_external(self, tmp_path: Path) -> None:
         (tmp_path / "main.c").write_text(
-            "#include <dlfcn.h>\nint main(){ void *h = dlopen(\"./libfoo.so\", 0); return 0; }\n"
+            '#include <dlfcn.h>\nint main(){ void *h = dlopen("./libfoo.so", 0); return 0; }\n'
         )
         edges = CDynamicHints().extract(tmp_path)
         assert any(e.hint_source == "c:dlopen" for e in edges)
@@ -138,9 +128,7 @@ class TestCHints:
 
 class TestLuauHints:
     def test_get_service(self, tmp_path: Path) -> None:
-        (tmp_path / "init.luau").write_text(
-            "local rs = game:GetService(\"ReplicatedStorage\")\n"
-        )
+        (tmp_path / "init.luau").write_text('local rs = game:GetService("ReplicatedStorage")\n')
         edges = LuauDynamicHints().extract(tmp_path)
         assert any(e.hint_source == "luau:get_service" for e in edges)
 
@@ -156,22 +144,18 @@ class TestLuauHints:
 
 class TestGoHints:
     def test_reflect_typeof(self, tmp_path: Path) -> None:
-        (tmp_path / "types.go").write_text(
-            "package x\ntype Foo struct{}\n"
-        )
+        (tmp_path / "types.go").write_text("package x\ntype Foo struct{}\n")
         (tmp_path / "use.go").write_text(
-            "package x\nimport \"reflect\"\nvar _ = reflect.TypeOf(Foo{})\n"
+            'package x\nimport "reflect"\nvar _ = reflect.TypeOf(Foo{})\n'
         )
         edges = GoDynamicHints().extract(tmp_path)
         targets = {e.target for e in edges if e.hint_source == "go:reflect_typeof"}
         assert "types.go" in targets
 
     def test_reflect_new_and_valueof(self, tmp_path: Path) -> None:
-        (tmp_path / "types.go").write_text(
-            "package x\ntype Bar struct{}\ntype Baz struct{}\n"
-        )
+        (tmp_path / "types.go").write_text("package x\ntype Bar struct{}\ntype Baz struct{}\n")
         (tmp_path / "use.go").write_text(
-            "package x\nimport \"reflect\"\n"
+            'package x\nimport "reflect"\n'
             "var _ = reflect.New(Bar{})\n"
             "var _ = reflect.ValueOf(Baz{})\n"
         )
@@ -181,7 +165,7 @@ class TestGoHints:
 
     def test_plugin_open_emits_external(self, tmp_path: Path) -> None:
         (tmp_path / "main.go").write_text(
-            "package main\nimport \"plugin\"\nfunc main(){ plugin.Open(\"./p.so\") }\n"
+            'package main\nimport "plugin"\nfunc main(){ plugin.Open("./p.so") }\n'
         )
         edges = GoDynamicHints().extract(tmp_path)
         assert any(e.hint_source == "go:plugin_open" for e in edges)

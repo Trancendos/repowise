@@ -39,36 +39,24 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
             **kwargs,
         )
 
-    async def get_git_metadata(
-        self, repository_id: str, file_path: str
-    ) -> GitMetadata | None:
+    async def get_git_metadata(self, repository_id: str, file_path: str) -> GitMetadata | None:
         return await crud.get_git_metadata(self._session, repository_id, file_path)
 
     async def get_git_metadata_bulk(
         self, repository_id: str, file_paths: list[str]
     ) -> dict[str, GitMetadata]:
-        return await crud.get_git_metadata_bulk(
-            self._session, repository_id, file_paths
-        )
+        return await crud.get_git_metadata_bulk(self._session, repository_id, file_paths)
 
-    async def get_all_git_metadata(
-        self, repository_id: str
-    ) -> dict[str, GitMetadata]:
+    async def get_all_git_metadata(self, repository_id: str) -> dict[str, GitMetadata]:
         return await crud.get_all_git_metadata(self._session, repository_id)
 
-    async def upsert_git_metadata_bulk(
-        self, repository_id: str, metadata_list: list[dict]
-    ) -> None:
-        await crud.upsert_git_metadata_bulk(
-            self._session, repository_id, metadata_list
-        )
+    async def upsert_git_metadata_bulk(self, repository_id: str, metadata_list: list[dict]) -> None:
+        await crud.upsert_git_metadata_bulk(self._session, repository_id, metadata_list)
 
     async def recompute_git_percentiles(self, repository_id: str) -> int:
         return await crud.recompute_git_percentiles(self._session, repository_id)
 
-    async def save_dead_code_findings(
-        self, repository_id: str, findings: list[dict]
-    ) -> None:
+    async def save_dead_code_findings(self, repository_id: str, findings: list[dict]) -> None:
         await crud.save_dead_code_findings(self._session, repository_id, findings)
 
     async def get_dead_code_findings(
@@ -90,9 +78,7 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
     async def update_dead_code_status(
         self, finding_id: str, status: str, note: str | None = None
     ) -> DeadCodeFinding | None:
-        return await crud.update_dead_code_status(
-            self._session, finding_id, status, note
-        )
+        return await crud.update_dead_code_status(self._session, finding_id, status, note)
 
     async def get_dead_code_summary(self, repository_id: str) -> dict:
         return await crud.get_dead_code_summary(self._session, repository_id)
@@ -100,9 +86,7 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
     async def upsert_decision(self, **kwargs: Any) -> DecisionRecord:
         return await crud.upsert_decision(self._session, **kwargs)
 
-    async def bulk_upsert_decisions(
-        self, repository_id: str, decisions: list[dict]
-    ) -> None:
+    async def bulk_upsert_decisions(self, repository_id: str, decisions: list[dict]) -> None:
         await crud.bulk_upsert_decisions(self._session, repository_id, decisions)
 
     async def get_decision(self, decision_id: str) -> DecisionRecord | None:
@@ -157,9 +141,7 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
             self._session, decision_id, status, superseded_by=superseded_by
         )
 
-    async def update_decision_by_id(
-        self, decision_id: str, **fields: Any
-    ) -> DecisionRecord | None:
+    async def update_decision_by_id(self, decision_id: str, **fields: Any) -> DecisionRecord | None:
         return await crud.update_decision_by_id(self._session, decision_id, **fields)
 
     async def delete_decision(self, decision_id: str) -> bool:
@@ -168,28 +150,20 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
     async def recompute_decision_staleness(
         self, repository_id: str, git_meta_map: dict[str, dict]
     ) -> int:
-        return await crud.recompute_decision_staleness(
-            self._session, repository_id, git_meta_map
-        )
+        return await crud.recompute_decision_staleness(self._session, repository_id, git_meta_map)
 
     async def get_stale_decisions(
         self, repository_id: str, threshold: float = 0.5
     ) -> list[DecisionRecord]:
-        return await crud.get_stale_decisions(
-            self._session, repository_id, threshold
-        )
+        return await crud.get_stale_decisions(self._session, repository_id, threshold)
 
     async def get_decision_health_summary(self, repository_id: str) -> dict:
         return await crud.get_decision_health_summary(self._session, repository_id)
 
-    async def save_health_findings(
-        self, repository_id: str, findings: list[Any]
-    ) -> None:
+    async def save_health_findings(self, repository_id: str, findings: list[Any]) -> None:
         await crud.save_health_findings(self._session, repository_id, findings)
 
-    async def save_health_metrics(
-        self, repository_id: str, metrics: list[Any]
-    ) -> None:
+    async def save_health_metrics(self, repository_id: str, metrics: list[Any]) -> None:
         await crud.save_health_metrics(self._session, repository_id, metrics)
 
     async def upsert_health_findings(
@@ -203,9 +177,7 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
             self._session, repository_id, findings, file_paths=file_paths
         )
 
-    async def upsert_health_metrics(
-        self, repository_id: str, metrics: list[Any]
-    ) -> None:
+    async def upsert_health_metrics(self, repository_id: str, metrics: list[Any]) -> None:
         await crud.upsert_health_metrics(self._session, repository_id, metrics)
 
     async def get_health_findings(
@@ -229,9 +201,7 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
     async def get_health_metrics(
         self, repository_id: str, *, file_paths: list[str] | None = None
     ) -> list[HealthFileMetric]:
-        return await crud.get_health_metrics(
-            self._session, repository_id, file_paths=file_paths
-        )
+        return await crud.get_health_metrics(self._session, repository_id, file_paths=file_paths)
 
     async def get_health_summary(self, repository_id: str) -> dict:
         return await crud.get_health_summary(self._session, repository_id)
@@ -239,9 +209,7 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
     async def update_health_finding_status(
         self, finding_id: str, status: str
     ) -> HealthFinding | None:
-        return await crud.update_health_finding_status(
-            self._session, finding_id, status
-        )
+        return await crud.update_health_finding_status(self._session, finding_id, status)
 
     async def save_health_snapshot(
         self,
@@ -270,9 +238,7 @@ class _SqlAnalysisMixin(AnalysisIndexStore):
     async def list_health_snapshots(
         self, repository_id: str, *, limit: int | None = None
     ) -> list[HealthSnapshot]:
-        return await crud.list_health_snapshots(
-            self._session, repository_id, limit=limit
-        )
+        return await crud.list_health_snapshots(self._session, repository_id, limit=limit)
 
     async def save_coverage_files(
         self,

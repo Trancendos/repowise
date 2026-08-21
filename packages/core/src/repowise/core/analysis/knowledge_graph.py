@@ -61,13 +61,12 @@ class KnowledgeGraphResult:
                 str(e.get("type", "")),
             ),
         )
+
         def _canonical_layer(layer: dict) -> dict:
             out = {**layer, "nodeIds": sorted(layer.get("nodeIds", []))}
             if isinstance(layer.get("subGroups"), list):
                 out["subGroups"] = [
-                    {**sg, "nodeIds": sorted(sg.get("nodeIds", []))}
-                    if isinstance(sg, dict)
-                    else sg
+                    {**sg, "nodeIds": sorted(sg.get("nodeIds", []))} if isinstance(sg, dict) else sg
                     for sg in layer["subGroups"]
                 ]
             return out
@@ -85,9 +84,7 @@ class KnowledgeGraphResult:
         if self.modules:
             # Additive key: present only when curation derived modules, so
             # the uncurated export's byte shape is unchanged.
-            out["modules"] = [
-                {**m, "nodeIds": sorted(m.get("nodeIds", []))} for m in self.modules
-            ]
+            out["modules"] = [{**m, "nodeIds": sorted(m.get("nodeIds", []))} for m in self.modules]
         return out
 
     @classmethod
@@ -147,25 +144,51 @@ class KnowledgeGraphResult:
 # Node classification helpers
 # ---------------------------------------------------------------------------
 
-_CONFIG_EXTENSIONS = frozenset({
-    ".yaml", ".yml", ".toml", ".json", ".env", ".ini", ".cfg", ".conf",
-    ".properties", ".xml",
-})
+_CONFIG_EXTENSIONS = frozenset(
+    {
+        ".yaml",
+        ".yml",
+        ".toml",
+        ".json",
+        ".env",
+        ".ini",
+        ".cfg",
+        ".conf",
+        ".properties",
+        ".xml",
+    }
+)
 
-_INFRA_EXTENSIONS = frozenset({
-    ".dockerfile", ".tf", ".hcl",
-})
+_INFRA_EXTENSIONS = frozenset(
+    {
+        ".dockerfile",
+        ".tf",
+        ".hcl",
+    }
+)
 
-_INFRA_NAMES = frozenset({
-    "dockerfile", "makefile", "rakefile", "justfile", "taskfile",
-    "vagrantfile", "procfile",
-})
+_INFRA_NAMES = frozenset(
+    {
+        "dockerfile",
+        "makefile",
+        "rakefile",
+        "justfile",
+        "taskfile",
+        "vagrantfile",
+        "procfile",
+    }
+)
 
 _INFRA_LANGUAGES = frozenset({"dockerfile", "makefile"})
 
-_DOC_EXTENSIONS = frozenset({
-    ".md", ".rst", ".txt", ".adoc",
-})
+_DOC_EXTENSIONS = frozenset(
+    {
+        ".md",
+        ".rst",
+        ".txt",
+        ".adoc",
+    }
+)
 
 
 def _classify_file_type(path: str, language: str, is_config: bool) -> str:
@@ -336,15 +359,17 @@ def build_knowledge_graph_skeleton(
                     kg_type = "class" if sym.kind == "class" else "function"
                     sym_node_id = f"{kg_type}:{path}:{sym.name}"
                     if sym_node_id not in node_id_set:
-                        nodes.append({
-                            "id": sym_node_id,
-                            "type": kg_type,
-                            "filePath": path,
-                            "name": sym.name,
-                            "language": fi.language,
-                            "tags": [],
-                            "summary": "",
-                        })
+                        nodes.append(
+                            {
+                                "id": sym_node_id,
+                                "type": kg_type,
+                                "filePath": path,
+                                "name": sym.name,
+                                "language": fi.language,
+                                "tags": [],
+                                "summary": "",
+                            }
+                        )
                         node_id_set.add(sym_node_id)
 
     # ---- Edges -----------------------------------------------------------
@@ -476,9 +501,7 @@ def should_skip_kg_rebuild(
     kg_path: Path,
 ) -> bool:
     return bool(
-        existing_fingerprint
-        and existing_fingerprint == new_fingerprint
-        and kg_path.exists()
+        existing_fingerprint and existing_fingerprint == new_fingerprint and kg_path.exists()
     )
 
 

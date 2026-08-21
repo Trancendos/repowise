@@ -19,44 +19,47 @@ def _write_json(path: Path, data: dict) -> None:
 def contracts_json(tmp_path: Path) -> Path:
     """Write a minimal contracts.json and return its path."""
     path = tmp_path / "contracts.json"
-    _write_json(path, {
-        "version": 2,
-        "generated_at": "2026-04-12T12:00:00Z",
-        "contracts": [
-            {
-                "repo": "backend",
-                "contract_id": "http::GET::/api/users",
-                "contract_type": "http",
-                "role": "provider",
-                "file_path": "routes.py",
-                "symbol_name": "get_users",
-                "confidence": 0.85,
-            },
-            {
-                "repo": "frontend",
-                "contract_id": "http::GET::/api/users",
-                "contract_type": "http",
-                "role": "consumer",
-                "file_path": "client.ts",
-                "symbol_name": "fetchUsers",
-                "confidence": 0.75,
-            },
-        ],
-        "contract_links": [
-            {
-                "contract_id": "http::GET::/api/users",
-                "contract_type": "http",
-                "match_type": "exact",
-                "confidence": 0.75,
-                "provider_repo": "backend",
-                "provider_file": "routes.py",
-                "provider_symbol": "get_users",
-                "consumer_repo": "frontend",
-                "consumer_file": "client.ts",
-                "consumer_symbol": "fetchUsers",
-            },
-        ],
-    })
+    _write_json(
+        path,
+        {
+            "version": 2,
+            "generated_at": "2026-04-12T12:00:00Z",
+            "contracts": [
+                {
+                    "repo": "backend",
+                    "contract_id": "http::GET::/api/users",
+                    "contract_type": "http",
+                    "role": "provider",
+                    "file_path": "routes.py",
+                    "symbol_name": "get_users",
+                    "confidence": 0.85,
+                },
+                {
+                    "repo": "frontend",
+                    "contract_id": "http::GET::/api/users",
+                    "contract_type": "http",
+                    "role": "consumer",
+                    "file_path": "client.ts",
+                    "symbol_name": "fetchUsers",
+                    "confidence": 0.75,
+                },
+            ],
+            "contract_links": [
+                {
+                    "contract_id": "http::GET::/api/users",
+                    "contract_type": "http",
+                    "match_type": "exact",
+                    "confidence": 0.75,
+                    "provider_repo": "backend",
+                    "provider_file": "routes.py",
+                    "provider_symbol": "get_users",
+                    "consumer_repo": "frontend",
+                    "consumer_file": "client.ts",
+                    "consumer_symbol": "fetchUsers",
+                },
+            ],
+        },
+    )
     return path
 
 
@@ -80,39 +83,29 @@ class TestEnricherContractLoading:
         )
         assert enricher.has_contract_data is False
 
-    def test_loads_contract_links(
-        self, empty_cross_repo: Path, contracts_json: Path
-    ) -> None:
+    def test_loads_contract_links(self, empty_cross_repo: Path, contracts_json: Path) -> None:
         enricher = CrossRepoEnricher(empty_cross_repo, contracts_path=contracts_json)
         assert enricher.has_contract_data is True
         assert enricher.has_data is True
 
-    def test_provider_index(
-        self, empty_cross_repo: Path, contracts_json: Path
-    ) -> None:
+    def test_provider_index(self, empty_cross_repo: Path, contracts_json: Path) -> None:
         enricher = CrossRepoEnricher(empty_cross_repo, contracts_path=contracts_json)
         links = enricher.get_contract_links_as_provider("backend", "routes.py")
         assert len(links) == 1
         assert links[0]["consumer_repo"] == "frontend"
 
-    def test_consumer_index(
-        self, empty_cross_repo: Path, contracts_json: Path
-    ) -> None:
+    def test_consumer_index(self, empty_cross_repo: Path, contracts_json: Path) -> None:
         enricher = CrossRepoEnricher(empty_cross_repo, contracts_path=contracts_json)
         links = enricher.get_contract_links_as_consumer("frontend", "client.ts")
         assert len(links) == 1
         assert links[0]["provider_repo"] == "backend"
 
-    def test_missing_file_returns_empty(
-        self, empty_cross_repo: Path, contracts_json: Path
-    ) -> None:
+    def test_missing_file_returns_empty(self, empty_cross_repo: Path, contracts_json: Path) -> None:
         enricher = CrossRepoEnricher(empty_cross_repo, contracts_path=contracts_json)
         assert enricher.get_contract_links_as_provider("backend", "nonexistent.py") == []
         assert enricher.get_contract_links_as_consumer("frontend", "nonexistent.ts") == []
 
-    def test_contract_summary(
-        self, empty_cross_repo: Path, contracts_json: Path
-    ) -> None:
+    def test_contract_summary(self, empty_cross_repo: Path, contracts_json: Path) -> None:
         enricher = CrossRepoEnricher(empty_cross_repo, contracts_path=contracts_json)
         summary = enricher.get_contract_summary()
         assert summary["total_contracts"] == 2

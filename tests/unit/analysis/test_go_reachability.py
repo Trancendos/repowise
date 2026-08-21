@@ -8,6 +8,7 @@ Validates that Go-specific dead-code semantics hold:
 - ``unused_internal`` now applies to Go (the Phase 2 exemption was lifted in
   Phase 3 once package-aware call edges landed).
 """
+
 from __future__ import annotations
 
 import fnmatch
@@ -23,6 +24,7 @@ from repowise.core.analysis.dead_code.go_reachability import (
 # ---------------------------------------------------------------------------
 # Graph helper (mirrors tests/unit/test_dead_code.py)
 # ---------------------------------------------------------------------------
+
 
 def _build_graph(nodes: dict[str, dict], edges: list | None = None) -> nx.DiGraph:
     g = nx.DiGraph()
@@ -58,6 +60,7 @@ def _go_file(**overrides: object) -> dict:
 # ---------------------------------------------------------------------------
 # is_go_file_reachable — unit level
 # ---------------------------------------------------------------------------
+
 
 class TestGoReachabilityHelper:
     def test_entry_package_sibling_is_reachable(self):
@@ -107,14 +110,16 @@ class TestGoReachabilityHelper:
             nodes={
                 "pkg/orphan/init.go": _go_file(
                     has_init=True,
-                    symbols=[{
-                        "name": "init",
-                        "kind": "function",
-                        "language": "go",
-                        "visibility": "private",
-                        "start_line": 1,
-                        "end_line": 3,
-                    }],
+                    symbols=[
+                        {
+                            "name": "init",
+                            "kind": "function",
+                            "language": "go",
+                            "visibility": "private",
+                            "start_line": 1,
+                            "end_line": 3,
+                        }
+                    ],
                 ),
             }
         )
@@ -125,6 +130,7 @@ class TestGoReachabilityHelper:
 # ---------------------------------------------------------------------------
 # Analyzer integration — _detect_unreachable_files
 # ---------------------------------------------------------------------------
+
 
 class TestGoUnreachableFiles:
     def test_entry_package_helper_not_flagged(self):
@@ -142,7 +148,9 @@ class TestGoUnreachableFiles:
                 "min_confidence": 0.0,
             }
         )
-        unreachable = {f.file_path for f in report.findings if f.kind == DeadCodeKind.UNREACHABLE_FILE}
+        unreachable = {
+            f.file_path for f in report.findings if f.kind == DeadCodeKind.UNREACHABLE_FILE
+        }
         assert "cmd/app/server.go" not in unreachable
 
     def test_orphan_package_still_flagged(self):
@@ -156,7 +164,9 @@ class TestGoUnreachableFiles:
                 "min_confidence": 0.0,
             }
         )
-        unreachable = {f.file_path for f in report.findings if f.kind == DeadCodeKind.UNREACHABLE_FILE}
+        unreachable = {
+            f.file_path for f in report.findings if f.kind == DeadCodeKind.UNREACHABLE_FILE
+        }
         assert "pkg/orphan/a.go" in unreachable
 
 
@@ -164,9 +174,11 @@ class TestGoUnreachableFiles:
 # Never-flag patterns
 # ---------------------------------------------------------------------------
 
+
 class TestGoNeverFlagPatterns:
     def _matches(self, path: str) -> bool:
         from repowise.core.analysis.dead_code.constants import _NEVER_FLAG_PATTERNS
+
         return any(fnmatch.fnmatch(path, p) for p in _NEVER_FLAG_PATTERNS)
 
     def test_test_file(self):
@@ -200,6 +212,7 @@ class TestGoNeverFlagPatterns:
 class TestGoEntrySymbols:
     def test_init_and_testmain_are_entry_symbols(self):
         from repowise.core.analysis.dead_code.analyzer import _ENTRY_POINT_SYMBOL_NAMES
+
         assert "init" in _ENTRY_POINT_SYMBOL_NAMES
         assert "TestMain" in _ENTRY_POINT_SYMBOL_NAMES
 
@@ -207,6 +220,7 @@ class TestGoEntrySymbols:
 class TestGoDynamicMarkers:
     def test_go_directives_present(self):
         from repowise.core.analysis.dead_code.dynamic_markers import _DYNAMIC_IMPORT_MARKERS
+
         go_markers = _DYNAMIC_IMPORT_MARKERS.get(".go", ())
         assert "//go:generate" in go_markers
         assert "//go:embed" in go_markers
@@ -257,19 +271,28 @@ class TestGoUnusedInternals:
                 "pkg/util/util.go": _go_file(
                     symbol_count=2,
                     symbols=[
-                        {"name": "config", "kind": "struct", "language": "go",
-                         "visibility": "private", "start_line": 1, "end_line": 5},
-                        {"name": "provider", "kind": "interface", "language": "go",
-                         "visibility": "private", "start_line": 6, "end_line": 9},
+                        {
+                            "name": "config",
+                            "kind": "struct",
+                            "language": "go",
+                            "visibility": "private",
+                            "start_line": 1,
+                            "end_line": 5,
+                        },
+                        {
+                            "name": "provider",
+                            "kind": "interface",
+                            "language": "go",
+                            "visibility": "private",
+                            "start_line": 6,
+                            "end_line": 9,
+                        },
                     ],
                 ),
             }
         )
         report = self._analyze(g)
-        names = {
-            f.symbol_name for f in report.findings
-            if f.kind == DeadCodeKind.UNUSED_INTERNAL
-        }
+        names = {f.symbol_name for f in report.findings if f.kind == DeadCodeKind.UNUSED_INTERNAL}
         assert "config" not in names
         assert "provider" not in names
 
@@ -280,21 +303,25 @@ class TestGoUnusedInternals:
                 "pkg/util/util.go": _go_file(symbol_count=1, symbols=[self._sym()]),
                 "pkg/util/caller.go": _go_file(
                     symbol_count=1,
-                    symbols=[{
-                        "name": "Run",
-                        "kind": "function",
-                        "language": "go",
-                        "visibility": "public",
-                        "start_line": 1,
-                        "end_line": 5,
-                    }],
+                    symbols=[
+                        {
+                            "name": "Run",
+                            "kind": "function",
+                            "language": "go",
+                            "visibility": "public",
+                            "start_line": 1,
+                            "end_line": 5,
+                        }
+                    ],
                 ),
             },
-            edges=[(
-                "pkg/util/caller.go::Run",
-                "pkg/util/util.go::helper",
-                {"edge_type": "calls"},
-            )],
+            edges=[
+                (
+                    "pkg/util/caller.go::Run",
+                    "pkg/util/util.go::helper",
+                    {"edge_type": "calls"},
+                )
+            ],
         )
         report = self._analyze(g)
         internals = [f for f in report.findings if f.kind == DeadCodeKind.UNUSED_INTERNAL]

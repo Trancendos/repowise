@@ -88,9 +88,7 @@ def test_templates_are_discovered() -> None:
     assert _TEMPLATE_FILES, f"no .j2 templates found under {_GENERATION_DIR}"
 
 
-@pytest.mark.parametrize(
-    "template_path", _TEMPLATE_FILES, ids=[p.name for p in _TEMPLATE_FILES]
-)
+@pytest.mark.parametrize("template_path", _TEMPLATE_FILES, ids=[p.name for p in _TEMPLATE_FILES])
 def test_template_avoids_banned_vocabulary(template_path: Path) -> None:
     hits = _offenders(template_path.read_text(encoding="utf-8"))
     assert not hits, (

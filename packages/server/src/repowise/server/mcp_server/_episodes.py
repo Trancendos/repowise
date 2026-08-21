@@ -83,8 +83,6 @@ SERVED_TIERS = SHAREABLE_TIERS
 #: not have to move with them.
 
 
-
-
 def quote_body(
     row: dict,
     *,

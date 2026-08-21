@@ -30,9 +30,7 @@ async def _set_hotspots(session, repo_id: str, paths: set[str]) -> None:
     code.
     """
     await session.execute(
-        update(GitMetadata)
-        .where(GitMetadata.repository_id == repo_id)
-        .values(is_hotspot=False)
+        update(GitMetadata).where(GitMetadata.repository_id == repo_id).values(is_hotspot=False)
     )
     if paths:
         await session.execute(
@@ -47,9 +45,7 @@ async def _set_hotspots(session, repo_id: str, paths: set[str]) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_overview_code_health_uses_the_hotspot_files(
-    session, setup_mcp, health_data
-):
+async def test_get_overview_code_health_uses_the_hotspot_files(session, setup_mcp, health_data):
     """The KPI averages the flagged file, not the biggest one.
 
     This is the whole disagreement in one assertion. The retired definition

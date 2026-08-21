@@ -1053,9 +1053,7 @@ async def sweep_retired_pages(session: Any, repo_id: str) -> list[str]:
     stale = (
         (
             await session.execute(
-                select(Page.id).where(
-                    Page.repository_id == repo_id, or_(*match_clauses)
-                )
+                select(Page.id).where(Page.repository_id == repo_id, or_(*match_clauses))
             )
         )
         .scalars()
@@ -1064,9 +1062,7 @@ async def sweep_retired_pages(session: Any, repo_id: str) -> list[str]:
     for i in range(0, len(stale), _PRUNE_CHUNK):
         batch = stale[i : i + _PRUNE_CHUNK]
         await session.execute(delete(PageVersion).where(PageVersion.page_id.in_(batch)))
-        await session.execute(
-            delete(Page).where(Page.repository_id == repo_id, Page.id.in_(batch))
-        )
+        await session.execute(delete(Page).where(Page.repository_id == repo_id, Page.id.in_(batch)))
     if stale:
         logger.info(
             "retired_pages_swept",
@@ -1203,9 +1199,7 @@ async def sweep_absent_cycle_pages(session: Any, repo_id: str, graph_builder: An
     existing = (
         (
             await session.execute(
-                select(Page.id).where(
-                    Page.repository_id == repo_id, Page.page_type == "scc_page"
-                )
+                select(Page.id).where(Page.repository_id == repo_id, Page.page_type == "scc_page")
             )
         )
         .scalars()
@@ -1215,9 +1209,7 @@ async def sweep_absent_cycle_pages(session: Any, repo_id: str, graph_builder: An
     for i in range(0, len(stale), _PRUNE_CHUNK):
         batch = stale[i : i + _PRUNE_CHUNK]
         await session.execute(delete(PageVersion).where(PageVersion.page_id.in_(batch)))
-        await session.execute(
-            delete(Page).where(Page.repository_id == repo_id, Page.id.in_(batch))
-        )
+        await session.execute(delete(Page).where(Page.repository_id == repo_id, Page.id.in_(batch)))
     if stale:
         logger.info("absent_cycle_pages_swept", repo_id=repo_id, count=len(stale))
     return stale
@@ -1560,9 +1552,7 @@ async def persist_analysis(result: Any, session: Any, repo_id: str) -> None:
         # Snapshot the run for trend tracking (rolling delete inside).
         kpis = hr.kpis or {}
         try:
-            scores_map, deductions_map = snapshot_file_maps(
-                hr.metrics or [], hr.findings or []
-            )
+            scores_map, deductions_map = snapshot_file_maps(hr.metrics or [], hr.findings or [])
             await save_health_snapshot(
                 session,
                 repo_id,

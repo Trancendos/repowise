@@ -21,4 +21,3 @@ C:\Users\ragha\Desktop\repowise\packages\web\src\components\__distill_tmp__.tsx
   36:7   warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images                                                                                                                                                                                jsx-a11y/alt-text
 
 ✖ 19 problems (9 errors, 10 warnings)
-

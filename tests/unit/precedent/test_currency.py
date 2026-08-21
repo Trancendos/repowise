@@ -110,9 +110,7 @@ def test_untouched_scope_reads_as_still_holding(repo: Path) -> None:
 def test_changed_scope_says_so_with_a_count(repo: Path) -> None:
     _touch_and_commit(repo, "moved.py")
 
-    sentence = describe_decision_currency(
-        repo, created_at=_BETWEEN, nodes=["moved.py", "kept.py"]
-    )
+    sentence = describe_decision_currency(repo, created_at=_BETWEEN, nodes=["moved.py", "kept.py"])
 
     assert sentence is not None
     assert "the 2 files it governs changed in 1 commit since" in sentence
@@ -133,9 +131,7 @@ def test_silence_when_git_cannot_decide(tmp_path: Path) -> None:
     assert sentence is None
 
 
-def test_git_never_inherits_the_callers_stdin(
-    repo: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_git_never_inherits_the_callers_stdin(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """The one spawn detail that is load-bearing rather than tidiness.
 
     ``get_why`` reaches this on every request that resolves an episode, and the

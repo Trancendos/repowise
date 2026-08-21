@@ -32,11 +32,11 @@ class TestIsReadablePath:
             ("src/flask/app.py", True),
             ("app.py", True),
             ("pkg/sub/mod.py", True),
-            ("cluster-config/x.py", True),   # hyphen in a real dir must not trip it
-            ("scc-607", False),              # community/SCC node id
-            ("layer:application", False),    # architectural-layer scheme token
+            ("cluster-config/x.py", True),  # hyphen in a real dir must not trip it
+            ("scc-607", False),  # community/SCC node id
+            ("layer:application", False),  # architectural-layer scheme token
             ("comm-12", False),
-            ("README", False),              # no separator, no extension
+            ("README", False),  # no separator, no extension
             ("", False),
         ],
     )
@@ -165,9 +165,9 @@ class TestSerializeHits:
 def _assert_no_underscore_keys(obj, path="root"):
     if isinstance(obj, dict):
         for k, v in obj.items():
-            assert not (str(k).startswith("_") and k != "_meta"), (
-                f"internal key {k!r} leaked at {path}"
-            )
+            assert not (
+                str(k).startswith("_") and k != "_meta"
+            ), f"internal key {k!r} leaked at {path}"
             if k != "_meta":
                 _assert_no_underscore_keys(v, f"{path}.{k}")
     elif isinstance(obj, list):

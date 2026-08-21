@@ -194,11 +194,7 @@ class TestRustHeadTypeIdentifier:
 
 _SOURCES: dict[str, str] = {
     "src/lib.rs": "pub mod types;\npub mod api;\n",
-    "src/types.rs": (
-        "pub struct RequestPayload {\n"
-        "    pub id: u32,\n"
-        "}\n"
-    ),
+    "src/types.rs": ("pub struct RequestPayload {\n" "    pub id: u32,\n" "}\n"),
     # Uses RequestPayload only as a parameter type: no call, no method use.
     # This is exactly the shape the old bogus `calls` edge used to rescue.
     "src/api.rs": (
@@ -266,10 +262,7 @@ class TestInferredTargetsDoNotWidenCallScope:
 
     _SRC: ClassVar[dict[str, str]] = {
         "src/lib.rs": "pub mod registry;\npub mod consumer;\n",
-        "src/registry.rs": (
-            "pub struct Registry;\n\n"
-            "pub fn spec() -> u32 { 1 }\n"
-        ),
+        "src/registry.rs": ("pub struct Registry;\n\n" "pub fn spec() -> u32 { 1 }\n"),
         "src/consumer.rs": (
             "pub fn run(reg: Registry) -> u32 {\n"
             "    let other = make();\n"
@@ -286,9 +279,7 @@ class TestInferredTargetsDoNotWidenCallScope:
         builder = GraphBuilder(repo_path=repo)
         for rel in self._SRC:
             abs_path = str((repo / rel).resolve())
-            parsed = _PARSER.parse_file(
-                _file_info(rel, abs_path), (repo / rel).read_bytes()
-            )
+            parsed = _PARSER.parse_file(_file_info(rel, abs_path), (repo / rel).read_bytes())
             builder.add_file(parsed)
         return builder.build()
 

@@ -567,8 +567,7 @@ class SessionStagingStore:
     def session_duration_totals(self) -> list[int]:
         """Total hook wall-time per session, in ms, for sessions that have it."""
         rows = self._conn.execute(
-            "SELECT SUM(duration_ms) FROM injections WHERE duration_ms > 0 "
-            "GROUP BY session_id"
+            "SELECT SUM(duration_ms) FROM injections WHERE duration_ms > 0 " "GROUP BY session_id"
         ).fetchall()
         return [int(r[0]) for r in rows if r[0]]
 

@@ -57,9 +57,7 @@ async def community_slice(
     _repo: object = Depends(with_repo),
 ) -> CommunitySliceResponse:
     """Return a single community's sub-graph for the constellation blossom."""
-    return await build_community_slice(
-        session, repo_id, community_id, member_limit=member_limit
-    )
+    return await build_community_slice(session, repo_id, community_id, member_limit=member_limit)
 
 
 @router.get("/{repo_id}/communities", response_model=list[CommunitySummaryItem])

@@ -58,7 +58,7 @@ class TestPybind11EmbeddedModuleMarker:
             _PYBIND11_MODULE_RE,
         )
 
-        src = "PYBIND11_EMBEDDED_MODULE(embed_test, m) { m.def(\"add\", &add); }"
+        src = 'PYBIND11_EMBEDDED_MODULE(embed_test, m) { m.def("add", &add); }'
         m = _PYBIND11_MODULE_RE.search(src)
         assert m is not None
         assert m.group(1) == "embed_test"
@@ -68,9 +68,7 @@ class TestPybind11EmbeddedModuleMarker:
             _PYBIND11_MODULE_RE,
         )
 
-        m = _PYBIND11_MODULE_RE.search(
-            "PYBIND11_MODULE(my_mod, m) { m.def(\"x\", &x); }"
-        )
+        m = _PYBIND11_MODULE_RE.search('PYBIND11_MODULE(my_mod, m) { m.def("x", &x); }')
         assert m is not None
         assert m.group(1) == "my_mod"
 

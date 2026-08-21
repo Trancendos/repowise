@@ -71,11 +71,15 @@ class TestHttpExtractor:
         fpath.write_text(content, encoding="utf-8")
 
     def test_express_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/routes.js", """
+        self._write_file(
+            tmp_path,
+            "src/routes.js",
+            """
             const router = require('express').Router();
             router.get('/api/users', handler);
             router.post('/api/users', createHandler);
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "backend")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 2
@@ -84,31 +88,42 @@ class TestHttpExtractor:
         assert "http::POST::/api/users" in ids
 
     def test_fastapi_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "main.py", """
+        self._write_file(
+            tmp_path,
+            "main.py",
+            """
             @app.get("/api/items/{item_id}")
             async def get_item(item_id: int): ...
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "api")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "http::GET::/api/items/{param}"
 
     def test_spring_with_class_prefix(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "UserController.java", """
+        self._write_file(
+            tmp_path,
+            "UserController.java",
+            """
             @RequestMapping("/api/v1")
             @RestController
             public class UserController {
                 @GetMapping("/users")
                 public List<User> list() { ... }
             }
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "backend")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "http::GET::/api/v1/users"
 
     def test_spring_multiple_classes_correct_prefix(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "MultiController.java", """
+        self._write_file(
+            tmp_path,
+            "MultiController.java",
+            """
             @RequestMapping("/api/v1")
             @RestController
             public class UserController {
@@ -122,7 +137,8 @@ class TestHttpExtractor:
                 @PostMapping("/admin")
                 public void doAdmin() { ... }
             }
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "backend")
         providers = [c for c in contracts if c.role == "provider"]
         ids = {c.contract_id for c in providers}
@@ -132,18 +148,26 @@ class TestHttpExtractor:
         assert "http::GET::/internal/users" not in ids
 
     def test_laravel_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "routes/web.php", """
+        self._write_file(
+            tmp_path,
+            "routes/web.php",
+            """
             Route::delete('/posts/{id}', [PostController::class, 'destroy']);
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "app")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "http::DELETE::/posts/{param}"
 
     def test_go_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "main.go", """
+        self._write_file(
+            tmp_path,
+            "main.go",
+            """
             r.GET("/health", healthHandler)
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "svc")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
@@ -151,7 +175,10 @@ class TestHttpExtractor:
 
     def test_fastapi_router_prefix_infile(self, tmp_path: Path) -> None:
         # APIRouter(prefix=...) must be stitched onto each decorator path.
-        self._write_file(tmp_path, "routers/snapshots.py", """
+        self._write_file(
+            tmp_path,
+            "routers/snapshots.py",
+            """
             router = APIRouter(prefix="/snapshots", tags=["snap"])
 
             @router.get("/{snapshot_id}/symbols")
@@ -159,7 +186,8 @@ class TestHttpExtractor:
 
             @router.post("/{snapshot_id}/chat")
             async def chat(snapshot_id: str): ...
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "backend")
         ids = {c.contract_id for c in contracts if c.role == "provider"}
         assert "http::GET::/snapshots/{param}/symbols" in ids
@@ -167,7 +195,10 @@ class TestHttpExtractor:
 
     def test_fastapi_multiple_routers_distinct_prefixes(self, tmp_path: Path) -> None:
         # Each route uses its own router's prefix, not the first one in the file.
-        self._write_file(tmp_path, "routers/multi.py", """
+        self._write_file(
+            tmp_path,
+            "routers/multi.py",
+            """
             repos_router = APIRouter(prefix="/repos")
             users_router = APIRouter(prefix="/users")
 
@@ -176,112 +207,179 @@ class TestHttpExtractor:
 
             @users_router.get("/me")
             async def me(): ...
-        """)
-        ids = {c.contract_id for c in HttpExtractor().extract(tmp_path, "backend") if c.role == "provider"}
+        """,
+        )
+        ids = {
+            c.contract_id
+            for c in HttpExtractor().extract(tmp_path, "backend")
+            if c.role == "provider"
+        }
         assert "http::GET::/repos/{param}" in ids
         assert "http::GET::/users/me" in ids
 
     def test_fastapi_dependency_paren_in_args(self, tmp_path: Path) -> None:
         # A nested call in the constructor args must not truncate the prefix scan.
-        self._write_file(tmp_path, "routers/secure.py", """
+        self._write_file(
+            tmp_path,
+            "routers/secure.py",
+            """
             router = APIRouter(prefix="/admin", dependencies=[Depends(require_admin)])
 
             @router.get("/stats")
             async def stats(): ...
-        """)
-        ids = {c.contract_id for c in HttpExtractor().extract(tmp_path, "backend") if c.role == "provider"}
+        """,
+        )
+        ids = {
+            c.contract_id
+            for c in HttpExtractor().extract(tmp_path, "backend")
+            if c.role == "provider"
+        }
         assert "http::GET::/admin/stats" in ids
 
     def test_fastapi_unknown_decorator_not_a_route(self, tmp_path: Path) -> None:
         # @cache.get(...) on a non-router object must not become a contract.
-        self._write_file(tmp_path, "service.py", """
+        self._write_file(
+            tmp_path,
+            "service.py",
+            """
             @cache.get("/some-key")
             def cached(): ...
-        """)
+        """,
+        )
         providers = [c for c in HttpExtractor().extract(tmp_path, "api") if c.role == "provider"]
         assert providers == []
 
     def test_fastapi_cross_file_include_router_prefix(self, tmp_path: Path) -> None:
         # include_router(items_router, prefix="/api") in main.py mounts a router
         # defined in another file under that prefix.
-        self._write_file(tmp_path, "app/main.py", """
+        self._write_file(
+            tmp_path,
+            "app/main.py",
+            """
             from .items import items_router
             app = FastAPI()
             app.include_router(items_router, prefix="/api")
-        """)
-        self._write_file(tmp_path, "app/items.py", """
+        """,
+        )
+        self._write_file(
+            tmp_path,
+            "app/items.py",
+            """
             items_router = APIRouter(prefix="/items")
 
             @items_router.get("/{item_id}")
             async def get_item(item_id: int): ...
-        """)
-        ids = {c.contract_id for c in HttpExtractor().extract(tmp_path, "backend") if c.role == "provider"}
+        """,
+        )
+        ids = {
+            c.contract_id
+            for c in HttpExtractor().extract(tmp_path, "backend")
+            if c.role == "provider"
+        }
         assert "http::GET::/api/items/{param}" in ids
 
     def test_express_cross_file_app_use_prefix(self, tmp_path: Path) -> None:
         # app.use('/api/users', userRouter) mounts a uniquely-named router.
-        self._write_file(tmp_path, "src/app.js", """
+        self._write_file(
+            tmp_path,
+            "src/app.js",
+            """
             const userRouter = require('./users');
             app.use('/api/users', userRouter);
-        """)
-        self._write_file(tmp_path, "src/users.js", """
+        """,
+        )
+        self._write_file(
+            tmp_path,
+            "src/users.js",
+            """
             const userRouter = express.Router();
             userRouter.get('/:id', handler);
-        """)
-        ids = {c.contract_id for c in HttpExtractor().extract(tmp_path, "backend") if c.role == "provider"}
+        """,
+        )
+        ids = {
+            c.contract_id
+            for c in HttpExtractor().extract(tmp_path, "backend")
+            if c.role == "provider"
+        }
         assert "http::GET::/api/users/{param}" in ids
 
     def test_go_route_group_nested(self, tmp_path: Path) -> None:
         # Nested groups compose: v1 := api.Group("/v1") under api := r.Group("/api").
-        self._write_file(tmp_path, "main.go", """
+        self._write_file(
+            tmp_path,
+            "main.go",
+            """
             r := gin.Default()
             api := r.Group("/api")
             v1 := api.Group("/v1")
             v1.GET("/users", listUsers)
-        """)
-        ids = {c.contract_id for c in HttpExtractor().extract(tmp_path, "svc") if c.role == "provider"}
+        """,
+        )
+        ids = {
+            c.contract_id for c in HttpExtractor().extract(tmp_path, "svc") if c.role == "provider"
+        }
         assert "http::GET::/api/v1/users" in ids
 
     def test_fetch_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             const users = await fetch('/api/users');
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "frontend")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "http::GET::/api/users"
 
     def test_fetch_with_method_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             await fetch('/api/users', { method: 'POST', body: data });
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "frontend")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "http::POST::/api/users"
 
     def test_axios_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/client.js", """
+        self._write_file(
+            tmp_path,
+            "src/client.js",
+            """
             const items = await axios.get('/api/items');
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "frontend")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "http::GET::/api/items"
 
     def test_requests_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "client.py", """
+        self._write_file(
+            tmp_path,
+            "client.py",
+            """
             resp = requests.post('http://backend:8000/api/data')
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "worker")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "http::POST::/api/data"
 
     def test_fetch_consumer_strips_leading_base_expr(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             const users = await fetch(`${API_BASE}/api/users`);
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "frontend")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -290,9 +388,13 @@ class TestHttpExtractor:
         assert consumers[0].meta.get("base_stripped") is True
 
     def test_fetch_consumer_keeps_interior_param(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             const u = await fetch(`/users/${id}`);
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "frontend")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -301,12 +403,16 @@ class TestHttpExtractor:
         assert "base_stripped" not in consumers[0].meta
 
     def test_rust_axum_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/main.rs", """
+        self._write_file(
+            tmp_path,
+            "src/main.rs",
+            """
             let app = Router::new()
                 .route("/path", post(find_path))
                 .route("/systems/{id}", get(get_system))
                 .route("/health", get(health));
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "rust-svc")
         providers = [c for c in contracts if c.role == "provider"]
         ids = {c.contract_id for c in providers}
@@ -315,38 +421,54 @@ class TestHttpExtractor:
         assert "http::GET::/health" in ids
 
     def test_rust_axum_chained_methods(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/routes.rs", """
+        self._write_file(
+            tmp_path,
+            "src/routes.rs",
+            """
             .route("/users", get(list_users).post(create_user))
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "rust-svc")
         ids = {c.contract_id for c in contracts if c.role == "provider"}
         assert "http::GET::/users" in ids
         assert "http::POST::/users" in ids
 
     def test_rust_attribute_macro_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/handlers.rs", """
+        self._write_file(
+            tmp_path,
+            "src/handlers.rs",
+            """
             #[get("/systems/nearby")]
             async fn get_nearby_systems() -> impl Responder { ... }
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "rust-svc")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "http::GET::/systems/nearby"
 
     def test_rust_reqwest_literal_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/client.rs", """
+        self._write_file(
+            tmp_path,
+            "src/client.rs",
+            """
             let resp = client.post("http://backend:8000/api/data").send().await?;
             let r = reqwest::get("http://svc/health").await?;
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "rust-client")
         ids = {c.contract_id for c in contracts if c.role == "consumer"}
         assert "http::POST::/api/data" in ids
         assert "http::GET::/health" in ids
 
     def test_rust_reqwest_format_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/client.rs", """
+        self._write_file(
+            tmp_path,
+            "src/client.rs",
+            """
             let r = client.get(format!("{}/systems/{}", base, id)).send().await?;
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "rust-client")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -355,20 +477,28 @@ class TestHttpExtractor:
 
     def test_rust_reqwest_ignores_map_get(self, tmp_path: Path) -> None:
         # A HashMap-style .get("key") has no slash and must not look like a route.
-        self._write_file(tmp_path, "src/lookup.rs", """
+        self._write_file(
+            tmp_path,
+            "src/lookup.rs",
+            """
             let v = config.get("database_url");
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "rust-client")
         assert [c for c in contracts if c.role == "consumer"] == []
 
     def test_csharp_wrapper_interpolated_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "ApiClient.cs", """
+        self._write_file(
+            tmp_path,
+            "ApiClient.cs",
+            """
             public class ApiClient {
                 public async Task Bids() {
                     return await GetRequest<Response>($"{_baseUrl}/vix/my/bids");
                 }
             }
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "unity-game")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -376,20 +506,28 @@ class TestHttpExtractor:
         assert consumers[0].meta.get("base_stripped") is True
 
     def test_csharp_wrapper_interior_param(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "ApiClient.cs", """
+        self._write_file(
+            tmp_path,
+            "ApiClient.cs",
+            """
             await PostRequest<Response>($"{_baseUrl}/vix/listings/{id}/bid", payload);
             GetAsync<Response>($"{_config.ApiBaseUrl}/fleet/summary/{playerId}", token);
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "unity-game")
         ids = {c.contract_id for c in contracts if c.role == "consumer"}
         assert "http::POST::/vix/listings/{param}/bid" in ids
         assert "http::GET::/fleet/summary/{param}" in ids
 
     def test_csharp_unitywebrequest_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Net.cs", """
+        self._write_file(
+            tmp_path,
+            "Net.cs",
+            """
             UnityWebRequest.Post($"{_baseUrl}/vix/my/bids", form);
             var req = UnityWebRequest.Get(url);
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "unity-game")
         consumers = [c for c in contracts if c.role == "consumer"]
         # The literal Post call is captured; Get(url) with a variable URL is not.
@@ -398,9 +536,13 @@ class TestHttpExtractor:
         assert consumers[0].meta["client"] == "unitywebrequest"
 
     def test_js_wrapper_consumer_with_method(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             fetchJSON(`${BASE}/path`, { method: "POST" });
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "client")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -408,29 +550,41 @@ class TestHttpExtractor:
         assert consumers[0].meta["client"] == "wrapper"
 
     def test_js_wrapper_consumer_default_get_and_interior_param(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             fetchJSON(`${BASE}/health`);
             fetchJSON(`${BASE}/systems/${Number(id)}`);
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "client")
         ids = {c.contract_id for c in contracts if c.role == "consumer"}
         assert "http::GET::/health" in ids
         assert "http::GET::/systems/{param}" in ids
 
     def test_js_wrapper_method_signal_without_http_name(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             send("/orders", { method: "PUT" });
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "client")
         ids = {c.contract_id for c in contracts if c.role == "consumer"}
         assert ids == {"http::PUT::/orders"}
 
     def test_js_wrapper_ignores_navigation_and_keys(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "src/app.tsx", """
+        self._write_file(
+            tmp_path,
+            "src/app.tsx",
+            """
             navigate("/dashboard");
             router.push("/home");
             t("/some/i18n/key");
-        """)
+        """,
+        )
         contracts = HttpExtractor().extract(tmp_path, "client")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert consumers == []
@@ -448,9 +602,13 @@ class TestHttpExtractor:
     def test_truncated_template_literal_dropped(self, tmp_path: Path) -> None:
         # A nested quote inside the template expression truncates the capture,
         # leaving an unbalanced ``${`` — this is noise and must not be emitted.
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             fetchJSON(`/repos/explore${qs ? '?' + qs : ''}`);
-        """)
+        """,
+        )
         consumers = [
             c for c in HttpExtractor().extract(tmp_path, "frontend") if c.role == "consumer"
         ]
@@ -459,9 +617,13 @@ class TestHttpExtractor:
     def test_bare_param_path_dropped(self, tmp_path: Path) -> None:
         # fetch(`${x}`) collapses to a single {param} segment — no concrete path
         # to match on, so it is dropped rather than linked indiscriminately.
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             await fetch(`${endpoint}`);
-        """)
+        """,
+        )
         consumers = [
             c for c in HttpExtractor().extract(tmp_path, "frontend") if c.role == "consumer"
         ]
@@ -469,9 +631,13 @@ class TestHttpExtractor:
 
     def test_absolute_host_recorded_in_meta(self, tmp_path: Path) -> None:
         # An absolute third-party URL keeps its host so the matcher can exclude it.
-        self._write_file(tmp_path, "src/api.ts", """
+        self._write_file(
+            tmp_path,
+            "src/api.ts",
+            """
             fetch('https://formspree.io/f/mkopzvak', { method: 'POST' });
-        """)
+        """,
+        )
         consumers = [
             c for c in HttpExtractor().extract(tmp_path, "frontend") if c.role == "consumer"
         ]
@@ -480,14 +646,22 @@ class TestHttpExtractor:
 
     def test_test_directory_files_excluded(self, tmp_path: Path) -> None:
         # A route defined only under tests/ is a fixture, not a service contract.
-        self._write_file(tmp_path, "tests/test_routes.py", """
+        self._write_file(
+            tmp_path,
+            "tests/test_routes.py",
+            """
             @app.get("/fixture-only")
             def fixture(): ...
-        """)
-        self._write_file(tmp_path, "app/routes.py", """
+        """,
+        )
+        self._write_file(
+            tmp_path,
+            "app/routes.py",
+            """
             @app.get("/real")
             def real(): ...
-        """)
+        """,
+        )
         from repowise.core.workspace.extractors.base import make_exclude_predicate
 
         ids = {
@@ -511,7 +685,10 @@ class TestGrpcExtractor:
         fpath.write_text(content, encoding="utf-8")
 
     def test_proto_parsing(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "auth.proto", """
+        self._write_file(
+            tmp_path,
+            "auth.proto",
+            """
             syntax = "proto3";
             package auth;
 
@@ -519,7 +696,8 @@ class TestGrpcExtractor:
                 rpc Login(LoginRequest) returns (LoginResponse);
                 rpc Logout(LogoutRequest) returns (Empty);
             }
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "auth")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 2
@@ -528,7 +706,10 @@ class TestGrpcExtractor:
         assert "grpc::auth.AuthService/Logout" in ids
 
     def test_proto_multiple_services(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "api.proto", """
+        self._write_file(
+            tmp_path,
+            "api.proto",
+            """
             syntax = "proto3";
             package api;
 
@@ -539,13 +720,17 @@ class TestGrpcExtractor:
             service OrderService {
                 rpc CreateOrder(CreateOrderReq) returns (Order);
             }
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "api")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 2
 
     def test_proto_nested_braces(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "svc.proto", """
+        self._write_file(
+            tmp_path,
+            "svc.proto",
+            """
             syntax = "proto3";
             package svc;
 
@@ -557,66 +742,91 @@ class TestGrpcExtractor:
                     };
                 }
             }
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "svc")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "grpc::svc.MyService/DoThing"
 
     def test_go_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "server.go", """
+        self._write_file(
+            tmp_path,
+            "server.go",
+            """
             pb.RegisterPaymentServer(grpcServer, &impl{})
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "payment")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "grpc::Payment/*"
 
     def test_go_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "client.go", """
+        self._write_file(
+            tmp_path,
+            "client.go",
+            """
             client := pb.NewPaymentClient(conn)
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "gateway")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "grpc::Payment/*"
 
     def test_java_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "AuthImpl.java", """
+        self._write_file(
+            tmp_path,
+            "AuthImpl.java",
+            """
             @GrpcService
             public class AuthImpl extends AuthGrpc.AuthImplBase {
                 @Override
                 public void login(LoginRequest req, StreamObserver<LoginReply> resp) {}
             }
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "auth")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "grpc::Auth/*"
 
     def test_java_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Client.java", """
+        self._write_file(
+            tmp_path,
+            "Client.java",
+            """
             var stub = AuthGrpc.newBlockingStub(channel);
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "gateway")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "grpc::Auth/*"
 
     def test_python_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "server.py", """
+        self._write_file(
+            tmp_path,
+            "server.py",
+            """
             add_GreeterServicer_to_server(GreeterServicer(), server)
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "greeter")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "grpc::Greeter/*"
 
     def test_python_consumer_filters_mock(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "test_client.py", """
+        self._write_file(
+            tmp_path,
+            "test_client.py",
+            """
             stub = MockGreeterStub(channel)
             real = GreeterStub(channel)
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "test")
         consumers = [c for c in contracts if c.role == "consumer"]
         # MockGreeterStub should be filtered, only GreeterStub remains
@@ -624,17 +834,24 @@ class TestGrpcExtractor:
         assert "Greeter" in consumers[0].contract_id
 
     def test_ts_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "auth.controller.ts", """
+        self._write_file(
+            tmp_path,
+            "auth.controller.ts",
+            """
             @GrpcMethod('AuthService', 'Login')
             login(data: LoginRequest): LoginResponse { ... }
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "auth")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "grpc::AuthService/Login"
 
     def test_csharp_consumer_requires_grpc_context(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Caller.cs", """
+        self._write_file(
+            tmp_path,
+            "Caller.cs",
+            """
             using Grpc.Net.Client;
             public class Caller {
                 public void Go() {
@@ -642,7 +859,8 @@ class TestGrpcExtractor:
                     var client = new GreeterClient(channel);
                 }
             }
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "web")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -651,14 +869,18 @@ class TestGrpcExtractor:
     def test_csharp_consumer_skips_non_grpc_clients(self, tmp_path: Path) -> None:
         # TLS/crypto client classes with no gRPC context must not be emitted as
         # gRPC consumers (the false positives reported in #474).
-        self._write_file(tmp_path, "Tls.cs", """
+        self._write_file(
+            tmp_path,
+            "Tls.cs",
+            """
             public class Security {
                 public void Setup() {
                     var tls = new TlsClient(config);
                     var sodium = new SodiumClient();
                 }
             }
-        """)
+        """,
+        )
         contracts = GrpcExtractor().extract(tmp_path, "game")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert consumers == []
@@ -676,10 +898,14 @@ class TestTopicExtractor:
         fpath.write_text(content, encoding="utf-8")
 
     def test_kafka_listener_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Consumer.java", """
+        self._write_file(
+            tmp_path,
+            "Consumer.java",
+            """
             @KafkaListener(topics = "orders")
             public void listen(String message) {}
-        """)
+        """,
+        )
         contracts = TopicExtractor().extract(tmp_path, "worker")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -687,28 +913,40 @@ class TestTopicExtractor:
         assert consumers[0].meta["broker"] == "kafka"
 
     def test_kafka_template_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Publisher.java", """
+        self._write_file(
+            tmp_path,
+            "Publisher.java",
+            """
             kafkaTemplate.send("orders", payload);
-        """)
+        """,
+        )
         contracts = TopicExtractor().extract(tmp_path, "api")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "topic::orders"
 
     def test_kafka_node_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "producer.js", """
+        self._write_file(
+            tmp_path,
+            "producer.js",
+            """
             await producer.send({ topic: 'payments', messages });
-        """)
+        """,
+        )
         contracts = TopicExtractor().extract(tmp_path, "svc")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "topic::payments"
 
     def test_rabbitmq_listener_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Worker.java", """
+        self._write_file(
+            tmp_path,
+            "Worker.java",
+            """
             @RabbitListener(queues = "jobs")
             public void process(Message msg) {}
-        """)
+        """,
+        )
         contracts = TopicExtractor().extract(tmp_path, "worker")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -716,9 +954,13 @@ class TestTopicExtractor:
         assert consumers[0].meta["broker"] == "rabbitmq"
 
     def test_nats_subscribe_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "listener.go", """
+        self._write_file(
+            tmp_path,
+            "listener.go",
+            """
             nc.Subscribe("events.created", handler)
-        """)
+        """,
+        )
         contracts = TopicExtractor().extract(tmp_path, "svc")
         consumers = [c for c in contracts if c.role == "consumer"]
         assert len(consumers) == 1
@@ -726,19 +968,27 @@ class TestTopicExtractor:
         assert consumers[0].meta["broker"] == "nats"
 
     def test_nats_publish_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "notifier.go", """
+        self._write_file(
+            tmp_path,
+            "notifier.go",
+            """
             nc.Publish("events.created", data)
-        """)
+        """,
+        )
         contracts = TopicExtractor().extract(tmp_path, "notifier")
         providers = [c for c in contracts if c.role == "provider"]
         assert len(providers) == 1
         assert providers[0].contract_id == "topic::events.created"
 
     def test_dedup_same_pattern_in_file(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "multi.java", """
+        self._write_file(
+            tmp_path,
+            "multi.java",
+            """
             kafkaTemplate.send("orders", payload1);
             kafkaTemplate.send("orders", payload2);
-        """)
+        """,
+        )
         contracts = TopicExtractor().extract(tmp_path, "svc")
         # Same topic, same role, same file → deduplicated
         providers = [c for c in contracts if c.role == "provider"]
@@ -841,6 +1091,7 @@ class TestNormalizeContractId:
     def test_topic_lowercases(self) -> None:
         assert normalize_contract_id("topic::Orders") == "topic::orders"
 
+
 class TestSocketExtractor:
     def _write_file(self, repo: Path, rel: str, content: str) -> None:
         fpath = repo / rel
@@ -848,81 +1099,133 @@ class TestSocketExtractor:
         fpath.write_text(content, encoding="utf-8")
 
     def test_csharp_clientwebsocket_consumer(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Net.cs", """
+        self._write_file(
+            tmp_path,
+            "Net.cs",
+            """
             using System.Net.WebSockets;
             var socket = new ClientWebSocket();
             await socket.ConnectAsync(new Uri("wss://backend.example.com/game/state"), token);
-        """)
-        consumers = [c for c in SocketExtractor().extract(tmp_path, "unity") if c.role == "consumer"]
+        """,
+        )
+        consumers = [
+            c for c in SocketExtractor().extract(tmp_path, "unity") if c.role == "consumer"
+        ]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "socket::/game/state"
         assert consumers[0].meta["transport"] == "clientwebsocket"
 
     def test_signalr_consumer_strips_base_expr(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "HubClient.cs", """
+        self._write_file(
+            tmp_path,
+            "HubClient.cs",
+            """
             using Microsoft.AspNetCore.SignalR.Client;
             var connection = new HubConnectionBuilder()
                 .WithUrl($"{baseUrl}/hubs/game")
                 .Build();
-        """)
-        consumers = [c for c in SocketExtractor().extract(tmp_path, "unity") if c.role == "consumer"]
+        """,
+        )
+        consumers = [
+            c for c in SocketExtractor().extract(tmp_path, "unity") if c.role == "consumer"
+        ]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "socket::/hubs/game"
         assert consumers[0].meta["transport"] == "signalr"
 
     def test_native_websocket_consumer_requires_context(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "SocketClient.cs", """
+        self._write_file(
+            tmp_path,
+            "SocketClient.cs",
+            """
             using NativeWebSocket;
             var ws = new WebSocket($"{baseUrl}/ws/lobby");
-        """)
-        consumers = [c for c in SocketExtractor().extract(tmp_path, "unity") if c.role == "consumer"]
+        """,
+        )
+        consumers = [
+            c for c in SocketExtractor().extract(tmp_path, "unity") if c.role == "consumer"
+        ]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "socket::/ws/lobby"
         assert consumers[0].meta["transport"] == "nativewebsocket"
 
     def test_websocketsharp_fully_qualified_constructor(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "SocketClient.cs", """
+        self._write_file(
+            tmp_path,
+            "SocketClient.cs",
+            """
             using WebSocketSharp;
             var ws = new WebSocketSharp.WebSocket("wss://backend.example.com/ws/lobby");
-        """)
-        consumers = [c for c in SocketExtractor().extract(tmp_path, "unity") if c.role == "consumer"]
+        """,
+        )
+        consumers = [
+            c for c in SocketExtractor().extract(tmp_path, "unity") if c.role == "consumer"
+        ]
         assert len(consumers) == 1
         assert consumers[0].contract_id == "socket::/ws/lobby"
         assert consumers[0].meta["transport"] == "websocketsharp"
 
     def test_signalr_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Program.cs", """
+        self._write_file(
+            tmp_path,
+            "Program.cs",
+            """
             app.MapHub<GameHub>("/hubs/game");
-        """)
-        providers = [c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "provider"]
+        """,
+        )
+        providers = [
+            c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "provider"
+        ]
         assert len(providers) == 1
         assert providers[0].contract_id == "socket::/hubs/game"
         assert providers[0].meta["transport"] == "signalr"
 
     def test_fastapi_websocket_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "main.py", """
+        self._write_file(
+            tmp_path,
+            "main.py",
+            """
             @app.websocket("/ws/chat/{room_id}")
             async def room_socket(): ...
-        """)
-        providers = [c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "provider"]
+        """,
+        )
+        providers = [
+            c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "provider"
+        ]
         assert len(providers) == 1
         assert providers[0].contract_id == "socket::/ws/chat/{param}"
 
     def test_fastapi_unknown_websocket_decorator_not_a_provider(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "main.py", """
+        self._write_file(
+            tmp_path,
+            "main.py",
+            """
             @metrics.websocket("/ws/chat/{room_id}")
             async def room_socket(): ...
-        """)
-        providers = [c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "provider"]
+        """,
+        )
+        providers = [
+            c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "provider"
+        ]
         assert providers == []
 
-    def test_signalr_provider_file_does_not_emit_consumer_from_unrelated_withurl(self, tmp_path: Path) -> None:
-        self._write_file(tmp_path, "Program.cs", """
+    def test_signalr_provider_file_does_not_emit_consumer_from_unrelated_withurl(
+        self, tmp_path: Path
+    ) -> None:
+        self._write_file(
+            tmp_path,
+            "Program.cs",
+            """
             app.MapHub<GameHub>("/hubs/game");
             client.WithUrl("/not-a-socket-provider");
-        """)
-        consumers = [c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "consumer"]
-        providers = [c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "provider"]
+        """,
+        )
+        consumers = [
+            c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "consumer"
+        ]
+        providers = [
+            c for c in SocketExtractor().extract(tmp_path, "backend") if c.role == "provider"
+        ]
         assert consumers == []
         assert len(providers) == 1
         assert providers[0].contract_id == "socket::/hubs/game"
@@ -977,7 +1280,12 @@ class TestMatchContracts:
     def test_exact_match_creates_link(self) -> None:
         contracts = [
             self._contract(repo="backend", role="provider", contract_id="http::GET::/api/users"),
-            self._contract(repo="frontend", role="consumer", contract_id="http::GET::/api/users", file_path="client.ts"),
+            self._contract(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/api/users",
+                file_path="client.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 1
@@ -1003,15 +1311,31 @@ class TestMatchContracts:
     def test_http_wildcard_method(self) -> None:
         contracts = [
             self._contract(repo="backend", role="provider", contract_id="http::GET::/api/orders"),
-            self._contract(repo="frontend", role="consumer", contract_id="http::*::/api/orders", file_path="c.ts"),
+            self._contract(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::*::/api/orders",
+                file_path="c.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 1
 
     def test_grpc_wildcard_service(self) -> None:
         contracts = [
-            self._contract(repo="auth", role="provider", contract_id="grpc::auth.AuthService/Login", contract_type="grpc"),
-            self._contract(repo="gateway", role="consumer", contract_id="grpc::auth.AuthService/*", contract_type="grpc", file_path="gw.go"),
+            self._contract(
+                repo="auth",
+                role="provider",
+                contract_id="grpc::auth.AuthService/Login",
+                contract_type="grpc",
+            ),
+            self._contract(
+                repo="gateway",
+                role="consumer",
+                contract_id="grpc::auth.AuthService/*",
+                contract_type="grpc",
+                file_path="gw.go",
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 1
@@ -1019,7 +1343,12 @@ class TestMatchContracts:
     def test_no_match(self) -> None:
         contracts = [
             self._contract(repo="backend", role="provider", contract_id="http::GET::/api/users"),
-            self._contract(repo="frontend", role="consumer", contract_id="http::GET::/api/orders", file_path="c.ts"),
+            self._contract(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/api/orders",
+                file_path="c.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 0
@@ -1027,8 +1356,18 @@ class TestMatchContracts:
     def test_multiple_consumers_for_one_provider(self) -> None:
         contracts = [
             self._contract(repo="backend", role="provider", contract_id="http::GET::/api/users"),
-            self._contract(repo="frontend", role="consumer", contract_id="http::GET::/api/users", file_path="c1.ts"),
-            self._contract(repo="mobile", role="consumer", contract_id="http::GET::/api/users", file_path="c2.ts"),
+            self._contract(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/api/users",
+                file_path="c1.ts",
+            ),
+            self._contract(
+                repo="mobile",
+                role="consumer",
+                contract_id="http::GET::/api/users",
+                file_path="c2.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 2
@@ -1059,8 +1398,13 @@ class TestCandidateMatching:
         # Consumer hits /api/resource/search; provider mounts /resource/search.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/resource/search"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/api/resource/search",
-                    file_path="c.ts", confidence=0.75),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/api/resource/search",
+                file_path="c.ts",
+                confidence=0.75,
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 1
@@ -1072,8 +1416,12 @@ class TestCandidateMatching:
         # Provider /v1/resource; consumer base resolved to a leading {param}.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::POST::/v1/resource"),
-            self._c(repo="frontend", role="consumer", contract_id="http::POST::/{param}/resource",
-                    file_path="c.ts"),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::POST::/{param}/resource",
+                file_path="c.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 1
@@ -1084,8 +1432,13 @@ class TestCandidateMatching:
         # unambiguous: the base can only be that service, so the link is exact.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/resource"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/resource",
-                    file_path="c.ts", meta={"base_stripped": True}),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/resource",
+                file_path="c.ts",
+                meta={"base_stripped": True},
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 1
@@ -1097,8 +1450,13 @@ class TestCandidateMatching:
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/resource"),
             self._c(repo="payments", role="provider", contract_id="http::GET::/resource"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/resource",
-                    file_path="c.ts", meta={"base_stripped": True}),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/resource",
+                file_path="c.ts",
+                meta={"base_stripped": True},
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 2
@@ -1110,8 +1468,13 @@ class TestCandidateMatching:
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/resource"),
             self._c(repo="payments", role="provider", contract_id="http::GET::/resource"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/resource",
-                    file_path="c.ts", meta={"base_stripped": True, "base_token": "API_BASE"}),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/resource",
+                file_path="c.ts",
+                meta={"base_stripped": True, "base_token": "API_BASE"},
+            ),
         ]
         annotate_consumer_targets(contracts, {"API_BASE": "backend"})
         links = match_contracts(contracts)
@@ -1122,7 +1485,12 @@ class TestCandidateMatching:
     def test_exact_match_takes_precedence_over_candidate(self) -> None:
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/api/users"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/api/users", file_path="c.ts"),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/api/users",
+                file_path="c.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 1
@@ -1133,7 +1501,12 @@ class TestCandidateMatching:
         # must never produce contract links.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/app.js"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/api/app.js", file_path="c.ts"),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/api/app.js",
+                file_path="c.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert links == []
@@ -1143,8 +1516,13 @@ class TestCandidateMatching:
         # repo) is excluded from matching even when a path-equal provider exists.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::POST::/f/mkopzvak"),
-            self._c(repo="frontend", role="consumer", contract_id="http::POST::/f/mkopzvak",
-                    file_path="c.ts", meta={"host": "formspree.io"}),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::POST::/f/mkopzvak",
+                file_path="c.ts",
+                meta={"host": "formspree.io"},
+            ),
         ]
         annotate_consumer_targets(contracts)
         assert any(c.meta.get("external") for c in contracts if c.role == "consumer")
@@ -1155,8 +1533,13 @@ class TestCandidateMatching:
         # links normally (target host is a service, not a third party).
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/api/data"),
-            self._c(repo="worker", role="consumer", contract_id="http::GET::/api/data",
-                    file_path="c.py", meta={"host": "backend"}),
+            self._c(
+                repo="worker",
+                role="consumer",
+                contract_id="http::GET::/api/data",
+                file_path="c.py",
+                meta={"host": "backend"},
+            ),
         ]
         annotate_consumer_targets(contracts)
         links = match_contracts(contracts)
@@ -1168,8 +1551,13 @@ class TestCandidateMatching:
         # only the full host or an internal-DNS leading label maps to an alias.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/v1/charges"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/v1/charges",
-                    file_path="c.ts", meta={"host": "backend.stripe.com"}),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/v1/charges",
+                file_path="c.ts",
+                meta={"host": "backend.stripe.com"},
+            ),
         ]
         annotate_consumer_targets(contracts)
         assert any(c.meta.get("external") for c in contracts if c.role == "consumer")
@@ -1179,8 +1567,13 @@ class TestCandidateMatching:
         # k8s service DNS backend.default.svc.cluster.local -> the 'backend' repo.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/api/data"),
-            self._c(repo="worker", role="consumer", contract_id="http::GET::/api/data",
-                    file_path="c.py", meta={"host": "backend.default.svc.cluster.local"}),
+            self._c(
+                repo="worker",
+                role="consumer",
+                contract_id="http::GET::/api/data",
+                file_path="c.py",
+                meta={"host": "backend.default.svc.cluster.local"},
+            ),
         ]
         annotate_consumer_targets(contracts)
         links = match_contracts(contracts)
@@ -1193,8 +1586,13 @@ class TestCandidateMatching:
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/resource"),
             self._c(repo="payments", role="provider", contract_id="http::GET::/resource"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/resource",
-                    file_path="c.ts", meta={"base_stripped": True, "base_token": "API_BASE"}),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/resource",
+                file_path="c.ts",
+                meta={"base_stripped": True, "base_token": "API_BASE"},
+            ),
         ]
         annotate_consumer_targets(contracts, {"API_BASE": "typo_repo"})
         links = match_contracts(contracts)
@@ -1204,8 +1602,13 @@ class TestCandidateMatching:
     def test_method_mismatch_no_candidate(self) -> None:
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::POST::/v1/resource"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/resource",
-                    file_path="c.ts", meta={"base_stripped": True}),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/resource",
+                file_path="c.ts",
+                meta={"base_stripped": True},
+            ),
         ]
         links = match_contracts(contracts)
         assert links == []
@@ -1214,7 +1617,12 @@ class TestCandidateMatching:
         # Go HandleFunc providers carry method "*" — compatible with any method.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::*::/v1/orders"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/api/orders", file_path="c.ts"),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/api/orders",
+                file_path="c.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert len(links) == 1
@@ -1225,7 +1633,9 @@ class TestCandidateMatching:
         # link safely.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/api/v1"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/api", file_path="c.ts"),
+            self._c(
+                repo="frontend", role="consumer", contract_id="http::GET::/api", file_path="c.ts"
+            ),
         ]
         links = match_contracts(contracts)
         assert links == []
@@ -1235,16 +1645,28 @@ class TestCandidateMatching:
         # not be stripped, so /internal/users and /api/users stay distinct.
         contracts = [
             self._c(repo="backend", role="provider", contract_id="http::GET::/internal/users"),
-            self._c(repo="frontend", role="consumer", contract_id="http::GET::/api/users", file_path="c.ts"),
+            self._c(
+                repo="frontend",
+                role="consumer",
+                contract_id="http::GET::/api/users",
+                file_path="c.ts",
+            ),
         ]
         links = match_contracts(contracts)
         assert links == []
 
     def test_same_repo_same_service_filtered_in_candidate(self) -> None:
         contracts = [
-            self._c(repo="mono", role="provider", contract_id="http::GET::/v1/resource", service="svc-a"),
-            self._c(repo="mono", role="consumer", contract_id="http::GET::/api/resource",
-                    file_path="c.py", service="svc-a"),
+            self._c(
+                repo="mono", role="provider", contract_id="http::GET::/v1/resource", service="svc-a"
+            ),
+            self._c(
+                repo="mono",
+                role="consumer",
+                contract_id="http::GET::/api/resource",
+                file_path="c.py",
+                service="svc-a",
+            ),
         ]
         links = match_contracts(contracts)
         assert links == []

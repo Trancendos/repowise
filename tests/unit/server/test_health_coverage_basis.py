@@ -42,9 +42,7 @@ async def _seed_graph(session, repo_id, *, nodes, edges) -> None:
     """Seed file nodes and edges. An edge is ``(src, dst, type[, origin])``."""
     for path, is_test in nodes.items():
         session.add(
-            GraphNode(
-                repository_id=repo_id, node_id=path, node_type="file", is_test=is_test
-            )
+            GraphNode(repository_id=repo_id, node_id=path, node_type="file", is_test=is_test)
         )
     for src, dst, etype, *origin in dict.fromkeys(
         (e[0], e[1], e[2], e[3] if len(e) > 3 else None) for e in edges
@@ -129,9 +127,7 @@ async def test_an_ingested_report_answers_as_measured(client, session, tmp_path)
 
 async def test_no_report_falls_back_to_the_graph(client, session, tmp_path):
     repo = await create_test_repo(client, tmp_path)
-    await save_health_metrics(
-        session, repo["id"], [_metric("src/a.py"), _metric("src/b.py")]
-    )
+    await save_health_metrics(session, repo["id"], [_metric("src/a.py"), _metric("src/b.py")])
     await _seed_graph(
         session,
         repo["id"],
@@ -150,9 +146,7 @@ async def test_no_report_falls_back_to_the_graph(client, session, tmp_path):
     assert body["inferred"]["test_file_count"] == 1
 
 
-async def test_a_repo_with_no_tests_at_all_says_none_not_inferred(
-    client, session, tmp_path
-):
+async def test_a_repo_with_no_tests_at_all_says_none_not_inferred(client, session, tmp_path):
     """``none`` is the honest unknown, distinct from "nothing reaches anything".
 
     With no test files there is no walk to run, so filing every file under
@@ -187,9 +181,7 @@ async def test_a_caller_can_decline_the_graph_fallback(client, session, tmp_path
     )
     await session.commit()
 
-    body = await _get(
-        client, repo["id"], limit=1, module_limit=0, include_inferred="false"
-    )
+    body = await _get(client, repo["id"], limit=1, module_limit=0, include_inferred="false")
 
     assert "inferred" not in body
     assert "basis" not in body
@@ -205,9 +197,7 @@ async def test_a_caller_can_decline_the_graph_fallback(client, session, tmp_path
 # ------------------------------------------------------------------ #
 
 
-async def test_the_measured_fields_stay_empty_on_the_inferred_basis(
-    client, session, tmp_path
-):
+async def test_the_measured_fields_stay_empty_on_the_inferred_basis(client, session, tmp_path):
     """The structural half of "never merge the two".
 
     A consumer that reads ``files`` or ``summary`` without checking ``basis``
@@ -235,9 +225,7 @@ async def test_the_measured_fields_stay_empty_on_the_inferred_basis(
     assert body["summary"]["line_coverage_pct"] is None
 
 
-async def test_the_inferred_payload_carries_no_percentage_anywhere(
-    client, session, tmp_path
-):
+async def test_the_inferred_payload_carries_no_percentage_anywhere(client, session, tmp_path):
     """Reaching has no line attribution, so no ratio may be derived from it.
 
     Asserted over the serialized payload rather than field by field: the rule is
@@ -245,9 +233,7 @@ async def test_the_inferred_payload_carries_no_percentage_anywhere(
     name has to fail this too.
     """
     repo = await create_test_repo(client, tmp_path)
-    await save_health_metrics(
-        session, repo["id"], [_metric("src/a.py"), _metric("src/b.py")]
-    )
+    await save_health_metrics(session, repo["id"], [_metric("src/a.py"), _metric("src/b.py")])
     await _seed_graph(
         session,
         repo["id"],
@@ -269,9 +255,7 @@ async def test_the_inferred_payload_carries_no_percentage_anywhere(
 # ------------------------------------------------------------------ #
 
 
-async def test_counts_stay_repo_wide_when_the_list_is_trimmed(
-    client, session, tmp_path
-):
+async def test_counts_stay_repo_wide_when_the_list_is_trimmed(client, session, tmp_path):
     """``limit`` pages ``files``; it does not shrink the repo.
 
     Same contract as ``modules_total`` on the measured branch. The hero figure
@@ -344,9 +328,7 @@ async def test_rows_carry_the_score_and_size_the_chart_plots(client, session, tm
 # ------------------------------------------------------------------ #
 
 
-async def test_the_file_endpoint_names_the_tests_and_the_tier(
-    client, session, tmp_path
-):
+async def test_the_file_endpoint_names_the_tests_and_the_tier(client, session, tmp_path):
     repo = await create_test_repo(client, tmp_path)
     await _seed_graph(
         session,
@@ -369,9 +351,7 @@ async def test_the_file_endpoint_names_the_tests_and_the_tier(
     }
 
 
-async def test_the_file_endpoint_marks_an_import_only_answer_as_weaker(
-    client, session, tmp_path
-):
+async def test_the_file_endpoint_marks_an_import_only_answer_as_weaker(client, session, tmp_path):
     """``via`` is why the endpoint returns a tier at all.
 
     A test that only imports the file is real but much cruder evidence than one
@@ -393,9 +373,7 @@ async def test_the_file_endpoint_marks_an_import_only_answer_as_weaker(
     assert body["tests"] == ["tests/test_a.py"]
 
 
-async def test_a_file_nothing_reaches_answers_none_with_no_tests(
-    client, session, tmp_path
-):
+async def test_a_file_nothing_reaches_answers_none_with_no_tests(client, session, tmp_path):
     repo = await create_test_repo(client, tmp_path)
     await _seed_graph(
         session,
@@ -413,9 +391,7 @@ async def test_a_file_nothing_reaches_answers_none_with_no_tests(
     assert body["via"] is None
 
 
-async def test_an_unreliable_call_edge_does_not_count_as_reaching(
-    client, session, tmp_path
-):
+async def test_an_unreliable_call_edge_does_not_count_as_reaching(client, session, tmp_path):
     """``global_unique`` binds a name to the only symbol carrying it repo-wide.
 
     That is a guess, and dropping it is worth 4 points of forward precision at
@@ -439,9 +415,7 @@ async def test_an_unreliable_call_edge_does_not_count_as_reaching(
     assert detail["basis"] == "none"
 
 
-async def test_the_file_endpoint_says_when_the_list_was_cut(
-    client, session, tmp_path, monkeypatch
-):
+async def test_the_file_endpoint_says_when_the_list_was_cut(client, session, tmp_path, monkeypatch):
     """``tests`` is capped; the count beside it must not be.
 
     The cut is ``sorted(tests)[:cap]``, so a surface printing ``len(tests)``

@@ -178,10 +178,7 @@ class TestParserEmitsTypeRefs:
     def test_method_param(self, tmp_path: Path) -> None:
         rel = "Svc.cs"
         (tmp_path / rel).write_text(
-            "namespace Demo;\n"
-            "class Svc {\n"
-            "  public void Handle(EventEnvelope env) {}\n"
-            "}\n"
+            "namespace Demo;\n" "class Svc {\n" "  public void Handle(EventEnvelope env) {}\n" "}\n"
         )
         parsed = ASTParser().parse_file(_file_info(tmp_path, rel), (tmp_path / rel).read_bytes())
         refs = [r for r in parsed.type_refs if r.type_name == "EventEnvelope"]
@@ -189,10 +186,7 @@ class TestParserEmitsTypeRefs:
 
     def test_record_primary_constructor(self, tmp_path: Path) -> None:
         rel = "Rec.cs"
-        (tmp_path / rel).write_text(
-            "namespace Demo;\n"
-            "public record Rec(Address Address);\n"
-        )
+        (tmp_path / rel).write_text("namespace Demo;\n" "public record Rec(Address Address);\n")
         parsed = ASTParser().parse_file(_file_info(tmp_path, rel), (tmp_path / rel).read_bytes())
         refs = [r for r in parsed.type_refs if r.type_name == "Address"]
         assert refs and refs[0].origin == "ctor_param"
@@ -209,9 +203,7 @@ class TestParserEmitsTypeRefs:
 
     def test_generic_uses_head_identifier(self, tmp_path: Path) -> None:
         rel = "G.cs"
-        (tmp_path / rel).write_text(
-            "namespace Demo;\nclass G { public G(IRepo<Basket> r) {} }\n"
-        )
+        (tmp_path / rel).write_text("namespace Demo;\nclass G { public G(IRepo<Basket> r) {} }\n")
         parsed = ASTParser().parse_file(_file_info(tmp_path, rel), (tmp_path / rel).read_bytes())
         names = {r.type_name for r in parsed.type_refs}
         assert "IRepo" in names
@@ -418,7 +410,10 @@ def test_resolve_type_refs_no_csharp(tmp_path: Path) -> None:
     graph = nx.DiGraph()
     graph.add_node("a.py", node_type="file", language="python")
     ctx = ResolverContext(
-        path_set={"a.py"}, stem_map={}, graph=graph, repo_path=tmp_path,
+        path_set={"a.py"},
+        stem_map={},
+        graph=graph,
+        repo_path=tmp_path,
     )
     emitted = resolve_type_refs({"a.py": parsed}, ctx, graph)
     assert emitted == {}

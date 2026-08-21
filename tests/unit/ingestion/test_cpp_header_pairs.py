@@ -17,6 +17,7 @@ def _build(repo: Path):
         builder.add_file(parser.parse_file(fi, Path(fi.abs_path).read_bytes()))
     return builder.build()
 
+
 class TestCppHeaderSourcePairing:
     def test_header_source_pair_links_both_directions(self, tmp_path: Path) -> None:
         (tmp_path / "util.h").write_text("int helper(void);\n")

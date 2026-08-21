@@ -49,25 +49,17 @@ def _build(repo: Path) -> nx.DiGraph:
     stem_map: dict[str, list[str]] = {}
     for p in path_set:
         stem_map.setdefault(Path(p).stem.lower(), []).append(p)
-    ctx = ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=graph, repo_path=repo
-    )
+    ctx = ResolverContext(path_set=path_set, stem_map=stem_map, graph=graph, repo_path=repo)
     add_framework_edges(graph, parsed, ctx, [])
     return graph
 
 
 def _bound(graph: nx.DiGraph) -> set[tuple[str, str]]:
-    return {
-        (s, t)
-        for s, t, d in graph.edges(data=True)
-        if d.get("edge_type") == "framework_binds"
-    }
+    return {(s, t) for s, t, d in graph.edges(data=True) if d.get("edge_type") == "framework_binds"}
 
 
 class TestFixtureInjection:
-    def test_conftest_fixture_is_linked_to_the_test_that_asks_for_it(
-        self, tmp_path: Path
-    ) -> None:
+    def test_conftest_fixture_is_linked_to_the_test_that_asks_for_it(self, tmp_path: Path) -> None:
         (tmp_path / "conftest.py").write_text(
             "import pytest\n\n\n@pytest.fixture\ndef client():\n    return 1\n"
         )
@@ -75,9 +67,7 @@ class TestFixtureInjection:
 
         assert ("test_api.py::test_get", "conftest.py::client") in _bound(_build(tmp_path))
 
-    def test_a_fixture_in_the_tests_own_module_wins_over_the_conftest(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_fixture_in_the_tests_own_module_wins_over_the_conftest(self, tmp_path: Path) -> None:
         (tmp_path / "conftest.py").write_text(
             "import pytest\n\n\n@pytest.fixture\ndef client():\n    return 1\n"
         )
@@ -120,8 +110,7 @@ class TestFixtureInjection:
         # `app`. Binding on the function name would miss it and claim a wrong
         # one; flask writes fixtures this way.
         (tmp_path / "conftest.py").write_text(
-            'import pytest\n\n\n@pytest.fixture(name="app")\n'
-            "def fixture_app():\n    return 1\n"
+            'import pytest\n\n\n@pytest.fixture(name="app")\n' "def fixture_app():\n    return 1\n"
         )
         (tmp_path / "test_api.py").write_text(
             "def test_get(app):\n    assert app\n\n\n"
@@ -158,9 +147,7 @@ class TestFixtureInjection:
         (tmp_path / "conftest.py").write_text(
             "import pytest\n\n\n@pytest.fixture\ndef client():\n    return 1\n"
         )
-        (tmp_path / "test_api.py").write_text(
-            "def helper(client):\n    return client\n"
-        )
+        (tmp_path / "test_api.py").write_text("def helper(client):\n    return client\n")
 
         assert _bound(_build(tmp_path)) == set()
 
@@ -216,9 +203,7 @@ class TestRefusals:
 
         assert _bound(_build(tmp_path)) == set()
 
-    def test_a_class_scoped_fixture_does_not_serve_a_sibling_class(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_class_scoped_fixture_does_not_serve_a_sibling_class(self, tmp_path: Path) -> None:
         (tmp_path / "test_api.py").write_text(
             "import pytest\n\n\n"
             "class TestA:\n"
@@ -251,9 +236,7 @@ class TestRefusals:
             "test_api.py::TestBase::client",
         ) in _bound(_build(tmp_path))
 
-    def test_an_annotation_containing_an_equals_is_not_a_default(
-        self, tmp_path: Path
-    ) -> None:
+    def test_an_annotation_containing_an_equals_is_not_a_default(self, tmp_path: Path) -> None:
         (tmp_path / "conftest.py").write_text(
             "import pytest\n\n\n@pytest.fixture\ndef client():\n    return 1\n"
         )
@@ -267,9 +250,7 @@ class TestRefusals:
         assert ("test_api.py::test_get", "conftest.py::client") in bound
         assert ("test_api.py::test_two", "conftest.py::client") in bound
 
-    def test_a_comment_in_a_multiline_signature_does_not_swallow_it(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_comment_in_a_multiline_signature_does_not_swallow_it(self, tmp_path: Path) -> None:
         # An apostrophe or a stray bracket in a per-parameter comment used to
         # take the whole list with it.
         (tmp_path / "conftest.py").write_text(
@@ -284,9 +265,7 @@ class TestRefusals:
             "conftest.py::client",
         ) in _bound(_build(tmp_path))
 
-    def test_an_escaped_quote_in_a_default_does_not_swallow_the_list(
-        self, tmp_path: Path
-    ) -> None:
+    def test_an_escaped_quote_in_a_default_does_not_swallow_the_list(self, tmp_path: Path) -> None:
         (tmp_path / "conftest.py").write_text(
             "import pytest\n\n\n@pytest.fixture\ndef client():\n    return 1\n"
         )
@@ -312,9 +291,7 @@ class TestRefusals:
 
         assert _bound(_build(tmp_path)) == set()
 
-    def test_the_projects_own_python_classes_setting_is_honoured(
-        self, tmp_path: Path
-    ) -> None:
+    def test_the_projects_own_python_classes_setting_is_honoured(self, tmp_path: Path) -> None:
         # celery collects `test_*` classes, not pytest's default `Test*`.
         # Assuming the default refuses almost every binding such a repo has.
         (tmp_path / "pyproject.toml").write_text(
@@ -340,17 +317,14 @@ class TestRefusals:
             "def user(request):\n    return request.param\n"
         )
         (tmp_path / "test_api.py").write_text(
-            "def test_u(user):\n    assert user\n\n\n"
-            "def test_v(alice):\n    assert alice\n"
+            "def test_u(user):\n    assert user\n\n\n" "def test_v(alice):\n    assert alice\n"
         )
 
         bound = _bound(_build(tmp_path))
         assert ("test_api.py::test_u", "conftest.py::user") in bound
         assert ("test_api.py::test_v", "conftest.py::user") not in bound
 
-    def test_a_parametrize_value_does_not_refuse_a_real_request(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_parametrize_value_does_not_refuse_a_real_request(self, tmp_path: Path) -> None:
         # Only the first argument names parameters. Reading the whole decorator
         # made every parametrize *value* look like a supplied name, so a fixture
         # called `client` became unreachable in any test parametrized over the

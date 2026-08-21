@@ -122,11 +122,7 @@ def build_methods_by_file(graph: Any) -> dict[str, tuple[str, ...]]:
     edge_map: dict[str, set[str]] = {}
     prefix_map: dict[str, set[str]] = {}
     for node_id, data in graph.nodes(data=True):
-        if (
-            data.get("node_type") == "symbol"
-            and data.get("kind") == "method"
-            and "::" in node_id
-        ):
+        if data.get("node_type") == "symbol" and data.get("kind") == "method" and "::" in node_id:
             prefix_map.setdefault(node_id.split("::", 1)[0], set()).add(node_id)
     for u, v, data in graph.edges(data=True):
         if data.get("edge_type") != "defines":

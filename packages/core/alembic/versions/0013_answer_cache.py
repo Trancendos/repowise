@@ -44,9 +44,7 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.func.now(),
         ),
-        sa.UniqueConstraint(
-            "repository_id", "question_hash", name="uq_answer_cache_q"
-        ),
+        sa.UniqueConstraint("repository_id", "question_hash", name="uq_answer_cache_q"),
     )
     op.create_index(
         "ix_answer_cache_repo",

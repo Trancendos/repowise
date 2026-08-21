@@ -289,9 +289,7 @@ class TestLanguageDispatch:
         _edges(parsed, tmp_path)
         assert spy.calls == ["_resolve_go_package_call"]
 
-    def test_an_undeclared_name_reaches_no_strategy_at_all(
-        self, tmp_path: Path, spy: _Spy
-    ) -> None:
+    def test_an_undeclared_name_reaches_no_strategy_at_all(self, tmp_path: Path, spy: _Spy) -> None:
         """The reject-early gate: nothing declares it, so nothing can match it."""
         parsed = _parse_all(
             tmp_path,
@@ -463,9 +461,7 @@ class TestPythonTypedReceiver:
             "receiver_typed_global",
         ) in _edges(parsed, tmp_path)
 
-    def test_a_python_class_attribute_never_types_a_bare_receiver(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_python_class_attribute_never_types_a_bare_receiver(self, tmp_path: Path) -> None:
         """A Python field is reached as ``self.graph``, never as ``graph``.
 
         So a bare receiver naming a class attribute is a different name, and
@@ -532,9 +528,7 @@ class TestImportedTypeThroughAReExport:
             "receiver_typed_import",
         ) in _edges(parsed, tmp_path)
 
-    def test_a_bound_file_that_declares_the_pair_answers_directly(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_bound_file_that_declares_the_pair_answers_directly(self, tmp_path: Path) -> None:
         """The chain is a fallback, not a first choice.
 
         This is the shape the import tier always handled, and it had no test —
@@ -582,13 +576,9 @@ class TestImportedTypeThroughAReExport:
                 "pkg/__init__.py": {"pkg.engine": "pkg/engine.py"},
             },
         )
-        assert not [
-            e for e in _edges(parsed, tmp_path) if str(e[3]).startswith("receiver_typed_")
-        ]
+        assert not [e for e in _edges(parsed, tmp_path) if str(e[3]).startswith("receiver_typed_")]
 
-    def test_an_alias_does_not_read_the_bound_file_s_own_binding(
-        self, tmp_path: Path
-    ) -> None:
+    def test_an_alias_does_not_read_the_bound_file_s_own_binding(self, tmp_path: Path) -> None:
         """The chain is keyed by each file's own local names, so an alias must
         be translated back before it is used as a key.
 
@@ -638,8 +628,6 @@ class TestImportedTypeThroughAReExport:
             imp.resolved_file = "external:thirdparty"
         resolver = CallResolver(parsed, {p: set() for p in parsed}, repo_path=str(tmp_path))
         recorded = [
-            origin
-            for origins in resolver._barrel_origins.values()
-            for origin in origins.values()
+            origin for origins in resolver._barrel_origins.values() for origin in origins.values()
         ]
         assert not [o for o in recorded if o.startswith("external:")]

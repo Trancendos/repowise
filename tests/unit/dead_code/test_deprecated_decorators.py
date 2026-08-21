@@ -183,12 +183,10 @@ class TestDeprecatedDecoratorIntegration:
     )
     def test_decorator_scores_confidence_0_3(self, decorator: str):
         report = self._run(decorator, min_confidence=0.0)
-        deprecated_findings = [
-            f for f in report.findings if f.symbol_name == "process_data"
-        ]
-        assert len(deprecated_findings) == 1, (
-            f"Expected one finding for decorator {decorator!r}; got {deprecated_findings}"
-        )
+        deprecated_findings = [f for f in report.findings if f.symbol_name == "process_data"]
+        assert (
+            len(deprecated_findings) == 1
+        ), f"Expected one finding for decorator {decorator!r}; got {deprecated_findings}"
         assert deprecated_findings[0].confidence == pytest.approx(0.3), (
             f"Expected confidence=0.3 for decorator {decorator!r}; "
             f"got {deprecated_findings[0].confidence}"
@@ -206,21 +204,18 @@ class TestDeprecatedDecoratorIntegration:
     def test_deprecated_decorator_hidden_under_default_floor(self, decorator: str):
         """Decorated symbols (confidence=0.3) fall below the 0.4 default floor."""
         report = self._run(decorator, min_confidence=0.4)
-        deprecated_in_findings = [
-            f for f in report.findings if f.symbol_name == "process_data"
-        ]
+        deprecated_in_findings = [f for f in report.findings if f.symbol_name == "process_data"]
         assert deprecated_in_findings == [], (
-            f"Decorated symbol should not appear under default floor; "
-            f"decorator={decorator!r}"
+            f"Decorated symbol should not appear under default floor; " f"decorator={decorator!r}"
         )
 
     def test_unrelated_decorator_does_not_lower_confidence(self):
         report = self._run("@property", min_confidence=0.0)
         findings = [f for f in report.findings if f.symbol_name == "process_data"]
         assert len(findings) == 1
-        assert findings[0].confidence != pytest.approx(0.3), (
-            "@property should not lower confidence to 0.3"
-        )
+        assert findings[0].confidence != pytest.approx(
+            0.3
+        ), "@property should not lower confidence to 0.3"
 
     def test_suffix_DEPRECATED_still_works_without_decorator(self):
         """Name-suffix detection (backward compat) is not broken by the new path."""
@@ -300,9 +295,9 @@ public class Foo {
         result = self._parser().parse_file(fi, src)
         old = next((s for s in result.symbols if s.name == "OldApi"), None)
         assert old is not None, "OldApi symbol not found"
-        assert any("Obsolete" in d for d in old.decorators), (
-            f"Expected 'Obsolete' in decorators; got {old.decorators}"
-        )
+        assert any(
+            "Obsolete" in d for d in old.decorators
+        ), f"Expected 'Obsolete' in decorators; got {old.decorators}"
 
     def test_csharp_obsolete_is_detected_as_deprecated(self):
         from repowise.core.analysis.dead_code.analyzer import _is_symbol_deprecated
@@ -318,9 +313,9 @@ public class Foo {
         result = self._parser().parse_file(fi, src)
         old = next((s for s in result.symbols if s.name == "OldApi"), None)
         assert old is not None
-        assert _is_symbol_deprecated(old.name, old.decorators), (
-            f"OldApi should be deprecated; decorators={old.decorators}"
-        )
+        assert _is_symbol_deprecated(
+            old.name, old.decorators
+        ), f"OldApi should be deprecated; decorators={old.decorators}"
 
     def test_csharp_no_attribute_has_empty_decorators(self):
         src = b"""
@@ -344,9 +339,9 @@ public class Foo {
         result = self._parser().parse_file(fi, src)
         sym = next((s for s in result.symbols if s.name == "old_api"), None)
         assert sym is not None, "old_api symbol not found"
-        assert any("deprecated" in d for d in sym.decorators), (
-            f"Expected 'deprecated' in decorators; got {sym.decorators}"
-        )
+        assert any(
+            "deprecated" in d for d in sym.decorators
+        ), f"Expected 'deprecated' in decorators; got {sym.decorators}"
 
     def test_cpp_deprecated_is_detected_as_deprecated(self):
         from repowise.core.analysis.dead_code.analyzer import _is_symbol_deprecated
@@ -356,9 +351,9 @@ public class Foo {
         result = self._parser().parse_file(fi, src)
         sym = next((s for s in result.symbols if s.name == "old_api"), None)
         assert sym is not None
-        assert _is_symbol_deprecated(sym.name, sym.decorators), (
-            f"old_api should be deprecated; decorators={sym.decorators}"
-        )
+        assert _is_symbol_deprecated(
+            sym.name, sym.decorators
+        ), f"old_api should be deprecated; decorators={sym.decorators}"
 
     def test_cpp_no_attribute_has_empty_decorators(self):
         src = b"void new_api() { }\n"
@@ -386,9 +381,7 @@ public class Service {
         result = self._parser().parse_file(fi, src)
         sym = next((s for s in result.symbols if s.name == "processData"), None)
         assert sym is not None, "processData symbol not found"
-        assert sym.decorators, (
-            f"processData should have non-empty decorators; got {sym.decorators}"
-        )
+        assert sym.decorators, f"processData should have non-empty decorators; got {sym.decorators}"
 
     def test_java_bare_deprecated_is_detected_as_deprecated(self):
         """Regression: bare @Deprecated blob must match _is_symbol_deprecated."""
@@ -404,9 +397,9 @@ public class Service {
         result = self._parser().parse_file(fi, src)
         sym = next((s for s in result.symbols if s.name == "processData"), None)
         assert sym is not None
-        assert _is_symbol_deprecated(sym.name, sym.decorators), (
-            f"processData should be deprecated; decorators={sym.decorators}"
-        )
+        assert _is_symbol_deprecated(
+            sym.name, sym.decorators
+        ), f"processData should be deprecated; decorators={sym.decorators}"
 
     def test_java_deprecated_with_args_is_detected(self):
         from repowise.core.analysis.dead_code.analyzer import _is_symbol_deprecated
@@ -421,9 +414,9 @@ public class Service {
         result = self._parser().parse_file(fi, src)
         sym = next((s for s in result.symbols if s.name == "processData"), None)
         assert sym is not None
-        assert _is_symbol_deprecated(sym.name, sym.decorators), (
-            f"processData should be deprecated; decorators={sym.decorators}"
-        )
+        assert _is_symbol_deprecated(
+            sym.name, sym.decorators
+        ), f"processData should be deprecated; decorators={sym.decorators}"
 
     def test_java_override_plus_deprecated_is_detected(self):
         """Regression: @Override\\n  @Deprecated\\n  public blob — only second annotation matters."""
@@ -440,9 +433,9 @@ public class Service extends Base {
         result = self._parser().parse_file(fi, src)
         sym = next((s for s in result.symbols if s.name == "processData"), None)
         assert sym is not None
-        assert _is_symbol_deprecated(sym.name, sym.decorators), (
-            f"processData should be deprecated; decorators={sym.decorators}"
-        )
+        assert _is_symbol_deprecated(
+            sym.name, sym.decorators
+        ), f"processData should be deprecated; decorators={sym.decorators}"
 
     def test_java_override_only_is_not_deprecated(self):
         from repowise.core.analysis.dead_code.analyzer import _is_symbol_deprecated
@@ -457,9 +450,9 @@ public class Service extends Base {
         result = self._parser().parse_file(fi, src)
         sym = next((s for s in result.symbols if s.name == "processData"), None)
         assert sym is not None
-        assert not _is_symbol_deprecated(sym.name, sym.decorators), (
-            f"processData should NOT be deprecated; decorators={sym.decorators}"
-        )
+        assert not _is_symbol_deprecated(
+            sym.name, sym.decorators
+        ), f"processData should NOT be deprecated; decorators={sym.decorators}"
 
     # ------------------------------------------------------------------
     # Rust — #[deprecated] is a preceding sibling (existing behaviour preserved)
@@ -474,6 +467,6 @@ public class Service extends Base {
         result = self._parser().parse_file(fi, src)
         sym = next((s for s in result.symbols if s.name == "old_api"), None)
         assert sym is not None, "old_api symbol not found"
-        assert _is_symbol_deprecated(sym.name, sym.decorators), (
-            f"old_api should be deprecated; decorators={sym.decorators}"
-        )
+        assert _is_symbol_deprecated(
+            sym.name, sym.decorators
+        ), f"old_api should be deprecated; decorators={sym.decorators}"

@@ -64,9 +64,7 @@ async def test_counts_are_measured_not_paged(client: AsyncClient, app) -> None:
     }
 
     # And the total exceeds what a single small page would have reported.
-    page = await client.get(
-        f"/api/repos/{repo['id']}/decisions", params={"limit": 3}
-    )
+    page = await client.get(f"/api/repos/{repo['id']}/decisions", params={"limit": 3})
     assert len(page.json()) == 3
     assert body["total"] == 10
 
@@ -120,9 +118,7 @@ async def test_counts_route_is_not_shadowed_by_decision_id(
 
 
 @pytest.mark.asyncio
-async def test_priority_sort_leads_with_confirmed_rules(
-    client: AsyncClient, app
-) -> None:
+async def test_priority_sort_leads_with_confirmed_rules(client: AsyncClient, app) -> None:
     """Newest-first buried every active decision under fresh proposals."""
     repo = await create_test_repo(client)
     sf = app.state.session_factory
@@ -133,9 +129,7 @@ async def test_priority_sort_leads_with_confirmed_rules(
     await _seed(sf, repo["id"], title="Strong guess", status="proposed", confidence=0.95)
     await _seed(sf, repo["id"], title="Retired", status="superseded", confidence=0.9)
 
-    rows = (
-        await client.get(f"/api/repos/{repo['id']}/decisions")
-    ).json()
+    rows = (await client.get(f"/api/repos/{repo['id']}/decisions")).json()
     assert [r["title"] for r in rows] == [
         "Confirmed rule",
         "Strong guess",
@@ -152,9 +146,7 @@ async def test_recent_sort_is_still_available(client: AsyncClient, app) -> None:
     await _seed(sf, repo["id"], title="Second", status="proposed")
 
     rows = (
-        await client.get(
-            f"/api/repos/{repo['id']}/decisions", params={"sort": "recent"}
-        )
+        await client.get(f"/api/repos/{repo['id']}/decisions", params={"sort": "recent"})
     ).json()
     assert [r["title"] for r in rows] == ["Second", "First"]
 
@@ -162,16 +154,12 @@ async def test_recent_sort_is_still_available(client: AsyncClient, app) -> None:
 @pytest.mark.asyncio
 async def test_unknown_sort_is_rejected(client: AsyncClient) -> None:
     repo = await create_test_repo(client)
-    resp = await client.get(
-        f"/api/repos/{repo['id']}/decisions", params={"sort": "sideways"}
-    )
+    resp = await client.get(f"/api/repos/{repo['id']}/decisions", params={"sort": "sideways"})
     assert resp.status_code == 422
 
 
 @pytest.mark.asyncio
-async def test_offset_pages_without_repeating_rows(
-    client: AsyncClient, app
-) -> None:
+async def test_offset_pages_without_repeating_rows(client: AsyncClient, app) -> None:
     """Server-side paging: the table asks for a window, not the whole set."""
     repo = await create_test_repo(client)
     sf = app.state.session_factory
@@ -179,14 +167,10 @@ async def test_offset_pages_without_repeating_rows(
         await _seed(sf, repo["id"], title=f"D{i}", status="proposed", confidence=1 - i / 10)
 
     first = (
-        await client.get(
-            f"/api/repos/{repo['id']}/decisions", params={"limit": 2, "offset": 0}
-        )
+        await client.get(f"/api/repos/{repo['id']}/decisions", params={"limit": 2, "offset": 0})
     ).json()
     second = (
-        await client.get(
-            f"/api/repos/{repo['id']}/decisions", params={"limit": 2, "offset": 2}
-        )
+        await client.get(f"/api/repos/{repo['id']}/decisions", params={"limit": 2, "offset": 2})
     ).json()
 
     assert len(first) == 2

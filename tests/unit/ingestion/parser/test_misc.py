@@ -90,9 +90,12 @@ class TestLanguageConfigs:
         for lang, config in LANGUAGE_CONFIGS.items():
             # Must be callable
             result = config.visibility_fn("MyClass", [])
-            assert result in ("public", "private", "protected", "internal"), (
-                f"{lang} visibility_fn returned unexpected: {result}"
-            )
+            assert result in (
+                "public",
+                "private",
+                "protected",
+                "internal",
+            ), f"{lang} visibility_fn returned unexpected: {result}"
 
 
 class TestArgumentCount:

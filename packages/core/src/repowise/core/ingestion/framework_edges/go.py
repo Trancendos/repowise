@@ -50,15 +50,11 @@ _GO_ROUTE_CALL_RE = re.compile(
 # gRPC generated registration: ``pb.RegisterGreeterServer(s, &greeter{})`` or
 # ``RegisterGreeterServer(srv, impl)``. Capture the implementation argument
 # (the second positional arg); we resolve its leading type identifier.
-_GO_GRPC_REGISTER_RE = re.compile(
-    r"\bRegister\w+Server\s*\(\s*[\w.]+\s*,\s*&?\s*([A-Za-z_][\w.]*)"
-)
+_GO_GRPC_REGISTER_RE = re.compile(r"\bRegister\w+Server\s*\(\s*[\w.]+\s*,\s*&?\s*([A-Za-z_][\w.]*)")
 
 
 def _imports_any(parsed: Any, *prefixes: str) -> bool:
-    return any(
-        imp.module_path.startswith(pkg) for pkg in prefixes for imp in parsed.imports
-    )
+    return any(imp.module_path.startswith(pkg) for pkg in prefixes for imp in parsed.imports)
 
 
 def _has_go_web_imports(parsed_files: dict[str, Any]) -> bool:
@@ -168,9 +164,7 @@ def _resolve_go_handler(
 
 class _GoWebHandler:
     def detect(self, dctx: DetectionContext) -> bool:
-        go_web_in_stack = any(
-            token in dctx.stack_lower for token in ("gin", "echo", "chi", "grpc")
-        )
+        go_web_in_stack = any(token in dctx.stack_lower for token in ("gin", "echo", "chi", "grpc"))
         return go_web_in_stack or _has_go_web_imports(dctx.parsed_files)
 
     def add_edges(

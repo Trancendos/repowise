@@ -94,7 +94,7 @@ _CUTS = [
     Cut(
         "pr_blast.all_affected_paths",
         "core/src/repowise/core/analysis/pr_blast.py",
-        "all_affected_paths = sorted(changed_set | {e[\"path\"] for e in transitive_affected})",
+        'all_affected_paths = sorted(changed_set | {e["path"] for e in transitive_affected})',
         "path order, before test_gaps is cut to 3 as missing_tests",
         forbids="all_affected_paths = list(changed_set |",
     ),

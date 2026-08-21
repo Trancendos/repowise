@@ -96,9 +96,7 @@ def validate_outline(
             report.bad_length_titles.append(f"{page.title} ({words}w)")
         if _is_bare_directory(page.title, page.group.dirs):
             report.bare_directory_titles.append(page.title)
-    report.title_word_avg = (
-        sum(len(t.split()) for t in titles) / len(titles) if titles else 0.0
-    )
+    report.title_word_avg = sum(len(t.split()) for t in titles) / len(titles) if titles else 0.0
 
     keys = Counter(p.structural_key for p in pages)
     report.duplicate_structural_keys = sorted(k for k, n in keys.items() if n > 1)

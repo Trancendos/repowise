@@ -391,9 +391,7 @@ async def _incremental_repo_update(
         # New commits but nothing the index cares about changed (merge/empty
         # commits, or every change excluded). Report success so the caller
         # bumps ``last_sync_commit`` instead of re-diffing forever.
-        return RepoUpdateResult(
-            alias=alias, updated=True, working_tree_paths=working_tree_paths
-        )
+        return RepoUpdateResult(alias=alias, updated=True, working_tree_paths=working_tree_paths)
 
     # Per-repo config, like the single-repo update path. The workspace-level
     # ``exclude_patterns`` (when provided) apply on top.
@@ -999,7 +997,9 @@ async def run_cross_repo_hooks(
             timings.on_phase_done(phase)
 
     overlay_result, store_result = await asyncio.gather(
-        _timed("cross_repo_analysis", run_cross_repo_analysis(ws_config, workspace_root, changed_repos)),
+        _timed(
+            "cross_repo_analysis", run_cross_repo_analysis(ws_config, workspace_root, changed_repos)
+        ),
         _timed(
             "contract_extraction",
             run_contract_extraction(

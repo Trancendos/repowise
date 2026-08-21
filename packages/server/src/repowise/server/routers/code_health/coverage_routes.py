@@ -91,9 +91,7 @@ async def health_coverage(
     # ``summary`` and ``modules`` are both repo-wide aggregates, so this cannot
     # be scoped by ``file_path`` or trimmed by ``limit`` — and none of the three
     # reads ``covered_lines_json``, which is most of the table's bytes.
-    all_rows = await crud.load_coverage_for_repo(
-        session, repo_id, include_covered_lines=False
-    )
+    all_rows = await crud.load_coverage_for_repo(session, repo_id, include_covered_lines=False)
     if not all_rows:
         # No report was ever ingested. The graph can still answer "does a test
         # reach this", so answer that instead of an empty measured shape.
@@ -185,9 +183,7 @@ def _empty_summary() -> dict[str, Any]:
     }
 
 
-async def _inferred_coverage(
-    session: AsyncSession, repo_id: str, limit: int
-) -> dict[str, Any]:
+async def _inferred_coverage(session: AsyncSession, repo_id: str, limit: int) -> dict[str, Any]:
     """The graph-inferred test map, in the shape the measured one leaves empty.
 
     Reuses the health engine's forward walk rather than the attributed reverse

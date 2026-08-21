@@ -368,7 +368,9 @@ async def test_overview_layer_file_count(setup_mcp_with_kg):
     from repowise.server.mcp_server import get_overview
 
     result = await get_overview()
-    core_layer = next(layer for layer in result["architecture"]["layers"] if layer["name"] == "Core Ingestion")
+    core_layer = next(
+        layer for layer in result["architecture"]["layers"] if layer["name"] == "Core Ingestion"
+    )
     assert core_layer["file_count"] == 1
 
 

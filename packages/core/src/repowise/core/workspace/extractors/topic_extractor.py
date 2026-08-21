@@ -244,9 +244,7 @@ class TopicExtractor:
         # File discovery is gitignore- and nested-repo-aware (see
         # ``iter_source_files``) so a workspace repo whose root contains nested
         # repos or large ignored trees is not scanned end-to-end.
-        for rel_path, _suffix, content in select_files(
-            repo_path, _EXTENSIONS, exclude, files
-        ):
+        for rel_path, _suffix, content in select_files(repo_path, _EXTENSIONS, exclude, files):
             for pdef in _ALL_PATTERNS:
                 for match in pdef.regex.finditer(content):
                     topic_name = match.group(pdef.topic_group).strip()

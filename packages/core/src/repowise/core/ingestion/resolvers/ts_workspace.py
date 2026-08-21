@@ -56,32 +56,42 @@ if TYPE_CHECKING:
 # The prune list is deliberately narrow: vendored/derived trees that can
 # never contain *our* manifests or docs. ``.github`` and other dot-dirs that
 # may hold real package.json files (custom actions) are NOT pruned wholesale.
-_SCAN_PRUNE_DIRS: frozenset[str] = frozenset({
-    "node_modules",
-    ".git",
-    ".hg",
-    ".svn",
-    ".venv",
-    "venv",
-    ".tox",
-    "__pycache__",
-    ".repowise",
-    ".repowise.prebench-bak",
-    ".next",
-    ".nuxt",
-    ".turbo",
-    ".cache",
-    ".parcel-cache",
-    ".yarn",
-    ".pnpm-store",
-})
+_SCAN_PRUNE_DIRS: frozenset[str] = frozenset(
+    {
+        "node_modules",
+        ".git",
+        ".hg",
+        ".svn",
+        ".venv",
+        "venv",
+        ".tox",
+        "__pycache__",
+        ".repowise",
+        ".repowise.prebench-bak",
+        ".next",
+        ".nuxt",
+        ".turbo",
+        ".cache",
+        ".parcel-cache",
+        ".yarn",
+        ".pnpm-store",
+    }
+)
 
-_VITEST_CONFIG_NAMES: frozenset[str] = frozenset({
-    "vitest.config.ts", "vitest.config.js", "vitest.config.mts",
-    "vitest.config.mjs", "vitest.config.cjs", "vitest.config.cts",
-    "vite.config.ts", "vite.config.js", "vite.config.mts",
-    "vite.config.mjs",
-})
+_VITEST_CONFIG_NAMES: frozenset[str] = frozenset(
+    {
+        "vitest.config.ts",
+        "vitest.config.js",
+        "vitest.config.mts",
+        "vitest.config.mjs",
+        "vitest.config.cjs",
+        "vitest.config.cts",
+        "vite.config.ts",
+        "vite.config.js",
+        "vite.config.mts",
+        "vite.config.mjs",
+    }
+)
 
 
 @dataclass
@@ -261,19 +271,13 @@ def _match_export_key(
             continue
         if suffix and not key.endswith(suffix):
             continue
-        captured = (
-            key[len(prefix) : len(key) - len(suffix)]
-            if suffix
-            else key[len(prefix) :]
-        )
+        captured = key[len(prefix) : len(key) - len(suffix)] if suffix else key[len(prefix) :]
         if len(prefix) > best_prefix_len:
             # Beyond the head, a candidate carrying no ``*`` is dropped: the
             # same fixed file would otherwise answer every distinct subpath
             # under this key, quietly collapsing them onto one another.
             kept = targets[:1] + tuple(t for t in targets[1:] if "*" in t)
-            best_targets = tuple(
-                t.replace("*", captured, 1) if "*" in t else t for t in kept
-            )
+            best_targets = tuple(t.replace("*", captured, 1) if "*" in t else t for t in kept)
             best_prefix_len = len(prefix)
     return best_targets
 
@@ -337,9 +341,7 @@ def _read_workspace_declaration(repo_path: Path) -> _WorkspaceDeclaration:
         return _WorkspaceDeclaration((), (), include_root=False)
     if not isinstance(data, dict):
         return _WorkspaceDeclaration((), (), include_root=False)
-    return _WorkspaceDeclaration(
-        tuple(_read_workspaces_field(data)), (), include_root=False
-    )
+    return _WorkspaceDeclaration(tuple(_read_workspaces_field(data)), (), include_root=False)
 
 
 def _expand_member_dirs(repo_path: Path, declared: _WorkspaceDeclaration) -> list[Path]:
@@ -411,8 +413,9 @@ def build_workspace_info(repo_path: Path | None) -> dict[str, dict[str, Any]]:
         result[name] = {
             "dir": rel,
             "exports": _build_exports_map(ws_data),
-            "main": ws_data.get("module") if isinstance(ws_data.get("module"), str)
-                    else (ws_data.get("main") if isinstance(ws_data.get("main"), str) else None),
+            "main": ws_data.get("module")
+            if isinstance(ws_data.get("module"), str)
+            else (ws_data.get("main") if isinstance(ws_data.get("main"), str) else None),
         }
     return result
 
@@ -667,9 +670,7 @@ def build_ts_workspace_index(ctx: ResolverContext) -> TsWorkspaceIndex:
             # import the resolver would otherwise drop; letting them widen the
             # published-entry set would suppress dead-code findings instead,
             # which is a different change and is not what was measured here.
-            entries.update(
-                _expand_exports_wildcard(targets[0], pattern, dir_posix, path_set)
-            )
+            entries.update(_expand_exports_wildcard(targets[0], pattern, dir_posix, path_set))
         # ``main``/``module`` shorthand — package's primary entry.
         main = pkg.get("main")
         if isinstance(main, str):
@@ -741,6 +742,7 @@ def find_mdx_import_targets(ctx: ResolverContext) -> set[str]:
             # parser layer to do this, which doesn't run for MDX.
             if spec.startswith("."):
                 import os as _os
+
                 joined = _os.path.normpath(_os.path.join(_os.path.dirname(rel), spec))
                 joined = joined.replace("\\", "/")
                 # Re-express as a relative spec rooted at the repo so
@@ -837,18 +839,36 @@ def find_vitest_include_targets(ctx: ResolverContext) -> set[str]:
 # Source-file extensions a script might point at directly. Includes the
 # ``.mts``/``.cts`` family because hono/zod benchmarks favour them.
 _NPM_SCRIPT_SOURCE_EXTS: tuple[str, ...] = (
-    ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
+    ".mts",
+    ".cts",
 )
 
 # Runner tokens that take a single source path as their first non-flag
 # positional. Detection is positional rather than name-based so we don't
 # have to track shell-syntax quirks (``--`` separators, env-var prefixes,
 # multi-command ``&&`` chains).
-_NPM_SCRIPT_RUNNERS: frozenset[str] = frozenset({
-    "tsx", "ts-node", "ts-node-esm", "vite-node", "swc-node",
-    "node", "deno", "bun",
-    "esbuild", "rollup", "vite", "webpack",
-})
+_NPM_SCRIPT_RUNNERS: frozenset[str] = frozenset(
+    {
+        "tsx",
+        "ts-node",
+        "ts-node-esm",
+        "vite-node",
+        "swc-node",
+        "node",
+        "deno",
+        "bun",
+        "esbuild",
+        "rollup",
+        "vite",
+        "webpack",
+    }
+)
 
 # Sub-package names that conventionally hold ad-hoc / experimental
 # scripts — bench harnesses, tree-shaking experiments, examples, demos.
@@ -856,19 +876,29 @@ _NPM_SCRIPT_RUNNERS: frozenset[str] = frozenset({
 # (``rollup -c --input X.ts``, ``tsx index.ts <file>``) rather than
 # imported by anything in the static graph. Treating them as entry
 # points matches how a human reads the repo: maintained code, not dead.
-_EXPERIMENT_DIR_NAMES: frozenset[str] = frozenset({
-    "bench", "benches", "benchmark", "benchmarks",
-    "treeshake", "treeshaking",
-    "example", "examples",
-    "demo", "demos",
-    "sample", "samples",
-    "playground", "playgrounds",
-    "scratch",
-    # ``scripts/`` is conventionally ad-hoc tooling invoked via npm
-    # commands or pre/post-commit hooks — never imported by application
-    # code, but always maintained. Treat the whole dir as live.
-    "scripts",
-})
+_EXPERIMENT_DIR_NAMES: frozenset[str] = frozenset(
+    {
+        "bench",
+        "benches",
+        "benchmark",
+        "benchmarks",
+        "treeshake",
+        "treeshaking",
+        "example",
+        "examples",
+        "demo",
+        "demos",
+        "sample",
+        "samples",
+        "playground",
+        "playgrounds",
+        "scratch",
+        # ``scripts/`` is conventionally ad-hoc tooling invoked via npm
+        # commands or pre/post-commit hooks — never imported by application
+        # code, but always maintained. Treat the whole dir as live.
+        "scripts",
+    }
+)
 
 
 def _iter_script_tokens(script: str) -> list[str]:
@@ -1008,8 +1038,16 @@ def find_npm_script_entry_targets(ctx: ResolverContext) -> set[str]:
                 # directories that actually exist in ``path_set`` to avoid
                 # treating arbitrary identifiers (``run``, ``--``) as dirs.
                 if "/" not in token and token in (
-                    "src", "lib", "app", "test", "tests", "scripts",
-                    "benchmarks", "perf-measures", "runtime-tests", "build",
+                    "src",
+                    "lib",
+                    "app",
+                    "test",
+                    "tests",
+                    "scripts",
+                    "benchmarks",
+                    "perf-measures",
+                    "runtime-tests",
+                    "build",
                     "examples",
                 ):
                     dir_rel = pkg_prefix + token

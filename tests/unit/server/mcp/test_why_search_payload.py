@@ -226,8 +226,7 @@ async def test_related_documentation_excludes_decision_pages(session, setup_mcp)
     result = await get_why("why zebrafish caching keeps latency down")
 
     assert all(
-        not r["page_id"].startswith(DECISION_VECTOR_PREFIX)
-        for r in result["related_documentation"]
+        not r["page_id"].startswith(DECISION_VECTOR_PREFIX) for r in result["related_documentation"]
     ), result["related_documentation"]
 
 

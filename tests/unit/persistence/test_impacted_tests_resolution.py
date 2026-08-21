@@ -141,7 +141,7 @@ async def test_import_graph_answers_before_the_filename_pattern(async_session) -
 
 
 async def test_a_changed_test_file_is_its_own_candidate(async_session) -> None:
-    """"That test has no test" is true and useless; run the test you changed."""
+    """ "That test has no test" is true and useless; run the test you changed."""
     from repowise.core.persistence.models import GraphNode
 
     repo = await insert_repo(async_session)

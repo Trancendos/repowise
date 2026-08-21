@@ -30,9 +30,9 @@ def tree(tmp_path: Path) -> Path:
         "tests/conftest.py",
         "tests/test_a.py",
         "tests/sub/test_b.py",
-        "node_modules/dep/index.js",          # pruned dir
-        "build/gen.go",                       # pruned (derived set)
-        "vendored/.git/HEAD",                 # nested git repo
+        "node_modules/dep/index.js",  # pruned dir
+        "build/gen.go",  # pruned (derived set)
+        "vendored/.git/HEAD",  # nested git repo
         "vendored/inner.go",
         "META-INF/services/com.example.Impl",
     ]
@@ -50,12 +50,12 @@ QUERIES = [
     "*.go",
     "*.py",
     "settings.py",
-    "settings",            # directory-name match
+    "settings",  # directory-name match
     "conftest.py",
     "go.mod",
-    "tsconfig*.json",      # no matches
-    "META-INF/services",   # /-tail pattern
-    ("*.go", "*.py"),      # multi-pattern, one walk
+    "tsconfig*.json",  # no matches
+    "META-INF/services",  # /-tail pattern
+    ("*.go", "*.py"),  # multi-pattern, one walk
 ]
 
 
@@ -79,9 +79,9 @@ class TestWalkSnapshotEquivalence:
     def test_pruned_and_nested_git_excluded(self, tree: Path) -> None:
         snap = WalkSnapshot(tree, prune_dirs=PRUNED_DIRS_DERIVED)
         hits = {p.name for p in snap.iter_glob(tree, ("*.go", "*.js"))}
-        assert "index.js" not in hits   # node_modules pruned
-        assert "gen.go" not in hits     # build pruned (derived set)
-        assert "inner.go" not in hits   # nested git repo pruned
+        assert "index.js" not in hits  # node_modules pruned
+        assert "gen.go" not in hits  # build pruned (derived set)
+        assert "inner.go" not in hits  # nested git repo pruned
 
     def test_out_of_tree_root_falls_back_to_live_walk(self, tree: Path, tmp_path_factory) -> None:
         other = tmp_path_factory.mktemp("elsewhere")
@@ -108,9 +108,7 @@ class TestWalkSnapshotEquivalence:
             tree, ["app/settings/base.py", "pkg/settings/local.py", "pkg/sub/deep/b.go"]
         )
         # Directory-name pattern yields the reconstructed dirs.
-        dirs = sorted(
-            p.relative_to(tree).as_posix() for p in list_snap.iter_glob(tree, "settings")
-        )
+        dirs = sorted(p.relative_to(tree).as_posix() for p in list_snap.iter_glob(tree, "settings"))
         assert dirs == ["app/settings", "pkg/settings"]
         # Subtree-rooted query serves only that subtree.
         sub = [p.name for p in list_snap.iter_glob(tree / "pkg", "*.py")]

@@ -51,9 +51,26 @@ _GENERIC_SEGMENTS = GENERIC_ORG_SEGMENTS
 
 # Keywords checked in filename stems for fallback labeling
 _LABEL_KEYWORDS = (
-    "api", "auth", "model", "service", "handler", "router", "db",
-    "cache", "worker", "util", "test", "config", "middleware", "schema",
-    "controller", "view", "store", "hook", "plugin", "adapter",
+    "api",
+    "auth",
+    "model",
+    "service",
+    "handler",
+    "router",
+    "db",
+    "cache",
+    "worker",
+    "util",
+    "test",
+    "config",
+    "middleware",
+    "schema",
+    "controller",
+    "view",
+    "store",
+    "hook",
+    "plugin",
+    "adapter",
 )
 
 
@@ -156,7 +173,8 @@ def _partition(graph: nx.Graph) -> tuple[dict, str]:
 
 
 def _split_community(
-    graph: nx.Graph, nodes: list[str],
+    graph: nx.Graph,
+    nodes: list[str],
 ) -> list[list[str]]:
     """Run a second partition pass on an oversized community subgraph."""
     subgraph = graph.subgraph(nodes)
@@ -370,7 +388,8 @@ def _deduplicate_labels(
 
 
 def _dominant_language(
-    members: list[str], graph: nx.DiGraph,
+    members: list[str],
+    graph: nx.DiGraph,
 ) -> str:
     """Find the most common language among community members."""
     lang_counter: Counter[str] = Counter()
@@ -387,6 +406,7 @@ def _dominant_language(
 # ---------------------------------------------------------------------------
 # Test / production separation
 # ---------------------------------------------------------------------------
+
 
 def _is_test_node(node_id: str, data: dict) -> bool:
     """Whether a graph file node is test material.
@@ -450,8 +470,7 @@ def detect_file_communities(
     # Sorted: node order seeds the undirected graph's insertion order, and
     # Louvain/Leiden partitions depend on iteration order even when seeded.
     file_nodes = sorted(
-        n for n, d in graph.nodes(data=True)
-        if d.get("node_type", "file") == "file"
+        n for n, d in graph.nodes(data=True) if d.get("node_type", "file") == "file"
     )
 
     if not file_nodes:
@@ -583,10 +602,7 @@ def detect_symbol_communities(graph: nx.DiGraph) -> dict[str, int]:
     # Sorted for the same reason detect_file_communities sorts its node list:
     # insertion order seeds the partition, and the graph's is not stable
     # between runs. This half was left unsorted when the file half was fixed.
-    symbol_nodes = sorted(
-        n for n, d in graph.nodes(data=True)
-        if d.get("node_type") == "symbol"
-    )
+    symbol_nodes = sorted(n for n, d in graph.nodes(data=True) if d.get("node_type") == "symbol")
 
     if not symbol_nodes:
         return {}

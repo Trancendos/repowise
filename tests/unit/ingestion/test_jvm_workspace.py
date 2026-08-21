@@ -128,8 +128,9 @@ class TestJvmWorkspaceIndex:
         (services_dir / "com.example.Plugin").write_text(
             "com.example.impl.PluginA\n# comment\ncom.example.impl.PluginB\n"
         )
-        a = _make_java(tmp_path, "src/main/java/com/example/impl/PluginA.java",
-                       "com.example.impl", "PluginA")
+        a = _make_java(
+            tmp_path, "src/main/java/com/example/impl/PluginA.java", "com.example.impl", "PluginA"
+        )
 
         ctx = _ctx(tmp_path, [a])
         index = build_jvm_workspace_index(ctx)
@@ -142,11 +143,12 @@ class TestJvmWorkspaceIndex:
     def test_spring_autoconfig_imports(self, tmp_path: Path) -> None:
         imports_dir = tmp_path / "src" / "main" / "resources" / "META-INF" / "spring"
         imports_dir.mkdir(parents=True)
-        (imports_dir / "org.springframework.boot.autoconfigure.AutoConfiguration.imports").write_text(
-            "com.example.MyAutoConfig\n# another\ncom.example.OtherConfig\n"
+        (
+            imports_dir / "org.springframework.boot.autoconfigure.AutoConfiguration.imports"
+        ).write_text("com.example.MyAutoConfig\n# another\ncom.example.OtherConfig\n")
+        a = _make_java(
+            tmp_path, "src/main/java/com/example/MyAutoConfig.java", "com.example", "MyAutoConfig"
         )
-        a = _make_java(tmp_path, "src/main/java/com/example/MyAutoConfig.java",
-                       "com.example", "MyAutoConfig")
 
         ctx = _ctx(tmp_path, [a])
         index = build_jvm_workspace_index(ctx)
@@ -189,9 +191,7 @@ class TestMemberFqnResolution:
         b = _make_kotlin(tmp_path, "src/main/java/okio/ByteString.kt", "okio", "ByteString")
         u = _make_kotlin(tmp_path, "src/main/java/okio/User.kt", "okio", "User")
         ctx = _ctx(tmp_path, [b, u])
-        targets = resolve_kotlin_import_all(
-            "okio.ByteString.Companion.encodeUtf8", u, ctx
-        )
+        targets = resolve_kotlin_import_all("okio.ByteString.Companion.encodeUtf8", u, ctx)
         assert targets == (b,)
 
     def test_kotlin_member_wildcard_import_resolves(self, tmp_path: Path) -> None:

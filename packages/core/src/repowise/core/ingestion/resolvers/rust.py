@@ -201,9 +201,7 @@ def _follow_crate_root_reexport(
 
 
 @lru_cache(maxsize=4096)
-def _find_rust_crate_root_cached(
-    importer_path: str, parsed_file_keys: frozenset[str]
-) -> str:
+def _find_rust_crate_root_cached(importer_path: str, parsed_file_keys: frozenset[str]) -> str:
     """Cached crate-root lookup (pure function with hashable args)."""
     parts = Path(importer_path).parts
     for i in range(len(parts) - 1, -1, -1):

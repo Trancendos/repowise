@@ -37,9 +37,7 @@ def test_map_hit_matches_disk_read(tmp_path, label, data, encoding, errors):
     f = tmp_path / "Sample.cs"
     f.write_bytes(data)
 
-    from_map = source_text(
-        "Sample.cs", f, {"Sample.cs": data}, encoding=encoding, errors=errors
-    )
+    from_map = source_text("Sample.cs", f, {"Sample.cs": data}, encoding=encoding, errors=errors)
     from_disk = source_text("Sample.cs", f, None, encoding=encoding, errors=errors)
 
     assert from_map == from_disk

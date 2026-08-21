@@ -524,4 +524,3 @@ export async function computeElkModulePositions(
 
   return positions;
 }
-

@@ -476,9 +476,7 @@ class EpisodeStore:
         self.prune(now=stamp)
         return noted
 
-    def _note_missing_sources(
-        self, tier: str, kind: str, present_subjects: Sequence[str]
-    ) -> int:
+    def _note_missing_sources(self, tier: str, kind: str, present_subjects: Sequence[str]) -> int:
         """Make the note match what is on disk, in both directions. In-transaction.
 
         A temporary table rather than a ``NOT IN`` list, because this is a
@@ -760,9 +758,7 @@ class EpisodeStore:
                 del row["body"]
         return rows
 
-    def group_counts(
-        self, column: str, *, tiers: Sequence[str] | None = None
-    ) -> dict[str, int]:
+    def group_counts(self, column: str, *, tiers: Sequence[str] | None = None) -> dict[str, int]:
         """``COUNT(*) GROUP BY column``, for a caller that needs a breakdown.
 
         *column* is checked against a literal allowlist rather than escaped: it
@@ -783,9 +779,7 @@ class EpisodeStore:
         sql = f"SELECT {column}, COUNT(*) FROM episodes{where} GROUP BY {column}"
         return {str(name): int(n) for name, n in self._conn.execute(sql, params)}
 
-    def get_episode(
-        self, episode_id: str, *, tiers: Sequence[str] | None = None
-    ) -> dict | None:
+    def get_episode(self, episode_id: str, *, tiers: Sequence[str] | None = None) -> dict | None:
         """One episode by id, or None — including when its tier is not allowed.
 
         The tier allowlist is applied here rather than by the caller because
@@ -830,9 +824,7 @@ class EpisodeStore:
         if built is None:
             return 0
         where, params = built
-        (rows,) = self._conn.execute(
-            f"SELECT COUNT(*) FROM episodes{where}", params
-        ).fetchone()
+        (rows,) = self._conn.execute(f"SELECT COUNT(*) FROM episodes{where}", params).fetchone()
         return int(rows)
 
     def search(
@@ -992,9 +984,7 @@ class EpisodeStore:
             for rows in self._scan_by_node(paths, tiers).values():
                 for row in rows:
                     seen[row["id"]] = row
-            ordered = sorted(
-                seen.values(), key=lambda r: (-(r.get("birth_at") or 0.0), r["id"])
-            )
+            ordered = sorted(seen.values(), key=lambda r: (-(r.get("birth_at") or 0.0), r["id"]))
             return ordered[: max(1, limit)]
         subs: list[str] = []
         params: list[object] = []

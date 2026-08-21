@@ -217,11 +217,8 @@ async def _degraded_next_action(symbol_bodies: list[dict], ctx, repository, excl
         repository,
         exclude_spec,
     )
-    return (
-        f"{cut['name']} was served through line {cut['lines'][1]}; call get_symbol "
-        + (
-            f"id='{hint_id}' for the withheld body."
-            if hint_id
-            else f"id='{cut['continuation']}' for the rest of it."
-        )
+    return f"{cut['name']} was served through line {cut['lines'][1]}; call get_symbol " + (
+        f"id='{hint_id}' for the withheld body."
+        if hint_id
+        else f"id='{cut['continuation']}' for the rest of it."
     )

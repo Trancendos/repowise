@@ -129,9 +129,7 @@ async def test_hierarchy_fields_are_refreshed_when_only_they_changed(async_sessi
     assert page.structural_key == "grp-bbbbbbbbbbbb"
 
 
-async def test_hierarchy_fields_default_for_a_page_that_has_no_place_yet(
-    async_session, repo_id
-):
+async def test_hierarchy_fields_default_for_a_page_that_has_no_place_yet(async_session, repo_id):
     """Every existing page predates these columns, so the unset case is normal."""
     await _upsert(async_session, repository_id=repo_id, title="Ingestion Pipeline")
     await async_session.commit()

@@ -30,9 +30,7 @@ def _git_init(p: Path) -> None:
 def _write_state(repo: Path, commit: str) -> None:
     rdir = repo / ".repowise"
     rdir.mkdir(exist_ok=True)
-    (rdir / "state.json").write_text(
-        json.dumps({"last_sync_commit": commit}), encoding="utf-8"
-    )
+    (rdir / "state.json").write_text(json.dumps({"last_sync_commit": commit}), encoding="utf-8")
 
 
 def test_workspace_checks_detects_state_drift(tmp_path: Path) -> None:
@@ -41,11 +39,13 @@ def test_workspace_checks_detects_state_drift(tmp_path: Path) -> None:
     _write_state(backend, "real-sha-from-state")
 
     cfg = WorkspaceConfig(
-        repos=[RepoEntry(
-            path="backend",
-            alias="backend",
-            last_commit_at_index="stale-sha-in-config",
-        )],
+        repos=[
+            RepoEntry(
+                path="backend",
+                alias="backend",
+                last_commit_at_index="stale-sha-in-config",
+            )
+        ],
     )
     cfg.save(tmp_path)
 
@@ -69,11 +69,13 @@ def test_workspace_checks_repair_syncs_drift(tmp_path: Path) -> None:
     _write_state(backend, real_sha)
 
     cfg = WorkspaceConfig(
-        repos=[RepoEntry(
-            path="backend",
-            alias="backend",
-            last_commit_at_index="OLD",
-        )],
+        repos=[
+            RepoEntry(
+                path="backend",
+                alias="backend",
+                last_commit_at_index="OLD",
+            )
+        ],
     )
     cfg.save(tmp_path)
 
@@ -88,7 +90,9 @@ def test_workspace_checks_repair_drops_dead_entries(tmp_path: Path) -> None:
     cfg = WorkspaceConfig(
         repos=[
             RepoEntry(
-                path="backend", alias="backend", last_commit_at_index="deadbeef",
+                path="backend",
+                alias="backend",
+                last_commit_at_index="deadbeef",
             ),
             RepoEntry(path="ghost", alias="ghost"),
         ],
@@ -108,9 +112,13 @@ def test_workspace_checks_clean_workspace_has_no_issues(tmp_path: Path) -> None:
     sha = "f" * 40
     _write_state(backend, sha)
     cfg = WorkspaceConfig(
-        repos=[RepoEntry(
-            path="backend", alias="backend", last_commit_at_index=sha,
-        )],
+        repos=[
+            RepoEntry(
+                path="backend",
+                alias="backend",
+                last_commit_at_index=sha,
+            )
+        ],
     )
     cfg.save(tmp_path)
     issues = _run_workspace_checks(tmp_path, cfg, repair=False)
@@ -128,17 +136,22 @@ def test_doctor_command_workspace_flag_runs(tmp_path: Path) -> None:
     (backend / ".repowise" / "wiki.db").write_bytes(b"")
 
     cfg = WorkspaceConfig(
-        repos=[RepoEntry(
-            path="backend", alias="backend",
-            is_primary=True, last_commit_at_index=sha,
-        )],
+        repos=[
+            RepoEntry(
+                path="backend",
+                alias="backend",
+                is_primary=True,
+                last_commit_at_index=sha,
+            )
+        ],
         default_repo="backend",
     )
     cfg.save(tmp_path)
 
     runner = CliRunner()
     result = runner.invoke(
-        doctor_command, [str(tmp_path), "--workspace"],
+        doctor_command,
+        [str(tmp_path), "--workspace"],
     )
     # The per-repo db check may fail because wiki.db is an empty file,
     # but the workspace doctor wiring must not crash.

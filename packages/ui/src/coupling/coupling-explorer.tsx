@@ -95,7 +95,7 @@ export function CouplingExplorer({
     setPinned(path);
     onFocusChange?.(path);
   };
-  
+
   // Drop a stale pin if a background revalidation returns an edge set that no
   // longer contains it, so the guidance never claims to trace a vanished file.
   const nodePaths = useMemo(
@@ -108,7 +108,7 @@ export function CouplingExplorer({
     // the latest onFocusChange.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pinned, nodePaths]);
-  
+
   // Transient hover peeks over the sticky pin: what the ring and table light up.
   const focus = hover ?? pinned;
 

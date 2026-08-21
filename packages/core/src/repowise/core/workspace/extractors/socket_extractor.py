@@ -160,9 +160,7 @@ class SocketExtractor:
         contracts: list[Contract] = []
         seen: set[tuple[str, str, str]] = set()
 
-        for rel_path, _suffix, content in select_files(
-            repo_path, _EXTENSIONS, exclude, files
-        ):
+        for rel_path, _suffix, content in select_files(repo_path, _EXTENSIONS, exclude, files):
             for pdef in _CLIENT_PATTERNS + _PROVIDER_PATTERNS:
                 if pdef.context_regex is not None and not pdef.context_regex.search(content):
                     continue

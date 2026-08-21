@@ -58,9 +58,7 @@ def _reset_recorder():
 )
 def test_rebuild_threads_state_git_tier(tmp_path, monkeypatch, state_tier, expected):
     _init_repo(tmp_path)
-    monkeypatch.setattr(
-        "repowise.core.ingestion.git_indexer.GitIndexer", _RecordingIndexer
-    )
+    monkeypatch.setattr("repowise.core.ingestion.git_indexer.GitIndexer", _RecordingIndexer)
 
     _rebuild_graph_and_git(tmp_path, [], {}, [], git_tier=state_tier)
 

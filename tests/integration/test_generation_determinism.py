@@ -61,9 +61,7 @@ async def _generate(parsed_files, source_map, tmp, *, order) -> list:
     builder.build()
 
     packages = [
-        PackageInfo(
-            name=d.name, path=d.name, language="unknown", entry_points=[], manifest_file=""
-        )
+        PackageInfo(name=d.name, path=d.name, language="unknown", entry_points=[], manifest_file="")
         for d in SAMPLE_REPO.iterdir()
         if d.is_dir()
     ]

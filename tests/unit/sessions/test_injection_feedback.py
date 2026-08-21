@@ -117,9 +117,7 @@ async def test_injection_no_session_could_disagree_with_is_not_followed(session,
         assert store.decision_feedback_totals()["no_verdict"] == 1
 
 
-async def test_contradicting_correction_is_recorded_without_touching_staleness(
-    session, tmp_path
-):
+async def test_contradicting_correction_is_recorded_without_touching_staleness(session, tmp_path):
     session.add(Repository(id=_REPO_ID, name="r", local_path=str(tmp_path)))
     await _add_decision(session, "d1", staleness=0.1)
     _record_injection(tmp_path, "sess-1", "d1", _OLD_ENOUGH)

@@ -26,8 +26,18 @@ async def repo(async_session):
 
 async def test_upsert_kg_layers_creates_layers(async_session, repo):
     layers = [
-        {"id": "layer:cli", "name": "CLI", "description": "Command line", "nodeIds": ["file:main.py"]},
-        {"id": "layer:core", "name": "Core", "description": "Core logic", "nodeIds": ["file:core.py"]},
+        {
+            "id": "layer:cli",
+            "name": "CLI",
+            "description": "Command line",
+            "nodeIds": ["file:main.py"],
+        },
+        {
+            "id": "layer:core",
+            "name": "Core",
+            "description": "Core logic",
+            "nodeIds": ["file:core.py"],
+        },
     ]
     await upsert_kg_layers(async_session, repo.id, layers)
     result = await get_kg_layers(async_session, repo.id)
@@ -39,8 +49,12 @@ async def test_upsert_kg_layers_creates_layers(async_session, repo):
 
 async def test_upsert_kg_layers_replaces_on_reinit(async_session, repo):
     """Verify delete-then-insert: old layers don't persist."""
-    await upsert_kg_layers(async_session, repo.id, [{"id": "layer:old", "name": "Old", "nodeIds": []}])
-    await upsert_kg_layers(async_session, repo.id, [{"id": "layer:new", "name": "New", "nodeIds": []}])
+    await upsert_kg_layers(
+        async_session, repo.id, [{"id": "layer:old", "name": "Old", "nodeIds": []}]
+    )
+    await upsert_kg_layers(
+        async_session, repo.id, [{"id": "layer:new", "name": "New", "nodeIds": []}]
+    )
     result = await get_kg_layers(async_session, repo.id)
     assert len(result) == 1
     assert result[0].layer_id == "layer:new"
@@ -74,8 +88,18 @@ async def test_upsert_kg_layers_node_ids_key_variants(async_session, repo):
 
 async def test_upsert_kg_tour_steps(async_session, repo):
     steps = [
-        {"order": 1, "title": "Entry Point", "description": "Start here", "nodeIds": ["file:main.py"]},
-        {"order": 2, "title": "Core Logic", "description": "Then here", "nodeIds": ["file:core.py"]},
+        {
+            "order": 1,
+            "title": "Entry Point",
+            "description": "Start here",
+            "nodeIds": ["file:main.py"],
+        },
+        {
+            "order": 2,
+            "title": "Core Logic",
+            "description": "Then here",
+            "nodeIds": ["file:core.py"],
+        },
     ]
     await upsert_kg_tour_steps(async_session, repo.id, steps)
     result = await get_kg_tour_steps(async_session, repo.id)
@@ -88,11 +112,13 @@ async def test_upsert_kg_tour_steps(async_session, repo):
 async def test_upsert_kg_tour_steps_replaces(async_session, repo):
     """Tour steps replaced on re-init."""
     await upsert_kg_tour_steps(
-        async_session, repo.id,
+        async_session,
+        repo.id,
         [{"order": 1, "title": "Old", "nodeIds": []}],
     )
     await upsert_kg_tour_steps(
-        async_session, repo.id,
+        async_session,
+        repo.id,
         [{"order": 1, "title": "New", "nodeIds": []}],
     )
     result = await get_kg_tour_steps(async_session, repo.id)
@@ -114,7 +140,8 @@ async def test_get_kg_tour_steps_empty_for_new_repo(async_session, repo):
 async def test_kg_layers_description_defaults_empty(async_session, repo):
     """Description defaults to empty string when not provided."""
     await upsert_kg_layers(
-        async_session, repo.id,
+        async_session,
+        repo.id,
         [{"id": "layer:minimal", "name": "Minimal", "nodeIds": []}],
     )
     result = await get_kg_layers(async_session, repo.id)
@@ -123,7 +150,8 @@ async def test_kg_layers_description_defaults_empty(async_session, repo):
 
 async def test_kg_tour_steps_description_defaults_empty(async_session, repo):
     await upsert_kg_tour_steps(
-        async_session, repo.id,
+        async_session,
+        repo.id,
         [{"order": 1, "title": "No desc", "nodeIds": []}],
     )
     result = await get_kg_tour_steps(async_session, repo.id)
@@ -142,7 +170,8 @@ async def test_kg_layers_sub_groups_round_trip(async_session, repo):
         {"id": "layer:ui:tables", "name": "tables", "nodeIds": ["file:src/ui/table.tsx"]},
     ]
     await upsert_kg_layers(
-        async_session, repo.id,
+        async_session,
+        repo.id,
         [{"id": "layer:ui", "name": "UI", "nodeIds": [], "subGroups": sub_groups}],
     )
     result = await get_kg_layers(async_session, repo.id)
@@ -152,7 +181,8 @@ async def test_kg_layers_sub_groups_round_trip(async_session, repo):
 async def test_kg_layers_sub_groups_default_empty(async_session, repo):
     """Layers without subGroups (legacy / community layers) store []."""
     await upsert_kg_layers(
-        async_session, repo.id,
+        async_session,
+        repo.id,
         [{"id": "layer:plain", "name": "Plain", "nodeIds": []}],
     )
     result = await get_kg_layers(async_session, repo.id)
@@ -161,9 +191,16 @@ async def test_kg_layers_sub_groups_default_empty(async_session, repo):
 
 async def test_kg_layers_sub_groups_snake_case_variant(async_session, repo):
     await upsert_kg_layers(
-        async_session, repo.id,
-        [{"id": "layer:s", "name": "S", "nodeIds": [],
-          "sub_groups": [{"id": "layer:s:x", "name": "x", "nodeIds": []}]}],
+        async_session,
+        repo.id,
+        [
+            {
+                "id": "layer:s",
+                "name": "S",
+                "nodeIds": [],
+                "sub_groups": [{"id": "layer:s:x", "name": "x", "nodeIds": []}],
+            }
+        ],
     )
     result = await get_kg_layers(async_session, repo.id)
     assert json.loads(result[0].sub_groups_json)[0]["name"] == "x"
@@ -197,7 +234,8 @@ async def test_kg_tour_steps_curated_fields_round_trip(async_session, repo):
 async def test_kg_tour_steps_legacy_steps_get_defaults(async_session, repo):
     """Legacy LLM tour steps (no curated fields) store None/empty defaults."""
     await upsert_kg_tour_steps(
-        async_session, repo.id,
+        async_session,
+        repo.id,
         [{"order": 1, "title": "Legacy", "description": "d", "nodeIds": ["file:a.py"]}],
     )
     row = (await get_kg_tour_steps(async_session, repo.id))[0]
@@ -211,7 +249,8 @@ async def test_kg_tour_steps_legacy_steps_get_defaults(async_session, repo):
 
 async def test_kg_project_meta_round_trip(async_session, repo):
     await upsert_kg_project_meta(
-        async_session, repo.id,
+        async_session,
+        repo.id,
         entry_points=["src/main.py", "src/cli.py"],
         entry_candidates=["src/main.py", "src/cli.py", "src/app.py"],
     )
@@ -219,7 +258,9 @@ async def test_kg_project_meta_round_trip(async_session, repo):
     assert meta is not None
     assert json.loads(meta.entry_points_json) == ["src/main.py", "src/cli.py"]
     assert json.loads(meta.entry_candidates_json) == [
-        "src/main.py", "src/cli.py", "src/app.py",
+        "src/main.py",
+        "src/cli.py",
+        "src/app.py",
     ]
 
 
@@ -237,8 +278,12 @@ async def test_kg_project_meta_missing_returns_none(async_session, repo):
 
 async def test_kg_node_meta_round_trip(async_session, repo):
     nodes = [
-        {"id": "src/main.py", "type": "file", "summary": "CLI entry point.",
-         "tags": ["entry_point", "python"]},
+        {
+            "id": "src/main.py",
+            "type": "file",
+            "summary": "CLI entry point.",
+            "tags": ["entry_point", "python"],
+        },
         {"id": "Dockerfile", "type": "service", "summary": "Container build.", "tags": []},
     ]
     await upsert_kg_node_meta(async_session, repo.id, nodes)

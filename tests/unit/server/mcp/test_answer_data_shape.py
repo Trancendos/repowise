@@ -115,9 +115,9 @@ def test_long_pasted_body_with_no_question_never_fires():
     thinnest possible answer to the broadest possible ask.
     """
     trace = (
-        'Traceback (most recent call last):\n'
+        "Traceback (most recent call last):\n"
         '  File "app/models.py", line 88, in save\n'
-        '    self.full_clean()\n'
+        "    self.full_clean()\n"
         'ValidationError: {"schema": ["This field is required."]}\n'
     ) * 8
     assert len(trace) > 400

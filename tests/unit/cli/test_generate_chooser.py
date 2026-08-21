@@ -47,9 +47,7 @@ class _MG:
 def test_choose_cascade_skips_prompt_when_outcome_is_identical() -> None:
     # No containers and no repo-wide pages: every cascade mode generates exactly
     # the seed, so the choice cannot change the outcome and must not prompt.
-    deps = build_page_dependencies(
-        module_groups=[], scc_groups=[], repo_wide_ids=()
-    )
+    deps = build_page_dependencies(module_groups=[], scc_groups=[], repo_wide_ids=())
     console = _RecordingConsole()
     mode = choose_cascade(console, {"file_page:a.py"}, deps, default="none")
     assert mode == "none"
@@ -85,9 +83,7 @@ def _run(records, deps):
 
 def test_run_interactive_chooser_returns_cascade_when_unwritten() -> None:
     records = [PageRecord("module_page:src", "module_page", "src", is_template=True)]
-    deps = build_page_dependencies(
-        module_groups=[], scc_groups=[], repo_wide_ids=()
-    )
+    deps = build_page_dependencies(module_groups=[], scc_groups=[], repo_wide_ids=())
     choice = _run(records, deps)
     assert choice is not None
     # No containers/repo-wide, so cascade cannot change the outcome; the default
@@ -97,9 +93,7 @@ def test_run_interactive_chooser_returns_cascade_when_unwritten() -> None:
 
 def test_run_interactive_chooser_bails_when_nothing_unwritten() -> None:
     records = [PageRecord("module_page:src", "module_page", "src", is_template=False)]
-    deps = build_page_dependencies(
-        module_groups=[], scc_groups=[], repo_wide_ids=()
-    )
+    deps = build_page_dependencies(module_groups=[], scc_groups=[], repo_wide_ids=())
     # Guard fires before the cascade step: every page is already written.
     assert _run(records, deps) is None
 
