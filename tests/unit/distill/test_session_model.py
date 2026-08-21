@@ -84,9 +84,7 @@ def test_most_recent_agent_wins_across_agents(tmp_path: Path) -> None:
     _write_claude(projects, repo, "claude-opus-4-8", mtime=1000.0)
     _write_codex(codex, repo, "gpt-5-codex", mtime=3000.0)  # newer
 
-    resolved = resolve_session_model(
-        repo, projects_root=projects, codex_sessions_root=codex
-    )
+    resolved = resolve_session_model(repo, projects_root=projects, codex_sessions_root=codex)
     assert resolved.model == "gpt-5-codex"
     assert resolved.agent == "codex"
     assert "Codex" in resolved.source
@@ -100,8 +98,6 @@ def test_codex_session_outside_repo_is_ignored(tmp_path: Path) -> None:
     _write_claude(projects, repo, "claude-opus-4-8", mtime=1000.0)
     _write_codex(codex, other, "gpt-5-codex", mtime=3000.0)  # newer but wrong repo
 
-    resolved = resolve_session_model(
-        repo, projects_root=projects, codex_sessions_root=codex
-    )
+    resolved = resolve_session_model(repo, projects_root=projects, codex_sessions_root=codex)
     assert resolved.model == "claude-opus-4-8"
     assert resolved.agent == "claude_code"

@@ -321,9 +321,7 @@ async def test_a_seeded_zero_bus_factor_is_read_as_unknown(client: AsyncClient, 
     assert model.box_signals[core.id].min_bus_factor == 2
 
 
-async def test_a_layer_whose_member_list_is_not_a_list_is_skipped(
-    client: AsyncClient, app
-) -> None:
+async def test_a_layer_whose_member_list_is_not_a_list_is_skipped(client: AsyncClient, app) -> None:
     """A bare JSON string parses fine and then iterates into single letters.
 
     Only a decode failure was guarded, so ``"abc"`` produced three file paths
@@ -369,9 +367,7 @@ async def test_a_layer_whose_member_list_is_not_a_list_is_skipped(
     assert file_layers == {"packages/core/src/ingestion/parser.py": "Ingestion"}
 
 
-async def test_the_tour_is_ordered_and_carries_its_layer_name(
-    client: AsyncClient, app
-) -> None:
+async def test_the_tour_is_ordered_and_carries_its_layer_name(client: AsyncClient, app) -> None:
     """Steps arrive unordered and name a layer by id, not by its display name."""
     from repowise.core.persistence.models import KnowledgeGraphLayer, KnowledgeGraphTourStep
 

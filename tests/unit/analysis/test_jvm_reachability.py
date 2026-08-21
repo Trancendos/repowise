@@ -115,13 +115,15 @@ class TestJvmFileReachable:
         graph = _build_graph(
             {
                 "app/svc/UserService.java": _java_file(
-                    symbols=[{
-                        "name": "UserService",
-                        "kind": "class",
-                        "visibility": "public",
-                        "decorators": ["@Service"],
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "UserService",
+                            "kind": "class",
+                            "visibility": "public",
+                            "decorators": ["@Service"],
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
         )
@@ -132,13 +134,15 @@ class TestJvmFileReachable:
         graph = _build_graph(
             {
                 "app/App.java": _java_file(
-                    symbols=[{
-                        "name": "App",
-                        "kind": "class",
-                        "visibility": "public",
-                        "decorators": ["@SpringBootApplication"],
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "App",
+                            "kind": "class",
+                            "visibility": "public",
+                            "decorators": ["@SpringBootApplication"],
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
         )
@@ -149,12 +153,14 @@ class TestJvmFileReachable:
         graph = _build_graph(
             {
                 "app/Launcher.java": _java_file(
-                    symbols=[{
-                        "name": "main",
-                        "kind": "method",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "main",
+                            "kind": "method",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
         )
@@ -165,13 +171,15 @@ class TestJvmFileReachable:
         graph = _build_graph(
             {
                 "app/User.java": _java_file(
-                    symbols=[{
-                        "name": "User",
-                        "kind": "class",
-                        "visibility": "public",
-                        "decorators": ["@jakarta.persistence.Entity"],
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "User",
+                            "kind": "class",
+                            "visibility": "public",
+                            "decorators": ["@jakarta.persistence.Entity"],
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
         )
@@ -182,12 +190,14 @@ class TestJvmFileReachable:
         graph = _build_graph(
             {
                 "lib/Dead.java": _java_file(
-                    symbols=[{
-                        "name": "Dead",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Dead",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
         )
@@ -198,12 +208,14 @@ class TestJvmFileReachable:
         graph = _build_graph(
             {
                 "app/Main.kt": _kt_file(
-                    symbols=[{
-                        "name": "main",
-                        "kind": "function",
-                        "visibility": "public",
-                        "language": "kotlin",
-                    }],
+                    symbols=[
+                        {
+                            "name": "main",
+                            "kind": "function",
+                            "visibility": "public",
+                            "language": "kotlin",
+                        }
+                    ],
                 ),
             },
         )
@@ -230,15 +242,9 @@ class TestJvmNeverFlag:
 
     def test_caffeine_test_source_sets_never_flagged(self) -> None:
         # These exact paths surface as false positives in the baseline.
-        assert _matches_any(
-            "caffeine/src/apacheTest/java/com/foo/CacheTest.java"
-        )
-        assert _matches_any(
-            "caffeine/src/eclipseTest/java/com/foo/SuiteTest.java"
-        )
-        assert _matches_any(
-            "caffeine/src/frayTest/java/com/foo/SomeFrayTest.java"
-        )
+        assert _matches_any("caffeine/src/apacheTest/java/com/foo/CacheTest.java")
+        assert _matches_any("caffeine/src/eclipseTest/java/com/foo/SuiteTest.java")
+        assert _matches_any("caffeine/src/frayTest/java/com/foo/SomeFrayTest.java")
 
     def test_integration_test_source_set(self) -> None:
         assert _matches_any("module/src/integrationTest/java/com/foo/IT.java")
@@ -251,9 +257,7 @@ class TestJvmNeverFlag:
 
     def test_generated_roots_never_flagged(self) -> None:
         assert _matches_any("module/build/generated/foo/Bar.java")
-        assert _matches_any(
-            "module/build/generated/source/kapt/main/com/foo/Generated.java"
-        )
+        assert _matches_any("module/build/generated/source/kapt/main/com/foo/Generated.java")
         assert _matches_any("module/target/generated-sources/Q_User.java")
 
     def test_ordinary_main_source_not_flagged(self) -> None:
@@ -297,13 +301,24 @@ class TestJvmContractMethods:
 
 class TestJvmFrameworkDecorators:
     def test_spring_stereotypes_present(self) -> None:
-        for d in ("Component", "Service", "Repository", "RestController",
-                  "SpringBootApplication", "Configuration"):
+        for d in (
+            "Component",
+            "Service",
+            "Repository",
+            "RestController",
+            "SpringBootApplication",
+            "Configuration",
+        ):
             assert d in _FRAMEWORK_DECORATORS
 
     def test_routing_annotations_present(self) -> None:
-        for d in ("GetMapping", "PostMapping", "RequestMapping",
-                  "MessageMapping", "ExceptionHandler"):
+        for d in (
+            "GetMapping",
+            "PostMapping",
+            "RequestMapping",
+            "MessageMapping",
+            "ExceptionHandler",
+        ):
             assert d in _FRAMEWORK_DECORATORS
 
     def test_test_markers_present(self) -> None:
@@ -311,8 +326,7 @@ class TestJvmFrameworkDecorators:
             assert d in _FRAMEWORK_DECORATORS
 
     def test_lifecycle_and_messaging_present(self) -> None:
-        for d in ("PostConstruct", "PreDestroy", "EventListener",
-                  "Scheduled", "KafkaListener"):
+        for d in ("PostConstruct", "PreDestroy", "EventListener", "Scheduled", "KafkaListener"):
             assert d in _FRAMEWORK_DECORATORS
 
 
@@ -326,20 +340,26 @@ class TestJvmEndToEnd:
         graph = _build_graph(
             {
                 "app/svc/UserService.java": _java_file(
-                    symbols=[{
-                        "name": "UserService",
-                        "kind": "class",
-                        "visibility": "public",
-                        "decorators": ["@Service"],
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "UserService",
+                            "kind": "class",
+                            "visibility": "public",
+                            "decorators": ["@Service"],
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
         )
         analyzer = DeadCodeAnalyzer(graph)
-        report = analyzer.analyze({"detect_unused_exports": False,
-                                   "detect_unused_internals": False,
-                                   "detect_zombie_packages": False})
+        report = analyzer.analyze(
+            {
+                "detect_unused_exports": False,
+                "detect_unused_internals": False,
+                "detect_zombie_packages": False,
+            }
+        )
         kinds = [f.kind for f in report.findings]
         assert DeadCodeKind.UNREACHABLE_FILE not in kinds
 
@@ -350,9 +370,13 @@ class TestJvmEndToEnd:
             },
         )
         analyzer = DeadCodeAnalyzer(graph)
-        report = analyzer.analyze({"detect_unused_exports": False,
-                                   "detect_unused_internals": False,
-                                   "detect_zombie_packages": False})
+        report = analyzer.analyze(
+            {
+                "detect_unused_exports": False,
+                "detect_unused_internals": False,
+                "detect_zombie_packages": False,
+            }
+        )
         kinds = [f.kind for f in report.findings]
         assert DeadCodeKind.UNREACHABLE_FILE not in kinds
 
@@ -362,21 +386,27 @@ class TestJvmEndToEnd:
         graph = _build_graph(
             {
                 "app/svc/UserService.java": _java_file(
-                    symbols=[{
-                        "name": "init",
-                        "kind": "method",
-                        "visibility": "private",
-                        "decorators": ["@PostConstruct"],
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "init",
+                            "kind": "method",
+                            "visibility": "private",
+                            "decorators": ["@PostConstruct"],
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
         )
         analyzer = DeadCodeAnalyzer(graph)
-        report = analyzer.analyze({"detect_unused_exports": False,
-                                   "detect_zombie_packages": False,
-                                   "detect_unreachable_files": False,
-                                   "detect_unused_internals": True})
+        report = analyzer.analyze(
+            {
+                "detect_unused_exports": False,
+                "detect_zombie_packages": False,
+                "detect_unreachable_files": False,
+                "detect_unused_internals": True,
+            }
+        )
         # The init method should not surface as unused_internal.
         kinds = [(f.kind, f.symbol_name) for f in report.findings]
         assert (DeadCodeKind.UNUSED_INTERNAL, "init") not in kinds
@@ -393,12 +423,14 @@ class TestWorkspaceNeverFlag:
             {
                 "lib/src/testFixtures/java/com/x/Fix.java": _java_file(
                     is_never_flag=True,
-                    symbols=[{
-                        "name": "Fix",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Fix",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
         )
@@ -420,26 +452,29 @@ class TestHeritageEdgeRescue:
         graph = _build_graph(
             {
                 "p/Base.java": _java_file(
-                    symbols=[{
-                        "name": "Base",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Base",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
                 "p/Child.java": _java_file(
-                    symbols=[{
-                        "name": "Child",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Child",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
             edges=[
                 ("p/Child.java", "p/Base.java", {"edge_type": "imports"}),
-                ("p/Child.java::Child", "p/Base.java::Base",
-                 {"edge_type": "extends"}),
+                ("p/Child.java::Child", "p/Base.java::Base", {"edge_type": "extends"}),
             ],
         )
         analyzer = DeadCodeAnalyzer(graph)
@@ -451,26 +486,29 @@ class TestHeritageEdgeRescue:
         graph = _build_graph(
             {
                 "p/Plugin.java": _java_file(
-                    symbols=[{
-                        "name": "Plugin",
-                        "kind": "interface",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Plugin",
+                            "kind": "interface",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
                 "p/Impl.java": _java_file(
-                    symbols=[{
-                        "name": "Impl",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Impl",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
             edges=[
                 ("p/Impl.java", "p/Plugin.java", {"edge_type": "imports"}),
-                ("p/Impl.java::Impl", "p/Plugin.java::Plugin",
-                 {"edge_type": "implements"}),
+                ("p/Impl.java::Impl", "p/Plugin.java::Plugin", {"edge_type": "implements"}),
             ],
         )
         analyzer = DeadCodeAnalyzer(graph)
@@ -482,26 +520,29 @@ class TestHeritageEdgeRescue:
         graph = _build_graph(
             {
                 "p/Config.java": _java_file(
-                    symbols=[{
-                        "name": "Config",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Config",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
                 "p/User.java": _java_file(
-                    symbols=[{
-                        "name": "User",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "java",
-                    }],
+                    symbols=[
+                        {
+                            "name": "User",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "java",
+                        }
+                    ],
                 ),
             },
             edges=[
                 ("p/User.java", "p/Config.java", {"edge_type": "imports"}),
-                ("p/User.java::User", "p/Config.java::Config",
-                 {"edge_type": "type_use"}),
+                ("p/User.java::User", "p/Config.java::Config", {"edge_type": "type_use"}),
             ],
         )
         analyzer = DeadCodeAnalyzer(graph)

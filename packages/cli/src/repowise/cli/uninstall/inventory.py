@@ -440,7 +440,11 @@ def _package_uninstall_hint() -> str:
     parts = {part.lower() for part in executable.parts}
     if "pipx" in parts:
         return "pipx uninstall repowise"
-    if "uv" in parts or (executable.parent / "uv.exe").exists() or (executable.parent / "uv").exists():
+    if (
+        "uv" in parts
+        or (executable.parent / "uv.exe").exists()
+        or (executable.parent / "uv").exists()
+    ):
         return "uv tool uninstall repowise"
     return "pip uninstall repowise"
 

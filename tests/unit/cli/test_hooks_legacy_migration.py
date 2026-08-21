@@ -84,9 +84,7 @@ class TestInstallMigratesLegacyHook:
 
         hook = git_repo / ".git" / "hooks" / "post-commit"
         hook.parent.mkdir(parents=True, exist_ok=True)
-        hook.write_text(
-            _LEGACY_BODY + "\n" + _HOOK_SCRIPT, encoding="utf-8"
-        )
+        hook.write_text(_LEGACY_BODY + "\n" + _HOOK_SCRIPT, encoding="utf-8")
 
         result = install(git_repo)
         assert result == "migrated legacy hook"
@@ -184,7 +182,6 @@ class TestInstallUpgradesMarkerBlock:
         result = install(git_repo)
         assert result == "already installed"
 
-
     class TestInstallInWorktree:
         """Issue #1609: a git worktree stores ``.git`` as a *file*, not a
         directory, so the naive ``root / \".git\" / \"hooks\"`` path crashed
@@ -238,4 +235,4 @@ class TestInstalledHookScript:
         assert ".update.queued" in _HOOK_SCRIPT
         assert ".update.log" in _HOOK_SCRIPT
         # And no silent /dev/null sink — that was the original bug.
-        assert "> /dev/null 2>&1" not in _HOOK_SCRIPT or ">> \"$LOG\"" in _HOOK_SCRIPT
+        assert "> /dev/null 2>&1" not in _HOOK_SCRIPT or '>> "$LOG"' in _HOOK_SCRIPT

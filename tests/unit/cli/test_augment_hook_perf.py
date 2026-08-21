@@ -307,9 +307,7 @@ def _indexed_search_repo(tmp_path: Path) -> Path:
         "CREATE TABLE wiki_symbols (repository_id TEXT, file_path TEXT, name TEXT, "
         "kind TEXT, start_line INTEGER)"
     )
-    con.execute(
-        "INSERT INTO wiki_symbols VALUES ('r1', 'src/b.py', 'parse_yaml', 'function', 42)"
-    )
+    con.execute("INSERT INTO wiki_symbols VALUES ('r1', 'src/b.py', 'parse_yaml', 'function', 42)")
     con.execute(
         "CREATE TABLE graph_nodes (repository_id TEXT, node_id TEXT, node_type TEXT, "
         "pagerank REAL)"
@@ -330,9 +328,7 @@ def test_a_triage_that_queries_the_index_imports_nothing_heavy(tmp_path: Path) -
     silent-invocation test above it can only pass by actually emitting.
     """
     repo = _indexed_search_repo(tmp_path)
-    content = "\n".join(
-        f"src/{'a' if i % 2 else 'b'}.py:{i}:parse_yaml(x)" for i in range(1, 21)
-    )
+    content = "\n".join(f"src/{'a' if i % 2 else 'b'}.py:{i}:parse_yaml(x)" for i in range(1, 21))
     payload = {
         "hook_event_name": "PostToolUse",
         "tool_name": "Grep",
@@ -492,9 +488,7 @@ def _modules_added_by(statement: str) -> set[str]:
         f"{statement} "
         "print('\\n'.join(sorted(set(sys.modules) - before)))"
     )
-    out = subprocess.run(
-        [sys.executable, "-c", code], capture_output=True, text=True, check=True
-    )
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
     return set(out.stdout.split())
 
 

@@ -288,7 +288,9 @@ def write_server_config(repo_path: Path) -> FileWrite:
     if doc is not None:
         servers = require_table(doc, "mcp_servers", config_path, "mcp_servers")
         if servers is not None:
-            stored = dict(require_table(servers, "repowise", config_path, "mcp_servers.repowise") or {})
+            stored = dict(
+                require_table(servers, "repowise", config_path, "mcp_servers.repowise") or {}
+            )
 
     # Generated keys overwrite stored ones so a moved repo repoints, but any
     # key the user added to the table survives. ``replace_table`` rewrites the
@@ -862,9 +864,7 @@ def remove_prompts() -> list[FileWrite]:
             # `repowise uninstall` printed "everything selected is gone" and
             # exited zero over a prompt still sitting in the user's directory.
             if existed:
-                removed.append(
-                    FileWrite(path=path, action=FileAction.FAILED, reason=str(exc))
-                )
+                removed.append(FileWrite(path=path, action=FileAction.FAILED, reason=str(exc)))
             continue
         removed.append(FileWrite(path=path, action=FileAction.REMOVED))
     return removed

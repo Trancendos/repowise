@@ -85,9 +85,7 @@ class TestWithheldDefinitions:
         names = {d["name"] for d in withheld_definitions(repo, "todo_tool.py:9-20")}
         assert "_dedupe_by_id" in names
 
-    @pytest.mark.parametrize(
-        "cont", [None, "", "garbage", "todo_tool.py:x-y", "missing.py:1-9"]
-    )
+    @pytest.mark.parametrize("cont", [None, "", "garbage", "todo_tool.py:x-y", "missing.py:1-9"])
     def test_unreadable_input_yields_nothing(self, repo, cont) -> None:
         """A probe that cannot read must not manufacture doubt."""
         from repowise.server.mcp_server.tool_answer.symbols import withheld_definitions
@@ -147,9 +145,7 @@ class TestImplicatedWithheldSymbols:
         )
 
         bodies = [{"truncated": True, "withheld_symbols": [{"name": "on"}]}]
-        assert implicated_withheld_symbols(
-            "unrelated", "based on the excerpts", bodies
-        ) == []
+        assert implicated_withheld_symbols("unrelated", "based on the excerpts", bodies) == []
 
     def test_irrelevant_truncation_does_not_fire(self) -> None:
         """22% of truncations withhold nothing relevant; `high` is worth keeping."""
@@ -157,9 +153,12 @@ class TestImplicatedWithheldSymbols:
             implicated_withheld_symbols,
         )
 
-        assert implicated_withheld_symbols(
-            "how does write work?", "write delegates to a helper", self.BODIES
-        ) == []
+        assert (
+            implicated_withheld_symbols(
+                "how does write work?", "write delegates to a helper", self.BODIES
+            )
+            == []
+        )
 
     def test_untruncated_body_never_fires(self) -> None:
         from repowise.server.mcp_server.tool_answer.confidence import (
@@ -209,12 +208,12 @@ def _build_e2e_src() -> str:
         lines += [f"    def pad_{i}(self):", f"        return {i}", ""]
     assert len(lines) == 115, len(lines)
     lines += [
-        "    @staticmethod",                                   # 116
-        "    def _validate(item):",                            # 117 served
-        '        """Validate."""',                             # 118
-        '        item_id = str(item.get("id", "")).strip()',    # 119
-        "        if not item_id:",                             # 120 boundary
-        '            item_id = "?"',                           # 121 WITHHELD
+        "    @staticmethod",  # 116
+        "    def _validate(item):",  # 117 served
+        '        """Validate."""',  # 118
+        '        item_id = str(item.get("id", "")).strip()',  # 119
+        "        if not item_id:",  # 120 boundary
+        '            item_id = "?"',  # 121 WITHHELD
         '        return {"id": item_id}',
         "",
     ]
@@ -345,9 +344,7 @@ async def test_truncated_body_exposes_what_it_withheld(setup_mcp, monkeypatch, t
 
 
 @pytest.mark.asyncio
-async def test_question_naming_withheld_symbol_drops_confidence(
-    setup_mcp, monkeypatch, tmp_path
-):
+async def test_question_naming_withheld_symbol_drops_confidence(setup_mcp, monkeypatch, tmp_path):
     """FAILS on bd577942. No exclusivity token anywhere, so gate 7 stays silent.
 
     This is the reproducible shape: the response depends on a symbol whose body
@@ -447,8 +444,11 @@ class TestUnionPathTruncation:
             {
                 "truncated": True,
                 "withheld_symbols": [
-                    {"name": "_validate", "symbol_id": "store.py::_validate",
-                     "body_continues": True}
+                    {
+                        "name": "_validate",
+                        "symbol_id": "store.py::_validate",
+                        "body_continues": True,
+                    }
                 ],
             }
         ]
@@ -481,12 +481,12 @@ class TestUnionPathTruncation:
         _patch_union(monkeypatch, answer_mod)
 
         result = await get_answer("where is Store defined?")
-        assert result.get("grounding") == "exact_symbol", (
-            f"this test only means something on the union path; got {result!r}"
-        )
-        assert any(b.get("truncated") for b in result["symbol_bodies"]), (
-            "the fixture must truncate or there is nothing to gate on"
-        )
+        assert (
+            result.get("grounding") == "exact_symbol"
+        ), f"this test only means something on the union path; got {result!r}"
+        assert any(
+            b.get("truncated") for b in result["symbol_bodies"]
+        ), "the fixture must truncate or there is nothing to gate on"
         assert result["confidence"] != "high", (
             "a union answer whose cited body was cut must not read high; got "
             f"{result['confidence']!r}"
@@ -565,9 +565,9 @@ def test_english_word_symbol_does_not_collapse_confidence(name, question) -> Non
     )
 
     bodies = [{"truncated": True, "withheld_symbols": [{"name": name}]}]
-    assert implicated_withheld_symbols(question, "", bodies) == [], (
-        f"a symbol named {name!r} must not be implicated by ordinary prose"
-    )
+    assert (
+        implicated_withheld_symbols(question, "", bodies) == []
+    ), f"a symbol named {name!r} must not be implicated by ordinary prose"
 
 
 @pytest.mark.parametrize(
@@ -586,9 +586,7 @@ def test_english_word_symbol_does_not_collapse_confidence(name, question) -> Non
         ("main", "what does `main` do first?"),
     ],
 )
-def test_question_route_still_fires_when_the_question_means_the_symbol(
-    name, question
-) -> None:
+def test_question_route_still_fires_when_the_question_means_the_symbol(name, question) -> None:
     """The other direction: the guard must not turn the route off entirely."""
     from repowise.server.mcp_server.tool_answer.confidence import (
         implicated_withheld_symbols,
@@ -741,7 +739,7 @@ def test_a_go_anonymous_func_literal_is_not_a_symbol_named_func(tmp_path) -> Non
         "func NewClient(t *testing.T) *http.Client {\n"
         "\treg := &httpmock.Registry{}\n"
         "\treg.Register(\n"
-        "\t\thttpmock.REST(\"GET\", \"repos/o/r\"),\n"
+        '\t\thttpmock.REST("GET", "repos/o/r"),\n'
         "\t\tfunc(req *http.Request) (*http.Response, error) {\n"
         "\t\t\treturn nil, nil\n"
         "\t\t},\n"
@@ -1003,11 +1001,7 @@ def test_a_cut_landing_on_a_multiline_signature_still_finds_the_symbol(
     from repowise.server.mcp_server.tool_answer.symbols import withheld_definitions
 
     (tmp_path / "r.py").write_text(
-        "async def wide(\n"
-        "    a: str,\n"
-        ") -> dict:\n"
-        "    x = 1\n"
-        "    return {}\n",
+        "async def wide(\n" "    a: str,\n" ") -> dict:\n" "    x = 1\n" "    return {}\n",
         encoding="utf-8",
     )
     got = withheld_definitions(tmp_path, "r.py:3-5")  # cut ON the ') -> dict:' line
@@ -1018,9 +1012,7 @@ def test_a_cut_landing_on_a_multiline_signature_still_finds_the_symbol(
 def test_a_cut_inside_a_flush_left_string_still_finds_the_symbol(tmp_path) -> None:
     from repowise.server.mcp_server.tool_answer.symbols import withheld_definitions
 
-    (tmp_path / "s.py").write_text(
-        'def f():\n    sql = """\nSELECT 1\n"""\n', encoding="utf-8"
-    )
+    (tmp_path / "s.py").write_text('def f():\n    sql = """\nSELECT 1\n"""\n', encoding="utf-8")
     got = withheld_definitions(tmp_path, "s.py:3-4")
     assert [d["name"] for d in got] == ["f"], got
 
@@ -1053,7 +1045,7 @@ def test_a_top_level_c_function_is_found(tmp_path) -> None:
 
     (tmp_path / "m.c").write_text(
         "#include <stdio.h>\n"
-        'int main(int argc, char **argv) {\n'
+        "int main(int argc, char **argv) {\n"
         '    puts("x");\n'
         "    return 0;\n"
         "}\n",
@@ -1134,8 +1126,8 @@ async def test_high_note_no_longer_cites_the_answers_own_directness(
     _patch_provider(monkeypatch, answer_mod, "Store keeps todos in a dict.")
 
     result = await get_answer("what does Store keep?")
-    assert result["confidence"] == "high", (
-        f"this test only covers the high note; got {result['confidence']!r}"
-    )
+    assert (
+        result["confidence"] == "high"
+    ), f"this test only covers the high note; got {result['confidence']!r}"
     note = (result.get("note") or "").lower()
     assert "hedging" not in note and "is direct" not in note, note

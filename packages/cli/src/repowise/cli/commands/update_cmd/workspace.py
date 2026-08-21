@@ -211,7 +211,6 @@ def _workspace_update(
     def _on_start(alias: str) -> None:
         console.print(f"  Updating [bold]{alias}[/bold]...")
 
-
     results = run_async(
         update_workspace(
             ws_root,

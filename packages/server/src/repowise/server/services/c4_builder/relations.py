@@ -30,9 +30,7 @@ from .labels import coupling_strength, relation_label
 from .models import Relation
 
 
-async def load_edges(
-    session: AsyncSession, repository_id: str
-) -> list[tuple[str, str, str]]:
+async def load_edges(session: AsyncSession, repository_id: str) -> list[tuple[str, str, str]]:
     """Read every graph edge once, as ``(source, target, type)`` rows.
 
     Split out so a caller rolling the same edges up several ways — by

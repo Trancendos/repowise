@@ -31,9 +31,7 @@ def _fake_install(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     transient-location check rejects — so the fake temp dir is moved away
     to keep the fake install eligible.
     """
-    monkeypatch.setattr(
-        "tempfile.gettempdir", lambda: str(tmp_path / "elsewhere-tmp")
-    )
+    monkeypatch.setattr("tempfile.gettempdir", lambda: str(tmp_path / "elsewhere-tmp"))
     bin_dir = tmp_path / "venv" / ("Scripts" if sys.platform == "win32" else "bin")
     bin_dir.mkdir(parents=True)
     fake_python = bin_dir / f"python{_SUFFIX}"
@@ -81,9 +79,7 @@ def test_falls_back_to_bare_name_under_temp_dir(
 def test_falls_back_to_bare_name_in_uv_cache(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(
-        "tempfile.gettempdir", lambda: str(tmp_path / "elsewhere-tmp")
-    )
+    monkeypatch.setattr("tempfile.gettempdir", lambda: str(tmp_path / "elsewhere-tmp"))
     bin_dir = (
         tmp_path
         / "uv"
@@ -108,9 +104,7 @@ def test_register_with_claude_code_pins_absolute_command(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(Path, "home", lambda: tmp_path / "home")
-    monkeypatch.setattr(
-        claude_config, "resolve_repowise_command", lambda: "/opt/venv/bin/repowise"
-    )
+    monkeypatch.setattr(claude_config, "resolve_repowise_command", lambda: "/opt/venv/bin/repowise")
     repo = tmp_path / "repo"
     repo.mkdir()
 
@@ -126,9 +120,7 @@ def test_register_with_claude_desktop_pins_absolute_command(
 ) -> None:
     monkeypatch.setattr(Path, "home", lambda: tmp_path / "home")
     monkeypatch.setattr(sys, "platform", "darwin")
-    monkeypatch.setattr(
-        claude_config, "resolve_repowise_command", lambda: "/opt/venv/bin/repowise"
-    )
+    monkeypatch.setattr(claude_config, "resolve_repowise_command", lambda: "/opt/venv/bin/repowise")
     desktop_parent = tmp_path / "home" / "Library" / "Application Support" / "Claude"
     desktop_parent.mkdir(parents=True)
     repo = tmp_path / "repo"
@@ -149,13 +141,9 @@ def test_reregistration_refreshes_stale_absolute_command(
     repo = tmp_path / "repo"
     repo.mkdir()
 
-    monkeypatch.setattr(
-        claude_config, "resolve_repowise_command", lambda: "/old/venv/bin/repowise"
-    )
+    monkeypatch.setattr(claude_config, "resolve_repowise_command", lambda: "/old/venv/bin/repowise")
     claude_config.register_with_claude_code(repo)
-    monkeypatch.setattr(
-        claude_config, "resolve_repowise_command", lambda: "/new/venv/bin/repowise"
-    )
+    monkeypatch.setattr(claude_config, "resolve_repowise_command", lambda: "/new/venv/bin/repowise")
     settings_path = claude_config.register_with_claude_code(repo)
     assert settings_path is not None
 
@@ -168,9 +156,7 @@ def test_reregistration_refreshes_stale_absolute_command(
 # ---------------------------------------------------------------------------
 
 
-def test_root_mcp_json_keeps_bare_command(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_root_mcp_json_keeps_bare_command(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """``.mcp.json`` may be committed — never bake in a machine-local path."""
     _fake_install(tmp_path, monkeypatch)  # absolute path IS resolvable...
 
@@ -180,9 +166,7 @@ def test_root_mcp_json_keeps_bare_command(
     assert saved["mcpServers"]["repowise"]["command"] == "repowise"  # ...but unused
 
 
-def test_codex_config_keeps_bare_command(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_codex_config_keeps_bare_command(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _fake_install(tmp_path, monkeypatch)
 
     config_path = mcp_config.save_codex_mcp_config(tmp_path)

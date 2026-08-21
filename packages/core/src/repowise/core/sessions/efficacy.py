@@ -327,8 +327,7 @@ _PATTERNS: tuple[tuple[str, str, re.Pattern[str]], ...] = (
         "wrong_path",
         "rescue",
         re.compile(
-            r"^\[repowise\] \S+ is not in this tree\. "
-            r"The only indexed \S+ is (?P<target>.+)$"
+            r"^\[repowise\] \S+ is not in this tree\. " r"The only indexed \S+ is (?P<target>.+)$"
         ),
     ),
     # The paths ride on the continuation lines, which ``parse_emission``
@@ -409,9 +408,7 @@ def parse_emission(text: str) -> list[Firing]:
                 block.append(follow)
             groups = m.groupdict()
             targets = [t for t in (groups.get("target"), groups.get("symbol")) if t]
-            targets.extend(
-                p for p in _FILEISH.findall("\n".join(block[1:])) if p not in targets
-            )
+            targets.extend(p for p in _FILEISH.findall("\n".join(block[1:])) if p not in targets)
             out.append(
                 Firing(
                     surface=surface,
@@ -433,9 +430,7 @@ def _normalize(path: str) -> str:
     id no repository has and widening the target to a substring that matches
     more than it should.
     """
-    return (
-        path.replace("\\\\", "/").replace("\\", "/").removeprefix("./").rstrip(".,;:")
-    )
+    return path.replace("\\\\", "/").replace("\\", "/").removeprefix("./").rstrip(".,;:")
 
 
 # ---------------------------------------------------------------------------
@@ -621,9 +616,9 @@ def iter_transcript_firings(path: Path, *, window: int = ACTION_WINDOW) -> Itera
         return
 
     for index, text, ts, duration_ms, session_id in emissions:
-        following = [
-            (name, raw) for (j, name, raw) in tool_uses if index < j <= index + window
-        ][:window]
+        following = [(name, raw) for (j, name, raw) in tool_uses if index < j <= index + window][
+            :window
+        ]
         for firing in parse_emission(text):
             firing.ts = ts
             firing.duration_ms = duration_ms
@@ -680,9 +675,7 @@ def _tool_uses(line: str, index: int) -> list[tuple[int, str, str]]:
         if isinstance(block, dict) and block.get("type") == "tool_use":
             name = block.get("name")
             if isinstance(name, str):
-                out.append(
-                    (index, name, json.dumps(block.get("input") or {}, ensure_ascii=False))
-                )
+                out.append((index, name, json.dumps(block.get("input") or {}, ensure_ascii=False)))
     return out
 
 
@@ -718,7 +711,9 @@ def discover_transcripts(
         return []
     needle = Path(repo_path).resolve().name.lower()
     return sorted(
-        p for d in root.iterdir() if d.is_dir() and needle in d.name.lower()
+        p
+        for d in root.iterdir()
+        if d.is_dir() and needle in d.name.lower()
         for p in d.glob("*.jsonl")
     )
 

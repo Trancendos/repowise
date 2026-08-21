@@ -21,7 +21,9 @@ from repowise.core.workspace.registry import RepoContext, RepoRegistry
 _NOW = datetime(2026, 4, 12, 10, 0, 0, tzinfo=UTC)
 
 
-def _make_workspace(tmp_path: Path, repo_names: list[str], default: str | None = None) -> WorkspaceConfig:
+def _make_workspace(
+    tmp_path: Path, repo_names: list[str], default: str | None = None
+) -> WorkspaceConfig:
     """Create repo dirs with .repowise/wiki.db and return a WorkspaceConfig."""
     entries = []
     for name in repo_names:
@@ -70,23 +72,25 @@ async def _seed_repo_db(repo_path: Path, repo_name: str) -> None:
             updated_at=_NOW,
         )
         session.add(repo)
-        session.add(Page(
-            id=f"repo_overview:{repo_name}",
-            repository_id=repo.id,
-            page_type="repo_overview",
-            title=f"{repo_name} Overview",
-            content=f"# {repo_name}\n\nOverview of {repo_name}.",
-            target_path=repo_name,
-            source_hash="abc",
-            model_name="mock",
-            provider_name="mock",
-            generation_level=6,
-            confidence=1.0,
-            freshness_status="fresh",
-            metadata_json="{}",
-            created_at=_NOW,
-            updated_at=_NOW,
-        ))
+        session.add(
+            Page(
+                id=f"repo_overview:{repo_name}",
+                repository_id=repo.id,
+                page_type="repo_overview",
+                title=f"{repo_name} Overview",
+                content=f"# {repo_name}\n\nOverview of {repo_name}.",
+                target_path=repo_name,
+                source_hash="abc",
+                model_name="mock",
+                provider_name="mock",
+                generation_level=6,
+                confidence=1.0,
+                freshness_status="fresh",
+                metadata_json="{}",
+                created_at=_NOW,
+                updated_at=_NOW,
+            )
+        )
         await session.commit()
     await engine.dispose()
 

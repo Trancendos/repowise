@@ -112,9 +112,7 @@ class TestJavaImportResolution:
         )
         assert targets == ("external:com.google.common.cache.CacheStats",)
 
-    def test_name_match_inside_the_named_package_still_resolves(
-        self, tmp_path: Path
-    ) -> None:
+    def test_name_match_inside_the_named_package_still_resolves(self, tmp_path: Path) -> None:
         # The package scan reads a file's package but records no type for it —
         # here the class name differs from the file name, so the exact-FQN
         # lookup misses and only the name match can answer.

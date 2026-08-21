@@ -147,7 +147,11 @@ def _render(projected: dict) -> None:
         console.print(
             f"[cyan]{projected.get('ref', '')}[/cyan] [dim]banked from "
             f"{projected.get('source') or '?'}"
-            + (f", {projected['original_tokens']} tokens" if projected.get("original_tokens") else "")
+            + (
+                f", {projected['original_tokens']} tokens"
+                if projected.get("original_tokens")
+                else ""
+            )
             + (f", {projected['created_at']}" if projected.get("created_at") else "")
             + "[/dim]"
         )
@@ -158,9 +162,7 @@ def _render(projected: dict) -> None:
 
     candidates = projected.get("candidates") or []
     if candidates:
-        console.print(
-            f"[yellow]{len(candidates)} symbols match that id — showing all.[/yellow]"
-        )
+        console.print(f"[yellow]{len(candidates)} symbols match that id — showing all.[/yellow]")
         for candidate in candidates:
             _render_body(console, candidate)
         return
@@ -186,8 +188,10 @@ def _render_body(console, body: dict) -> None:
     if start is not None:
         where = f"{where}:{start}-{end}"
     verified = "verified" if body.get("verified") else body.get("bounds") or "unverified"
-    console.print(f"[cyan]{body.get('qualified_name') or body.get('name') or ''}[/cyan] "
-                  f"[dim]{body.get('kind', '')} · {where} · {verified}[/dim]")
+    console.print(
+        f"[cyan]{body.get('qualified_name') or body.get('name') or ''}[/cyan] "
+        f"[dim]{body.get('kind', '')} · {where} · {verified}[/dim]"
+    )
     _echo_lines(body.get("source") or "")
     for line in body.get("fallback_lines") or []:
         _echo_lines(str(line))

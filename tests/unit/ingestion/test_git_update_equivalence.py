@@ -86,9 +86,9 @@ async def test_changed_file_metadata_matches_full_index(tmp_path) -> None:
     assert set(upd_by_path) == {"a.py", "b.py"}
     for path in ("a.py", "b.py"):
         for field in _COMPARED_FIELDS:
-            assert upd_by_path[path].get(field) == full_by_path[path].get(field), (
-                f"{path}: field {field!r} diverges between update and init"
-            )
+            assert upd_by_path[path].get(field) == full_by_path[path].get(
+                field
+            ), f"{path}: field {field!r} diverges between update and init"
         assert upd_by_path[path]["temporal_hotspot_score"] == pytest.approx(
             full_by_path[path]["temporal_hotspot_score"], rel=1e-3
         )
@@ -267,9 +267,9 @@ async def test_idle_decay_refresh_recovers_as_anchor_advances(tmp_path, monkeypa
     upd = GitIndexer(tmp_path, tier=GitIndexTier.FULL)
     await upd.index_changed_files(["b.py"], all_files={"a.py", "b.py"}, idle_decay_sink=sink)
 
-    assert sink["a.py"]["temporal_hotspot_score"] < early_a, (
-        "idle file's decayed score must recover (shrink) as the anchor advances"
-    )
+    assert (
+        sink["a.py"]["temporal_hotspot_score"] < early_a
+    ), "idle file's decayed score must recover (shrink) as the anchor advances"
 
 
 def test_thread_repo_pool_reuses_per_thread_and_closes(tmp_path) -> None:

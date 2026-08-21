@@ -93,9 +93,7 @@ class _FakeVectorStore:
         self._ranked = ranked_paths
 
     async def search(self, query, limit=10):
-        return [
-            _VecResult(f"module_page:{p}", "module_page", p) for p in self._ranked[:limit]
-        ]
+        return [_VecResult(f"module_page:{p}", "module_page", p) for p in self._ranked[:limit]]
 
 
 class _Ctx:
@@ -117,17 +115,32 @@ def _hit(page_type, target_path, score, sources=("vector",)):
 async def _seed(session: AsyncSession, module_paths):
     session.add(
         Repository(
-            id="r1", name="r", url="u", local_path="/t", default_branch="main",
-            settings_json="{}", created_at=_NOW, updated_at=_NOW,
+            id="r1",
+            name="r",
+            url="u",
+            local_path="/t",
+            default_branch="main",
+            settings_json="{}",
+            created_at=_NOW,
+            updated_at=_NOW,
         )
     )
     for p in module_paths:
         session.add(
             Page(
-                id=f"module_page:{p}", repository_id="r1", page_type="module_page",
-                title=f"{p.rsplit('/', 1)[-1]} overview", content="c", summary="s",
-                target_path=p, source_hash="h", model_name="m", provider_name="m",
-                generation_level=4, created_at=_NOW, updated_at=_NOW,
+                id=f"module_page:{p}",
+                repository_id="r1",
+                page_type="module_page",
+                title=f"{p.rsplit('/', 1)[-1]} overview",
+                content="c",
+                summary="s",
+                target_path=p,
+                source_hash="h",
+                model_name="m",
+                provider_name="m",
+                generation_level=4,
+                created_at=_NOW,
+                updated_at=_NOW,
             )
         )
     await session.flush()

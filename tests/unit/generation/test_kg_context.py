@@ -17,29 +17,68 @@ def sample_kg_json(tmp_path):
         "version": "1.0.0",
         "project": {"name": "test"},
         "nodes": [
-            {"id": "file:src/main.py", "type": "file", "filePath": "src/main.py",
-             "summary": "Entry point", "tags": ["cli", "entry_point"], "complexity": "simple"},
-            {"id": "file:src/core.py", "type": "file", "filePath": "src/core.py",
-             "summary": "Core logic", "tags": ["core"], "complexity": "complex"},
-            {"id": "file:src/utils.py", "type": "file", "filePath": "src/utils.py",
-             "summary": "", "tags": [], "complexity": "simple"},
+            {
+                "id": "file:src/main.py",
+                "type": "file",
+                "filePath": "src/main.py",
+                "summary": "Entry point",
+                "tags": ["cli", "entry_point"],
+                "complexity": "simple",
+            },
+            {
+                "id": "file:src/core.py",
+                "type": "file",
+                "filePath": "src/core.py",
+                "summary": "Core logic",
+                "tags": ["core"],
+                "complexity": "complex",
+            },
+            {
+                "id": "file:src/utils.py",
+                "type": "file",
+                "filePath": "src/utils.py",
+                "summary": "",
+                "tags": [],
+                "complexity": "simple",
+            },
         ],
         "edges": [
-            {"source": "file:src/main.py", "target": "file:src/core.py",
-             "type": "imports", "direction": "forward", "weight": 1.0},
-            {"source": "file:src/core.py", "target": "file:src/utils.py",
-             "type": "imports", "direction": "forward", "weight": 1.0},
+            {
+                "source": "file:src/main.py",
+                "target": "file:src/core.py",
+                "type": "imports",
+                "direction": "forward",
+                "weight": 1.0,
+            },
+            {
+                "source": "file:src/core.py",
+                "target": "file:src/utils.py",
+                "type": "imports",
+                "direction": "forward",
+                "weight": 1.0,
+            },
         ],
         "layers": [
-            {"id": "layer:cli", "name": "CLI", "description": "Command line interface",
-             "nodeIds": ["file:src/main.py"]},
-            {"id": "layer:core", "name": "Core", "description": "Core business logic",
-             "nodeIds": ["file:src/core.py", "file:src/utils.py"]},
+            {
+                "id": "layer:cli",
+                "name": "CLI",
+                "description": "Command line interface",
+                "nodeIds": ["file:src/main.py"],
+            },
+            {
+                "id": "layer:core",
+                "name": "Core",
+                "description": "Core business logic",
+                "nodeIds": ["file:src/core.py", "file:src/utils.py"],
+            },
         ],
         "tour": [
-            {"order": 1, "title": "Start Here",
-             "description": "Begin with the CLI entry point.",
-             "nodeIds": ["file:src/main.py"]},
+            {
+                "order": 1,
+                "title": "Start Here",
+                "description": "Begin with the CLI entry point.",
+                "nodeIds": ["file:src/main.py"],
+            },
         ],
     }
     (tmp_path / "src").mkdir()
@@ -145,10 +184,16 @@ class TestTourValidation:
         kg = {
             "nodes": [{"id": "file:exists.py", "filePath": "exists.py"}],
             "edges": [],
-            "layers": [{"id": "layer:x", "name": "X", "nodeIds": ["file:exists.py", "file:deleted.py"]}],
+            "layers": [
+                {"id": "layer:x", "name": "X", "nodeIds": ["file:exists.py", "file:deleted.py"]}
+            ],
             "tour": [
-                {"order": 1, "title": "Step 1", "description": "Y",
-                 "nodeIds": ["file:exists.py", "file:deleted.py"]},
+                {
+                    "order": 1,
+                    "title": "Step 1",
+                    "description": "Y",
+                    "nodeIds": ["file:exists.py", "file:deleted.py"],
+                },
             ],
         }
         (tmp_path / "exists.py").touch()
@@ -227,14 +272,19 @@ class TestCuratedTourShape:
             ],
             "edges": [],
             "layers": [
-                {"id": "layer:app", "name": "Application",
-                 "nodeIds": ["file:src/main.py"]},
+                {"id": "layer:app", "name": "Application", "nodeIds": ["file:src/main.py"]},
             ],
             "tour": [
-                {"order": 1, "target_path": "src/main.py", "page_type": "file_page",
-                 "title": "main.py", "depth": 1, "kind": "code",
-                 "reason": "An entry point — execution and imports fan out from here.",
-                 "layer_id": "layer:app"},
+                {
+                    "order": 1,
+                    "target_path": "src/main.py",
+                    "page_type": "file_page",
+                    "title": "main.py",
+                    "depth": 1,
+                    "kind": "code",
+                    "reason": "An entry point — execution and imports fan out from here.",
+                    "layer_id": "layer:app",
+                },
             ],
         }
         (tmp_path / "src").mkdir()

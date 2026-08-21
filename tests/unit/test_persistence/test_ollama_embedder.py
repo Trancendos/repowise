@@ -176,8 +176,8 @@ async def test_embed_raises_when_server_returns_wrong_width_inferred() -> None:
         await embedder.embed(["hello"])
 
     msg = str(exc_info.value)
-    assert "3" in msg                       # actual width named
-    assert "OLLAMA_EMBEDDING_DIMS" in msg   # points at the env var fix
+    assert "3" in msg  # actual width named
+    assert "OLLAMA_EMBEDDING_DIMS" in msg  # points at the env var fix
 
 
 async def test_embed_raises_when_server_returns_wrong_width_explicit() -> None:
@@ -199,4 +199,3 @@ async def test_embed_width_check_not_triggered_on_empty() -> None:
     # embed([]) short-circuits and returns [] without calling the server.
     embedder = OllamaEmbedder(model="embeddinggemma")
     assert await embedder.embed([]) == []
-

@@ -402,9 +402,9 @@ class TestGenerationPipeline:
 
     def test_no_duplicate_page_ids(self, pipeline_result):
         ids = [p.page_id for p in pipeline_result["pages"]]
-        assert len(ids) == len(set(ids)), (
-            f"Duplicate page IDs found: {[i for i in ids if ids.count(i) > 1]}"
-        )
+        assert len(ids) == len(
+            set(ids)
+        ), f"Duplicate page IDs found: {[i for i in ids if ids.count(i) > 1]}"
 
     def test_all_pages_have_model_name(self, pipeline_result):
         for page in pipeline_result["pages"]:
@@ -548,9 +548,9 @@ class TestGenerationPipeline:
     def test_level_values_in_range(self, pipeline_result):
         """All generation_level values must be in [0, 8] — onboarding is level 8."""
         for page in pipeline_result["pages"]:
-            assert 0 <= page.generation_level <= 8, (
-                f"Page {page.page_id} has out-of-range level {page.generation_level}"
-            )
+            assert (
+                0 <= page.generation_level <= 8
+            ), f"Page {page.page_id} has out-of-range level {page.generation_level}"
 
     def test_scc_page_only_for_true_cycles(self, pipeline_result):
         """scc_page pages should only exist if sample_repo has actual cycles."""

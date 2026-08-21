@@ -293,7 +293,12 @@ _EVOLUTION_KEYWORDS: tuple[tuple[str, re.Pattern[str]], ...] = (
             re.IGNORECASE,
         ),
     ),
-    ("fix", re.compile(r"\b(fix|fixes|fixed|bug|patch|hotfix|regression|crash|revert)\b", re.IGNORECASE)),
+    (
+        "fix",
+        re.compile(
+            r"\b(fix|fixes|fixed|bug|patch|hotfix|regression|crash|revert)\b", re.IGNORECASE
+        ),
+    ),
     (
         "refactor",
         re.compile(
@@ -311,7 +316,9 @@ _EVOLUTION_KEYWORDS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ),
     (
         "chore",
-        re.compile(r"\b(chore|lint|format|style|ci|build|release|merge|config|tooling)\b", re.IGNORECASE),
+        re.compile(
+            r"\b(chore|lint|format|style|ci|build|release|merge|config|tooling)\b", re.IGNORECASE
+        ),
     ),
 )
 

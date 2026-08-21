@@ -35,9 +35,7 @@ def _make_module(repo: Path, name: str, package: str, class_name: str) -> str:
 
 class TestKotlinIndex:
     def test_settings_gradle_subprojects(self, tmp_path: Path) -> None:
-        (tmp_path / "settings.gradle.kts").write_text(
-            'include("app", "core", "feature-foo")\n'
-        )
+        (tmp_path / "settings.gradle.kts").write_text('include("app", "core", "feature-foo")\n')
         (tmp_path / "build.gradle.kts").write_text("// root\n")
         # Create app module
         _make_module(tmp_path, "app", "com.example.app", "MainActivity")
@@ -66,9 +64,7 @@ class TestKotlinIndex:
         result = resolve_kotlin_import("com.example.Foo", "main.kt", ctx)
         assert result == "external:com.example.Foo"
 
-    def test_falls_through_without_gradle_on_a_matching_path(
-        self, tmp_path: Path
-    ) -> None:
+    def test_falls_through_without_gradle_on_a_matching_path(self, tmp_path: Path) -> None:
         # Same shape, still no build file and no package clause, but the path
         # mirrors the package: the directory fallback answers.
         src = tmp_path / "src" / "com" / "example"
@@ -131,14 +127,10 @@ class TestKotlinStdlibFiltering:
         repo_file.parent.mkdir(parents=True)
         repo_file.write_text("package com.acme.cache\n\nclass CacheStats\n")
         ctx = _ctx(tmp_path, ["src/cache/CacheStats.kt"])
-        result = resolve_kotlin_import(
-            "com.google.common.cache.CacheStats", "Main.kt", ctx
-        )
+        result = resolve_kotlin_import("com.google.common.cache.CacheStats", "Main.kt", ctx)
         assert result == "external:com.google.common.cache.CacheStats"
 
-    def test_top_level_function_in_the_named_package_still_resolves(
-        self, tmp_path: Path
-    ) -> None:
+    def test_top_level_function_in_the_named_package_still_resolves(self, tmp_path: Path) -> None:
         # A file declaring only top-level functions records no type, so the
         # exact-FQN lookup misses; the package is what identifies the file.
         # Its path does not mirror the package, so the directory fallback

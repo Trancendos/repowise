@@ -16,14 +16,14 @@
    Linting and checking validity of types ...
    Collecting page data ...
    Generating static pages (0/8) ...
-   Generating static pages (2/8) 
+   Generating static pages (2/8)
 node.exe : [TypeError: fetch failed] {
 At line:1 char:1
 + & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: ([TypeError: fetch failed] {:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
   [cause]: [AggregateError: ] { code: 'ECONNREFUSED' }
 }
 [TypeError: fetch failed] {
@@ -47,8 +47,8 @@ At line:1 char:1
 [TypeError: fetch failed] {
   [cause]: [AggregateError: ] { code: 'ECONNREFUSED' }
 }
-   Generating static pages (4/8) 
-   Generating static pages (6/8) 
+   Generating static pages (4/8)
+   Generating static pages (6/8)
  ✓ Generating static pages (8/8)
    Finalizing page optimization ...
    Collecting build traces ...
@@ -96,4 +96,3 @@ Route (app)                                    Size  First Load JS  Revalidate  
 
 ○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand
-

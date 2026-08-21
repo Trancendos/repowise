@@ -404,9 +404,7 @@ def test_snippet_sliced_from_anchor_region():
     pair = _pair("pkg/a.py", "pkg/b.py", 10, 25, 40, 55)
     s = next(
         s
-        for s in detect_refactorings(
-            _ctx("pkg/a.py", [pair], source_lines=_numbered_source(80))
-        )
+        for s in detect_refactorings(_ctx("pkg/a.py", [pair], source_lines=_numbered_source(80)))
         if s.refactoring_type == "extract_helper"
     )
     assert s.plan["snippet_start_line"] == 10
@@ -434,9 +432,7 @@ def test_snippet_capped_and_flagged():
     pair = _pair("pkg/a.py", "pkg/b.py", 10, 69, 100, 159)
     s = next(
         s
-        for s in detect_refactorings(
-            _ctx("pkg/a.py", [pair], source_lines=_numbered_source(200))
-        )
+        for s in detect_refactorings(_ctx("pkg/a.py", [pair], source_lines=_numbered_source(200)))
         if s.refactoring_type == "extract_helper"
     )
     assert s.plan["snippet_truncated"] is True
@@ -448,9 +444,7 @@ def test_snippet_clamped_to_short_file():
     pair = _pair("pkg/a.py", "pkg/b.py", 10, 25, 40, 55)
     s = next(
         s
-        for s in detect_refactorings(
-            _ctx("pkg/a.py", [pair], source_lines=_numbered_source(18))
-        )
+        for s in detect_refactorings(_ctx("pkg/a.py", [pair], source_lines=_numbered_source(18)))
         if s.refactoring_type == "extract_helper"
     )
     lines = s.plan["snippet"].split("\n")

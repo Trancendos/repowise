@@ -682,9 +682,7 @@ async def _persist_full_update_async(
                 # Cycle pages are never regenerated on this path (the ladder
                 # stops at file pages), so a cycle that no longer exists can
                 # only be retired by asking the rebuilt graph directly.
-                swept_page_ids += await sweep_absent_cycle_pages(
-                    session, repo_id, graph_builder
-                )
+                swept_page_ids += await sweep_absent_cycle_pages(session, repo_id, graph_builder)
 
                 # Drop the embeddings before the SQL session commits, the same
                 # ordering ``init`` uses: the vector store is a separate engine,

@@ -124,7 +124,6 @@ def _zombie_graph() -> object:
     )
 
 
-
 def _run_zombie_only(git_meta: dict) -> list:
     """Run the analyzer with zombie detection only and return pkgA zombie findings.
 
@@ -212,7 +211,6 @@ def test_zombie_package_commit_count_summed_from_git_meta():
     )
 
 
-
 def test_zombie_package_last_commit_at_from_git_meta():
     """last_commit_at on a zombie finding is the most recent commit across all files.
 
@@ -245,9 +243,9 @@ def test_zombie_package_last_commit_at_from_git_meta():
         "Likely caused by getattr() being used instead of dict.get() on git_meta_map values."
     )
     # age_days is derived from last_commit_at; it should be ~30 days, not None
-    assert finding.age_days is not None, (
-        "age_days should not be None when last_commit_at is available."
-    )
+    assert (
+        finding.age_days is not None
+    ), "age_days should not be None when last_commit_at is available."
     assert 25 <= finding.age_days <= 35, (  # 5-day slack for test runtime
         f"Expected age_days ~30, got {finding.age_days}."
     )

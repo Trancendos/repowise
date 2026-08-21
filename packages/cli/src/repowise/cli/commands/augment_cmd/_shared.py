@@ -53,6 +53,7 @@ def as_result(value: HookResult | str | None) -> HookResult:
         return value
     return HookResult(context=value or None)
 
+
 #: Wall clock at the first moment repowise code runs in this hook process.
 #: Every ledger row carries the elapsed time to its own write, which is the
 #: part of hook latency repowise controls. It is a *lower bound* on what the

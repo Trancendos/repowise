@@ -81,9 +81,7 @@ async def test_docs_count_is_zero_without_pages(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_prose_count_follows_the_provider_not_the_page_type(
-    client: AsyncClient, app
-) -> None:
+async def test_prose_count_follows_the_provider_not_the_page_type(client: AsyncClient, app) -> None:
     """A model-written page counts as prose whatever type it is.
 
     Scoping the count to "page types a model usually writes" looks more

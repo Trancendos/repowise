@@ -35,6 +35,7 @@ def supports_updated_output() -> bool:
     """The probe under test, now owned by the harness adapter that answers it."""
     return ClaudeCodeAdapter().supports_updated_output()
 
+
 _SESSION = "sess-1"
 
 
@@ -389,9 +390,7 @@ def test_a_config_that_is_not_utf8_costs_only_this_enrichment(repo: Path) -> Non
     assert "changed (Edit/Write) after your previous read" in (result.context or "")
 
 
-def test_no_durable_state_means_no_replacement(
-    repo: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_no_durable_state_means_no_replacement(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """The escape hatch is the state file; without it the promise has no ceiling."""
     from repowise.cli.commands.augment_cmd import read_state
 

@@ -455,7 +455,12 @@ def _set_read_skeleton(
 ) -> None:
     """Write ``hooks.read_skeleton`` for the target repo or workspace."""
     _set_hook_surface(
-        path, workspace, no_workspace, surface="read_skeleton", label="Skeleton-served Reads", enabled=enabled
+        path,
+        workspace,
+        no_workspace,
+        surface="read_skeleton",
+        label="Skeleton-served Reads",
+        enabled=enabled,
     )
 
 
@@ -531,8 +536,12 @@ def read_reread_group() -> None:
 def read_reread_install(path: str | None, workspace: bool, no_workspace: bool) -> None:
     """Collapse unchanged re-reads to a notice in this repo."""
     _set_hook_surface(
-        path, workspace, no_workspace,
-        surface="read_reread", label="Collapsed re-reads", enabled=True,
+        path,
+        workspace,
+        no_workspace,
+        surface="read_reread",
+        label="Collapsed re-reads",
+        enabled=True,
     )
 
 
@@ -543,8 +552,12 @@ def read_reread_install(path: str | None, workspace: bool, no_workspace: bool) -
 def read_reread_uninstall(path: str | None, workspace: bool, no_workspace: bool) -> None:
     """Stop collapsing re-reads in this repo; they come back whole."""
     _set_hook_surface(
-        path, workspace, no_workspace,
-        surface="read_reread", label="Collapsed re-reads", enabled=False,
+        path,
+        workspace,
+        no_workspace,
+        surface="read_reread",
+        label="Collapsed re-reads",
+        enabled=False,
     )
 
 
@@ -593,8 +606,12 @@ def search_digest_group() -> None:
 def search_digest_install(path: str | None, workspace: bool, no_workspace: bool) -> None:
     """Serve multi-file grep floods as digests in this repo."""
     _set_hook_surface(
-        path, workspace, no_workspace,
-        surface="search_digest", label="Digest-served searches", enabled=True,
+        path,
+        workspace,
+        no_workspace,
+        surface="search_digest",
+        label="Digest-served searches",
+        enabled=True,
     )
 
 
@@ -605,8 +622,12 @@ def search_digest_install(path: str | None, workspace: bool, no_workspace: bool)
 def search_digest_uninstall(path: str | None, workspace: bool, no_workspace: bool) -> None:
     """Stop replacing search floods in this repo; the digest goes back to riding alongside."""
     _set_hook_surface(
-        path, workspace, no_workspace,
-        surface="search_digest", label="Digest-served searches", enabled=False,
+        path,
+        workspace,
+        no_workspace,
+        surface="search_digest",
+        label="Digest-served searches",
+        enabled=False,
     )
 
 

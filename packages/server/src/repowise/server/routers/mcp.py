@@ -55,9 +55,7 @@ def _surface(repo_id: str | None, repo_path: str | None) -> McpToolSurfaceRespon
 
 
 @router.get("/tools", response_model=McpToolSurfaceResponse)
-async def get_tool_surface(
-    request: Request, repo_id: str | None = None
-) -> McpToolSurfaceResponse:
+async def get_tool_surface(request: Request, repo_id: str | None = None) -> McpToolSurfaceResponse:
     """Return the configurable tool surface for a repo.
 
     Pass ``?repo_id=`` so the response reflects that repo's workspace mode and

@@ -71,9 +71,7 @@ def _run_level(store) -> list[str]:
             return _page("reused.py", reused=True)
 
         run = _fake_run(store)
-        await _GenerationRun.run_level(
-            run, [("p1", fresh()), ("p2", reused())], level=2
-        )
+        await _GenerationRun.run_level(run, [("p1", fresh()), ("p2", reused())], level=2)
         return [pid for batch in store.batches for (pid, *_rest) in batch]
 
     return asyncio.run(_go())

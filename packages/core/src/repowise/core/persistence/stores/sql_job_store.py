@@ -95,13 +95,9 @@ class SqlJobStore(JobStore):
         await self._session.flush()
         return _to_record(row)
 
-    async def find_resumable(
-        self, *, repository_id: str | None = None
-    ) -> list[JobRecord]:
+    async def find_resumable(self, *, repository_id: str | None = None) -> list[JobRecord]:
         q = select(PipelineJob).where(
-            PipelineJob.state.in_(
-                [JobState.PENDING.value, JobState.RUNNING.value]
-            )
+            PipelineJob.state.in_([JobState.PENDING.value, JobState.RUNNING.value])
         )
         if repository_id is not None:
             q = q.where(PipelineJob.repository_id == repository_id)

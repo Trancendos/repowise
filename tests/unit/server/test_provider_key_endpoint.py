@@ -72,7 +72,9 @@ async def test_remove_key_with_repo_id_clears_repo_env(client: AsyncClient) -> N
 
 
 @pytest.mark.asyncio
-async def test_add_key_resolves_non_primary_workspace_repo(client: AsyncClient, app, tmp_path) -> None:
+async def test_add_key_resolves_non_primary_workspace_repo(
+    client: AsyncClient, app, tmp_path
+) -> None:
     # Workspace mode: a non-primary repo's row lives only in its own wiki.db, not
     # the primary DB. The key endpoint gets repo_id in the body, so resolution
     # must route by repo_id (not the request path/query) to reach that DB.
@@ -143,9 +145,7 @@ async def test_validate_reports_probe_failure(client: AsyncClient, monkeypatch) 
     repo = await create_test_repo(client)
     from repowise.server import provider_config as pc
 
-    monkeypatch.setattr(
-        pc, "get_chat_provider_instance", lambda **_k: _FakeProvider(raises=True)
-    )
+    monkeypatch.setattr(pc, "get_chat_provider_instance", lambda **_k: _FakeProvider(raises=True))
 
     resp = await client.post(f"/api/providers/anthropic/validate?repo_id={repo['id']}")
     assert resp.status_code == 200

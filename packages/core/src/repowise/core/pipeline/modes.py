@@ -35,9 +35,7 @@ class OrchestratorMode(enum.StrEnum):
     @property
     def git_tier(self) -> GitIndexTier:
         """Git-indexing tier this mode runs."""
-        return (
-            GitIndexTier.ESSENTIAL if self is OrchestratorMode.FAST else GitIndexTier.FULL
-        )
+        return GitIndexTier.ESSENTIAL if self is OrchestratorMode.FAST else GitIndexTier.FULL
 
     @property
     def allows_doc_generation(self) -> bool:

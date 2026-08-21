@@ -132,7 +132,9 @@ def test_an_index_with_no_record_falls_back_to_its_rows(tmp_path: Path) -> None:
         subprocess.run(["git", *args], cwd=str(repo), capture_output=True, text=True)
     (repo / "a.py").write_text("def alpha():\n    return 1\n")
     subprocess.run(["git", "add", "."], cwd=str(repo), capture_output=True, text=True)
-    subprocess.run(["git", "commit", "-m", "initial"], cwd=str(repo), capture_output=True, text=True)
+    subprocess.run(
+        ["git", "commit", "-m", "initial"], cwd=str(repo), capture_output=True, text=True
+    )
 
     asyncio.run(index_repo_full(repo))  # real store, keyless, no onboarding pages
 

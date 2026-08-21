@@ -42,13 +42,13 @@ def test_every_performance_biomarker_carries_a_weight() -> None:
         b.name for b in registered_biomarkers() if getattr(b, "category", "") == "performance"
     }
     assert registered, "no performance detectors registered — the check is vacuous"
-    assert registered <= set(_PERF_MARKER_POINTS), (
-        f"unweighted performance biomarkers: {sorted(registered - set(_PERF_MARKER_POINTS))}"
-    )
+    assert registered <= set(
+        _PERF_MARKER_POINTS
+    ), f"unweighted performance biomarkers: {sorted(registered - set(_PERF_MARKER_POINTS))}"
     # And no stale entries pointing at detectors that no longer exist.
-    assert set(_PERF_MARKER_POINTS) <= registered, (
-        f"weights for unregistered markers: {sorted(set(_PERF_MARKER_POINTS) - registered)}"
-    )
+    assert (
+        set(_PERF_MARKER_POINTS) <= registered
+    ), f"weights for unregistered markers: {sorted(set(_PERF_MARKER_POINTS) - registered)}"
 
 
 def test_a_cross_function_subprocess_n_plus_one_outranks_a_filesystem_one() -> None:

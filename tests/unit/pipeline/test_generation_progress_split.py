@@ -44,7 +44,9 @@ class _CostTracker:
     session_cost = 0.25
 
 
-def _run(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, page_types: list[str]) -> _RecordingProgress:
+def _run(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, page_types: list[str]
+) -> _RecordingProgress:
     """Drive ``run_generation``'s callbacks with a fixed sequence of page types."""
     import asyncio
 

@@ -160,9 +160,7 @@ async def job_store(request, async_session: AsyncSession):
 @pytest.mark.asyncio
 async def test_job_store_create_and_get(job_store):
     repo_id = job_store._test_repo_id  # type: ignore[attr-defined]
-    job = await job_store.create_job(
-        repository_id=repo_id, phase="parse", metadata={"k": 1}
-    )
+    job = await job_store.create_job(repository_id=repo_id, phase="parse", metadata={"k": 1})
     assert job.state is JobState.PENDING
     assert job.phase == "parse"
     assert job.metadata == {"k": 1}
@@ -176,9 +174,7 @@ async def test_job_store_state_transitions(job_store):
     job = await job_store.create_job(repository_id=repo_id, phase="graph")
     updated = await job_store.update_state(job.id, JobState.RUNNING)
     assert updated.state is JobState.RUNNING
-    final = await job_store.update_state(
-        job.id, JobState.FAILED, error="boom"
-    )
+    final = await job_store.update_state(job.id, JobState.FAILED, error="boom")
     assert final.state is JobState.FAILED
     assert final.error == "boom"
 

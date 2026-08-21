@@ -43,22 +43,83 @@ async def _seed_two_containers(client: AsyncClient, app) -> str:
 
     async with app.state.session_factory() as session:
         nodes = [
-            {"node_id": "packages/core/parser.py", "node_type": "file", "language": "python", "symbol_count": 2},
-            {"node_id": "packages/core/graph.py", "node_type": "file", "language": "python", "symbol_count": 3},
-            {"node_id": "packages/web/page.tsx", "node_type": "file", "language": "typescript", "symbol_count": 1},
-            {"node_id": "external:fastapi", "node_type": "file", "language": "python", "symbol_count": 0},
-            {"node_id": "external:react", "node_type": "file", "language": "typescript", "symbol_count": 0},
+            {
+                "node_id": "packages/core/parser.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 2,
+            },
+            {
+                "node_id": "packages/core/graph.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 3,
+            },
+            {
+                "node_id": "packages/web/page.tsx",
+                "node_type": "file",
+                "language": "typescript",
+                "symbol_count": 1,
+            },
+            {
+                "node_id": "external:fastapi",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 0,
+            },
+            {
+                "node_id": "external:react",
+                "node_type": "file",
+                "language": "typescript",
+                "symbol_count": 0,
+            },
         ]
         await batch_upsert_graph_nodes(session, repo_id, nodes)
-        await batch_upsert_graph_edges(session, repo_id, [
-            {"source_node_id": "packages/web/page.tsx", "target_node_id": "packages/core/graph.py", "edge_type": "imports"},
-            {"source_node_id": "packages/core/parser.py", "target_node_id": "external:fastapi", "edge_type": "imports"},
-            {"source_node_id": "packages/web/page.tsx", "target_node_id": "external:react", "edge_type": "imports"},
-        ])
-        id_map = await bulk_upsert_external_systems(session, repo_id, [
-            {"name": "fastapi", "display_name": "FastAPI", "ecosystem": "pypi", "category": "framework", "version": "0.110", "declared_in": "packages/core/pyproject.toml", "is_dev_dep": False},
-            {"name": "react", "display_name": "React", "ecosystem": "npm", "category": "framework", "version": "^18", "declared_in": "packages/web/package.json", "is_dev_dep": False},
-        ])
+        await batch_upsert_graph_edges(
+            session,
+            repo_id,
+            [
+                {
+                    "source_node_id": "packages/web/page.tsx",
+                    "target_node_id": "packages/core/graph.py",
+                    "edge_type": "imports",
+                },
+                {
+                    "source_node_id": "packages/core/parser.py",
+                    "target_node_id": "external:fastapi",
+                    "edge_type": "imports",
+                },
+                {
+                    "source_node_id": "packages/web/page.tsx",
+                    "target_node_id": "external:react",
+                    "edge_type": "imports",
+                },
+            ],
+        )
+        id_map = await bulk_upsert_external_systems(
+            session,
+            repo_id,
+            [
+                {
+                    "name": "fastapi",
+                    "display_name": "FastAPI",
+                    "ecosystem": "pypi",
+                    "category": "framework",
+                    "version": "0.110",
+                    "declared_in": "packages/core/pyproject.toml",
+                    "is_dev_dep": False,
+                },
+                {
+                    "name": "react",
+                    "display_name": "React",
+                    "ecosystem": "npm",
+                    "category": "framework",
+                    "version": "^18",
+                    "declared_in": "packages/web/package.json",
+                    "is_dev_dep": False,
+                },
+            ],
+        )
         name_to_id = {n: sid for (n, _), sid in id_map.items()}
         await link_graph_nodes_to_external_systems(session, repo_id, name_to_id)
         await session.commit()
@@ -77,7 +138,9 @@ async def test_l1_endpoint_returns_system_and_externals(client: AsyncClient, app
     assert len(body["relations"]) == 3
 
 
-async def test_l2_endpoint_returns_containers_and_aggregated_edges(client: AsyncClient, app) -> None:
+async def test_l2_endpoint_returns_containers_and_aggregated_edges(
+    client: AsyncClient, app
+) -> None:
     repo_id = await _seed_two_containers(client, app)
     resp = await client.get(f"/api/graph/{repo_id}/c4/l2")
     assert resp.status_code == 200
@@ -138,9 +201,7 @@ async def test_l1_endpoint_on_empty_repo(client: AsyncClient) -> None:
     assert body["system"]["name"] == "test-repo"
 
 
-async def test_structurizr_endpoint_returns_a_model_fragment(
-    client: AsyncClient, app
-) -> None:
+async def test_structurizr_endpoint_returns_a_model_fragment(client: AsyncClient, app) -> None:
     repo_id = await _seed_two_containers(client, app)
     resp = await client.get(f"/api/graph/{repo_id}/c4/structurizr")
     assert resp.status_code == 200
@@ -169,9 +230,7 @@ async def test_structurizr_endpoint_standalone_returns_a_workspace(
 
 async def test_structurizr_endpoint_can_drop_externals(client: AsyncClient, app) -> None:
     repo_id = await _seed_two_containers(client, app)
-    resp = await client.get(
-        f"/api/graph/{repo_id}/c4/structurizr", params={"externals": "false"}
-    )
+    resp = await client.get(f"/api/graph/{repo_id}/c4/structurizr", params={"externals": "false"})
     assert resp.status_code == 200
     assert "FastAPI" not in resp.text
 

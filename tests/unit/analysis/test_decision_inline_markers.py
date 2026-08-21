@@ -65,9 +65,7 @@ async def test_each_decision_is_scoped_to_its_own_marker(tmp_path):
         ]
     )
 
-    decisions = await DecisionExtractor(
-        repo_path=tmp_path, provider=provider
-    ).scan_inline_markers()
+    decisions = await DecisionExtractor(repo_path=tmp_path, provider=provider).scan_inline_markers()
 
     by_title = {d.title: d for d in decisions}
     assert len(by_title) == 2
@@ -99,9 +97,7 @@ async def test_unattributable_decision_gets_no_span_rather_than_a_neighbours(tmp
         ]
     )
 
-    decisions = await DecisionExtractor(
-        repo_path=tmp_path, provider=provider
-    ).scan_inline_markers()
+    decisions = await DecisionExtractor(repo_path=tmp_path, provider=provider).scan_inline_markers()
 
     assert len(decisions) == 1
     assert decisions[0].evidence_line is None
@@ -114,13 +110,9 @@ async def test_single_marker_file_needs_no_hint(tmp_path):
         "# DECISION: pin the driver to 2.x because 3.x drops the sync API\n",
         encoding="utf-8",
     )
-    provider = _StubProvider(
-        [{"title": "Pin the driver", "decision": "pin the driver to 2.x"}]
-    )
+    provider = _StubProvider([{"title": "Pin the driver", "decision": "pin the driver to 2.x"}])
 
-    decisions = await DecisionExtractor(
-        repo_path=tmp_path, provider=provider
-    ).scan_inline_markers()
+    decisions = await DecisionExtractor(repo_path=tmp_path, provider=provider).scan_inline_markers()
 
     assert len(decisions) == 1
     assert decisions[0].evidence_line == 1

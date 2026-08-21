@@ -201,9 +201,7 @@ async def _indexed_ids(engine) -> set[str]:
         return {r[0] for r in rows.fetchall()}
 
 
-async def test_rebuild_discards_orphans_instead_of_refusing(
-    async_engine, async_session, repo
-):
+async def test_rebuild_discards_orphans_instead_of_refusing(async_engine, async_session, repo):
     """An index holding more rows than ``wiki_pages`` still upgrades (#1309).
 
     The excess is orphans: rows whose page was swept from SQL while the FTS
@@ -266,9 +264,7 @@ async def test_rebuild_leaves_the_old_index_alone_when_wiki_pages_is_missing(asy
     assert await _indexed_ids(async_engine) == {"p1"}
 
 
-async def test_prune_orphans_removes_rows_whose_page_is_gone(
-    async_engine, async_session, repo
-):
+async def test_prune_orphans_removes_rows_whose_page_is_gone(async_engine, async_session, repo):
     """The residue of a sweep whose FTS delete never ran.
 
     Six call sites delete pages from SQL and their index rows afterwards,
@@ -296,9 +292,7 @@ async def test_prune_orphans_is_a_no_op_on_a_clean_store(async_engine, async_ses
     assert await _indexed_ids(async_engine) == {"file_page:src/main.py"}
 
 
-async def test_ensure_index_prunes_orphans_on_a_current_schema(
-    async_engine, async_session, repo
-):
+async def test_ensure_index_prunes_orphans_on_a_current_schema(async_engine, async_session, repo):
     """The self-heal cannot depend on there being a column upgrade to do.
 
     A store already on the current shape is where the orphans of an

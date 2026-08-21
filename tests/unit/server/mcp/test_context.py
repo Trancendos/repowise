@@ -690,9 +690,7 @@ async def _add_tree(session) -> None:
     """
     from repowise.core.persistence.models import Repository
 
-    rid = (
-        await session.execute(__import__("sqlalchemy").select(Repository))
-    ).scalars().first().id
+    rid = (await session.execute(__import__("sqlalchemy").select(Repository))).scalars().first().id
 
     def _page(pid, ptype, title, path, *, parent=None, section=None, order=0):
         return Page(

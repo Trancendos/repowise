@@ -38,10 +38,7 @@ class _Git:
 def _git(*partners: tuple[str, float, str | None]) -> _Git:
     return _Git(
         co_change_partners_json=json.dumps(
-            [
-                {"file_path": p, "co_change_count": c, "last_co_change": d}
-                for p, c, d in partners
-            ]
+            [{"file_path": p, "co_change_count": c, "last_co_change": d} for p, c, d in partners]
         )
     )
 

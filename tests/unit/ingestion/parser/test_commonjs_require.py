@@ -159,9 +159,9 @@ def test_module_reference_declarator_is_import_not_symbol(
 ) -> None:
     result = _parse(parser, source, language=language)
     assert any(i.module_path == module for i in result.imports), f"{source!r} lost its import edge"
-    assert name not in {s.name for s in result.symbols}, (
-        f"{source!r} was indexed as a symbol as well as an import"
-    )
+    assert name not in {
+        s.name for s in result.symbols
+    }, f"{source!r} was indexed as a symbol as well as an import"
 
 
 @pytest.mark.parametrize("language", ["javascript", "typescript"])

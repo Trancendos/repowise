@@ -86,9 +86,7 @@ class HttpExtractor:
     @classmethod
     def source_extensions(cls) -> frozenset[str]:
         """Every extension this extractor's dialects claim."""
-        return _union_extensions(cls.provider_dialects) | _union_extensions(
-            cls.consumer_dialects
-        )
+        return _union_extensions(cls.provider_dialects) | _union_extensions(cls.consumer_dialects)
 
     def extract(
         self,
@@ -124,9 +122,7 @@ class HttpExtractor:
         own_hashes: dict[str, str] | None = None
         if files is None and index is not None and content_hashes is None:
             own_hashes = content_hashes = {}
-        scanned = select_files(
-            repo_path, self.source_extensions(), exclude, files, own_hashes
-        )
+        scanned = select_files(repo_path, self.source_extensions(), exclude, files, own_hashes)
         mounts = self._collect_mounts(scanned)
 
         from ..from_index import CONSUMER_INDEX_SUFFIXES, extract_http_providers, parsed_for

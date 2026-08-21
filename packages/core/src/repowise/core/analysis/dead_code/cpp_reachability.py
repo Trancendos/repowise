@@ -46,11 +46,21 @@ from ...ingestion.models import REACHABILITY_USE_EDGE_TYPES
 # count as headers here: like a header, a fragment has no importer of its
 # own beyond the translation unit that pastes it in.
 _CPP_HEADER_EXTS: tuple[str, ...] = (
-    ".h", ".hpp", ".hxx", ".hh", ".h++", ".inc",
+    ".h",
+    ".hpp",
+    ".hxx",
+    ".hh",
+    ".h++",
+    ".inc",
     *sorted(INCLUDE_FRAGMENT_EXTENSIONS),
 )
 _CPP_SOURCE_EXTS: tuple[str, ...] = (
-    ".c", ".cc", ".cpp", ".cxx", ".c++", ".C",
+    ".c",
+    ".cc",
+    ".cpp",
+    ".cxx",
+    ".c++",
+    ".C",
 )
 _CPP_ALL_EXTS: tuple[str, ...] = _CPP_HEADER_EXTS + _CPP_SOURCE_EXTS
 
@@ -58,15 +68,17 @@ _CPP_ALL_EXTS: tuple[str, ...] = _CPP_HEADER_EXTS + _CPP_SOURCE_EXTS
 # Function names that mark a translation unit as a binary entry point.
 # A file defining one of these is the program / DLL / fuzzer entry — no
 # importer will ever exist by design.
-_CPP_ENTRY_FUNCTION_NAMES: frozenset[str] = frozenset({
-    "main",
-    "WinMain",
-    "wWinMain",
-    "wmain",
-    "LLVMFuzzerTestOneInput",
-    "LLVMFuzzerInitialize",
-    "DllMain",
-})
+_CPP_ENTRY_FUNCTION_NAMES: frozenset[str] = frozenset(
+    {
+        "main",
+        "WinMain",
+        "wWinMain",
+        "wmain",
+        "LLVMFuzzerTestOneInput",
+        "LLVMFuzzerInitialize",
+        "DllMain",
+    }
+)
 
 
 # Edge types that count as "this symbol is used by something". A header

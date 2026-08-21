@@ -112,9 +112,9 @@ async def test_legacy_db_missing_column_is_reconciled(tmp_path: Path) -> None:
     finally:
         await engine.dispose()
 
-    assert "verification" in _table_columns(db_path, "decision_records"), (
-        "init_db did not reconcile missing column"
-    )
+    assert "verification" in _table_columns(
+        db_path, "decision_records"
+    ), "init_db did not reconcile missing column"
 
 
 @pytest.mark.asyncio
@@ -225,9 +225,9 @@ async def test_legacy_db_missing_index_is_recreated(tmp_path: Path) -> None:
     finally:
         await engine.dispose()
 
-    assert candidate_index in _table_indexes(db_path, candidate_table), (
-        f"reconciler did not re-create index {candidate_index}"
-    )
+    assert candidate_index in _table_indexes(
+        db_path, candidate_table
+    ), f"reconciler did not re-create index {candidate_index}"
 
 
 @pytest.mark.asyncio
@@ -335,9 +335,9 @@ async def test_failed_statement_does_not_strand_later_tables(
             await engine.dispose()
 
     assert victim_column not in _table_columns(db_path, victim_table)
-    assert later_column in _table_columns(db_path, later_table), (
-        "a failure on an earlier table stranded every table after it"
-    )
+    assert later_column in _table_columns(
+        db_path, later_table
+    ), "a failure on an earlier table stranded every table after it"
 
 
 @pytest.mark.asyncio

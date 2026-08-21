@@ -76,8 +76,12 @@ def test_filter_graph_nodes_uses_node_id_for_file_nodes():
 
     file_keep = SimpleNamespace(node_type="file", node_id="src/main.py", file_path=None)
     file_drop = SimpleNamespace(node_type="file", node_id=".claude/c.py", file_path=None)
-    sym_keep = SimpleNamespace(node_type="symbol", node_id="src/main.py::foo", file_path="src/main.py")
-    sym_drop = SimpleNamespace(node_type="symbol", node_id=".claude/c.py::bar", file_path=".claude/c.py")
+    sym_keep = SimpleNamespace(
+        node_type="symbol", node_id="src/main.py::foo", file_path="src/main.py"
+    )
+    sym_drop = SimpleNamespace(
+        node_type="symbol", node_id=".claude/c.py::bar", file_path=".claude/c.py"
+    )
 
     result = filter_graph_nodes([file_keep, file_drop, sym_keep, sym_drop], SPEC)
     assert result == [file_keep, sym_keep]

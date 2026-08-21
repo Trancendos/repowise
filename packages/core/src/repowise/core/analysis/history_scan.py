@@ -138,7 +138,9 @@ class HistorySecurityScanner:
     # Git layer (thin wrappers around _run_git; overridable for tests)
     # ------------------------------------------------------------------
 
-    def _list_commits(self, repo_path: Path, since: str | None, to: str | None) -> list[tuple[str, str]]:
+    def _list_commits(
+        self, repo_path: Path, since: str | None, to: str | None
+    ) -> list[tuple[str, str]]:
         """Return ``[(sha, author_iso), ...]`` oldest→newest for the range.
 
         *since* / *to* mirror ``git rev-list`` range syntax: ``since..to``.
@@ -360,9 +362,7 @@ class HistorySecurityScanner:
             if (not path or self._is_source(path))
             and not (secrets_only and path and is_test_related_path(path))
         ]
-        contents_map = self._read_blobs_batch(
-            repo_path, [blob_sha for blob_sha, _ in source_items]
-        )
+        contents_map = self._read_blobs_batch(repo_path, [blob_sha for blob_sha, _ in source_items])
 
         for idx, (blob_sha, path) in enumerate(source_items, start=1):
             summary.files_scanned += 1

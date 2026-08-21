@@ -364,9 +364,7 @@ class TestRewriteHookStatus:
         assert (status.installed, status.fires) == (True, True)
         assert status.unmatched == ("PowerShell",)
 
-    def test_codex_stale_bash_matcher_is_narrowed(
-        self, codex_hooks_path, codex_adapter
-    ) -> None:
+    def test_codex_stale_bash_matcher_is_narrowed(self, codex_hooks_path, codex_adapter) -> None:
         # The exact install every Codex user held before the tool-name fix.
         # ``Bash`` stays in the gate because a live hook payload was never
         # captured, so the honest verdict is narrowed rather than dead: it
@@ -549,9 +547,7 @@ class TestCodexHooksInstall:
         install_codex_rewrite_hook()
         assert len(_codex_pre_hooks(codex_hooks_path)) == 1
 
-    def test_reinstall_upgrades_a_matcher_codex_no_longer_uses(
-        self, codex_hooks_path
-    ) -> None:
+    def test_reinstall_upgrades_a_matcher_codex_no_longer_uses(self, codex_hooks_path) -> None:
         """An existing install must not stay dead just because it is present.
 
         ``_is_rewrite_hook`` keys on the command, so an entry left over from
@@ -610,9 +606,7 @@ class TestCodexHooksInstall:
         # Idempotent: a second pass has nothing to do and writes nothing.
         assert codex_config.migrate_codex_rewrite_hook() is False
 
-    def test_self_heal_never_installs_for_someone_who_opted_out(
-        self, codex_hooks_path
-    ) -> None:
+    def test_self_heal_never_installs_for_someone_who_opted_out(self, codex_hooks_path) -> None:
         """No hooks file, or no repowise entry, means nothing to migrate."""
         assert codex_config.migrate_codex_rewrite_hook() is False
 
@@ -624,9 +618,7 @@ class TestCodexHooksInstall:
                         "PreToolUse": [
                             {
                                 "matcher": "Bash",
-                                "hooks": [
-                                    {"type": "command", "command": "my-validator"}
-                                ],
+                                "hooks": [{"type": "command", "command": "my-validator"}],
                             }
                         ]
                     }
@@ -637,9 +629,7 @@ class TestCodexHooksInstall:
         assert codex_config.migrate_codex_rewrite_hook() is False
         assert _codex_pre_hooks(codex_hooks_path)[0]["matcher"] == "Bash"
 
-    def test_reinstall_leaves_a_deliberately_narrowed_matcher_alone(
-        self, codex_hooks_path
-    ) -> None:
+    def test_reinstall_leaves_a_deliberately_narrowed_matcher_alone(self, codex_hooks_path) -> None:
         """Only matchers this installer shipped are moved, not the user's."""
         codex_hooks_path.parent.mkdir(parents=True, exist_ok=True)
         theirs = {

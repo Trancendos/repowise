@@ -65,9 +65,7 @@ def _seed(repo_dir: Path) -> None:
 
 
 class TestColdStart:
-    async def test_no_store_is_a_200_saying_so(
-        self, client: AsyncClient, tmp_path: Path
-    ) -> None:
+    async def test_no_store_is_a_200_saying_so(self, client: AsyncClient, tmp_path: Path) -> None:
         """Not a 404: the repository exists, the feature has no data yet."""
         repo = await create_test_repo(client, tmp_path)
         resp = await client.get(f"/api/repos/{repo['id']}/episodes")
@@ -88,9 +86,7 @@ class TestColdStart:
         assert not db.exists()
         assert not db.parent.exists()
 
-    async def test_counts_degrade_the_same_way(
-        self, client: AsyncClient, tmp_path: Path
-    ) -> None:
+    async def test_counts_degrade_the_same_way(self, client: AsyncClient, tmp_path: Path) -> None:
         repo = await create_test_repo(client, tmp_path)
         body = (await client.get(f"/api/repos/{repo['id']}/episodes/counts")).json()
         assert body["available"] is False
@@ -136,25 +132,19 @@ class TestTierSafety:
         repo = await create_test_repo(client, tmp_path)
         _seed(Path(repo["local_path"]))
         for bad in (TIER_TRANSCRIPT, "made-up"):
-            body = (
-                await client.get(f"/api/repos/{repo['id']}/episodes?tier={bad}")
-            ).json()
+            body = (await client.get(f"/api/repos/{repo['id']}/episodes?tier={bad}")).json()
             assert body["episodes"] == [] and body["total"] == 0
 
 
 class TestListing:
-    async def test_rows_carry_no_body(
-        self, client: AsyncClient, tmp_path: Path
-    ) -> None:
+    async def test_rows_carry_no_body(self, client: AsyncClient, tmp_path: Path) -> None:
         repo = await create_test_repo(client, tmp_path)
         _seed(Path(repo["local_path"]))
         body = (await client.get(f"/api/repos/{repo['id']}/episodes")).json()
         assert body["episodes"]
         assert all("body" not in e for e in body["episodes"])
 
-    async def test_newest_first_and_pageable(
-        self, client: AsyncClient, tmp_path: Path
-    ) -> None:
+    async def test_newest_first_and_pageable(self, client: AsyncClient, tmp_path: Path) -> None:
         repo = await create_test_repo(client, tmp_path)
         _seed(Path(repo["local_path"]))
         base = f"/api/repos/{repo['id']}/episodes"
@@ -210,9 +200,7 @@ class TestListing:
 
 
 class TestCounts:
-    async def test_grouped_by_tier_and_kind(
-        self, client: AsyncClient, tmp_path: Path
-    ) -> None:
+    async def test_grouped_by_tier_and_kind(self, client: AsyncClient, tmp_path: Path) -> None:
         repo = await create_test_repo(client, tmp_path)
         _seed(Path(repo["local_path"]))
         body = (await client.get(f"/api/repos/{repo['id']}/episodes/counts")).json()
@@ -265,17 +253,13 @@ class TestByFile:
 
 
 class TestDetail:
-    async def test_serves_the_body_and_a_verdict(
-        self, client: AsyncClient, tmp_path: Path
-    ) -> None:
+    async def test_serves_the_body_and_a_verdict(self, client: AsyncClient, tmp_path: Path) -> None:
         repo = await create_test_repo(client, tmp_path)
         repo_dir = Path(repo["local_path"])
         _seed(repo_dir)
         listing = (await client.get(f"/api/repos/{repo['id']}/episodes")).json()
         one = listing["episodes"][0]
-        body = (
-            await client.get(f"/api/repos/{repo['id']}/episodes/{one['id']}")
-        ).json()
+        body = (await client.get(f"/api/repos/{repo['id']}/episodes/{one['id']}")).json()
         assert body["body"].startswith("the whole body of")
         assert body["subject"] == one["subject"]
         # git cannot answer in a bare tmp dir, so the verdict says so rather
@@ -299,21 +283,15 @@ class TestDetail:
         )
         (row,) = store.list_episodes(tier=TIER_GIT)
         store.close()
-        body = (
-            await client.get(f"/api/repos/{repo['id']}/episodes/{row['id']}")
-        ).json()
+        body = (await client.get(f"/api/repos/{repo['id']}/episodes/{row['id']}")).json()
         assert len(body["nodes"]) == len(wide)
 
-    async def test_unknown_episode_is_a_404(
-        self, client: AsyncClient, tmp_path: Path
-    ) -> None:
+    async def test_unknown_episode_is_a_404(self, client: AsyncClient, tmp_path: Path) -> None:
         """Paired with a real id, or a deleted router would pass this too."""
         repo = await create_test_repo(client, tmp_path)
         _seed(Path(repo["local_path"]))
         real = (await client.get(f"/api/repos/{repo['id']}/episodes")).json()
-        good = await client.get(
-            f"/api/repos/{repo['id']}/episodes/{real['episodes'][0]['id']}"
-        )
+        good = await client.get(f"/api/repos/{repo['id']}/episodes/{real['episodes'][0]['id']}")
         assert good.status_code == 200
         bad = await client.get(f"/api/repos/{repo['id']}/episodes/deadbeef")
         assert bad.status_code == 404

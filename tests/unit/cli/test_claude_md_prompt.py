@@ -36,9 +36,7 @@ def test_unticking_claude_code_reaches_the_writer(monkeypatch, tmp_path: Path) -
     monkeypatch.setattr(agent_selection, "interactive_agent_select", lambda *_a: set())
 
     options = select_agents_interactively(_silent_console(), tmp_path, _empty_options())
-    claude_integration.ClaudeCodeSetup().write_project_files(
-        _silent_console(), tmp_path, options
-    )
+    claude_integration.ClaudeCodeSetup().write_project_files(_silent_console(), tmp_path, options)
 
     assert not (tmp_path / ".claude").exists()
     cfg = (tmp_path / ".repowise" / "config.yaml").read_text(encoding="utf-8")
@@ -59,9 +57,7 @@ def test_maybe_generate_skips_write_when_user_opted_out(tmp_path: Path) -> None:
     (tmp_path / ".repowise").mkdir()
     claude_dir = tmp_path / ".claude"
 
-    claude_integration.maybe_generate_claude_md(
-        _silent_console(), tmp_path, no_claude_md=True
-    )
+    claude_integration.maybe_generate_claude_md(_silent_console(), tmp_path, no_claude_md=True)
 
     # No .claude directory and no CLAUDE.md should have been created.
     assert not claude_dir.exists()
@@ -84,12 +80,8 @@ def test_maybe_generate_skips_write_when_config_disabled(tmp_path: Path) -> None
     cfg_path.write_text("editor_files:\n  claude_md: false\n", encoding="utf-8")
 
     # Patch the writer to detect any unexpected call.
-    with patch(
-        "repowise.cli.editor_integrations.claude._write_claude_md_async"
-    ) as fake_write:
-        claude_integration.maybe_generate_claude_md(
-            _silent_console(), tmp_path, no_claude_md=False
-        )
+    with patch("repowise.cli.editor_integrations.claude._write_claude_md_async") as fake_write:
+        claude_integration.maybe_generate_claude_md(_silent_console(), tmp_path, no_claude_md=False)
 
     fake_write.assert_not_called()
     assert not (tmp_path / ".claude" / "CLAUDE.md").exists()

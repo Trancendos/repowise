@@ -274,9 +274,7 @@ def _answer_paths(payload: dict) -> set[str]:
         paths.update(p for p in (payload.get(key) or []) if isinstance(p, str))
     for hit in payload.get("retrieval") or []:
         if isinstance(hit, dict):
-            paths.update(
-                p for p in (hit.get("path"), hit.get("target_path")) if isinstance(p, str)
-            )
+            paths.update(p for p in (hit.get("path"), hit.get("target_path")) if isinstance(p, str))
     for guess in payload.get("best_guesses") or []:
         if isinstance(guess, dict) and isinstance(guess.get("file"), str):
             paths.add(guess["file"])

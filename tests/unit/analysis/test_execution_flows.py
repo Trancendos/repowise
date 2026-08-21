@@ -59,9 +59,7 @@ def test_all_candidates_scored_are_exposed():
 def test_trace_follows_primary_chain():
     g = _chain_graph()
     report = trace_execution_flows(g, {}, FlowConfig(min_flow_depth=1))
-    main_flow = next(
-        f for f in report.flows if f.entry_point_id == "src/app.py::main"
-    )
+    main_flow = next(f for f in report.flows if f.entry_point_id == "src/app.py::main")
     # Primary path follows the highest-fan-out successor at each hop.
     assert main_flow.trace[:4] == [
         "src/app.py::main",

@@ -35,9 +35,7 @@ async def _seed(repo_path, files: list[dict]) -> None:
                     url="https://example.test/coverage",
                 )
                 await session.commit()
-            await save_coverage_files(
-                session, repo.id, files, source_format="lcov"
-            )
+            await save_coverage_files(session, repo.id, files, source_format="lcov")
             await session.commit()
     finally:
         await engine.dispose()

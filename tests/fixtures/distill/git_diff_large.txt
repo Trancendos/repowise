@@ -4,10 +4,10 @@ index d0be19e4..7fb48981 100644
 +++ b/packages/cli/src/repowise/cli/commands/health_cmd.py
 @@ -8,6 +8,7 @@ back to a live in-process analysis when run outside an indexed repo.
  from __future__ import annotations
- 
+
  import json
 +from pathlib import Path
- 
+
  import click
  from rich.table import Table
 @@ -215,6 +216,7 @@ def health_command(
@@ -43,7 +43,7 @@ index d4c2098d..f33de34b 100644
 @@ -616,7 +618,7 @@ def init_command(
          # Validate provider connection
          from repowise.core.providers.llm.base import ProviderError
- 
+
 -        with console.status("  Verifying provider connection…", spinner="dots"):
 +        with console.status("  Verifying provider connection…", spinner=OWL_SPINNER):
              try:
@@ -51,7 +51,7 @@ index d4c2098d..f33de34b 100644
                      provider.generate(
 @@ -645,7 +647,7 @@ def init_command(
      orchestrator_mode = OrchestratorMode.FAST if run_mode == "fast" else OrchestratorMode.STANDARD
- 
+
      with Progress(
 -        SpinnerColumn(),
 +        SpinnerColumn(spinner_name=OWL_SPINNER, style=BRAND_STYLE),
@@ -71,16 +71,16 @@ index d4c2098d..f33de34b 100644
 +                "saved — run [bold]repowise init --resume[/] to continue where it stopped."
              )
              return
- 
+
 @@ -757,7 +761,7 @@ def init_command(
              console, 4, total_phases, "Persistence", "Saving to database and building search index"
          )
- 
+
 -    with console.status("  Persisting to database…", spinner="dots"):
 +    with console.status("  Persisting to database…", spinner=OWL_SPINNER):
          run_async(persist_result(result, repo_path))
      console.print("  [green]✓[/green] Database updated")
- 
+
 diff --git a/packages/cli/src/repowise/cli/commands/init_cmd/generation.py b/packages/cli/src/repowise/cli/commands/init_cmd/generation.py
 index 29ecf4b8..ca41107e 100644
 --- a/packages/cli/src/repowise/cli/commands/init_cmd/generation.py
@@ -91,13 +91,13 @@ index 29ecf4b8..ca41107e 100644
  )
 -from repowise.cli.ui import MaybeCountColumn, RichProgressCallback
 +from repowise.cli.ui import BRAND_STYLE, OWL_SPINNER, MaybeCountColumn, RichProgressCallback
- 
+
  # The LLM-cost confirmation threshold. A run whose estimate exceeds this asks
  # for confirmation (unless ``--yes``); below it generation proceeds silently.
 @@ -187,7 +187,7 @@ def _enrich_knowledge_graph(
              result.knowledge_graph_result = _run()
          return
- 
+
 -    with console.status("  Enriching knowledge graph (layers + tour)…", spinner="dots"):
 +    with console.status("  Enriching knowledge graph (layers + tour)…", spinner=OWL_SPINNER):
          try:
@@ -105,7 +105,7 @@ index 29ecf4b8..ca41107e 100644
              enriched = result.knowledge_graph_result
 @@ -237,7 +237,7 @@ def run_repo_generation(
      provider._cost_tracker = cost_tracker
- 
+
      with Progress(
 -        SpinnerColumn(),
 +        SpinnerColumn(spinner_name=OWL_SPINNER, style=BRAND_STYLE),
@@ -126,7 +126,7 @@ index 84c9a05c..f0e15b7d 100644
      RichProgressCallback,
      interactive_advanced_config,
 @@ -211,7 +213,7 @@ def _ingest_and_generate_repo(repo: Any, idx: int, total: int, ctx: _WorkspaceCt
- 
+
      try:
          with Progress(
 -            SpinnerColumn(),
@@ -143,12 +143,12 @@ index 17e9cee6..30c794bc 100644
      run_async,
  )
 +from repowise.cli.ui import BRAND_STYLE, OWL_SPINNER
- 
- 
+
+
  @click.command("reindex")
 @@ -115,7 +116,7 @@ async def _reindex(repo_path, embedder_name: str, batch_size: int) -> None:
      failed = 0
- 
+
      with Progress(
 -        SpinnerColumn(),
 +        SpinnerColumn(spinner_name=OWL_SPINNER, style=BRAND_STYLE),
@@ -162,14 +162,14 @@ index ed1b58ca..1dd532e8 100644
 @@ -346,22 +346,45 @@ def _build_repo_graph(
      """
      from pathlib import Path as PathlibPath
- 
+
 -    from repowise.core.ingestion import ASTParser, FileTraverser, GraphBuilder
 +    from repowise.core.ingestion import ASTParser, FileTraverser, GraphBuilder, compute_content_hash
- 
+
      traverser = FileTraverser(repo_path, extra_exclude_patterns=exclude_patterns or None)
      file_infos = list(traverser.traverse())
      repo_structure = traverser.get_repo_structure()
- 
+
 -    parser = ASTParser()
 +    # Content-hash parse cache: an incremental update re-ingests the whole
 +    # repo, but only the changed files actually need a tree-sitter parse.
@@ -192,7 +192,7 @@ index ed1b58ca..1dd532e8 100644
 +        exclude_patterns=exclude_patterns,
 +        centrality_cache_dir=PathlibPath(repo_path) / ".repowise",
 +    )
- 
+
      skipped = 0
      for fi in file_infos:
          try:
@@ -215,7 +215,7 @@ index ed1b58ca..1dd532e8 100644
      graph_builder.build()
 +    if parse_cache is not None:
 +        parse_cache.save()
- 
+
      if skipped:
          console.print(f"[yellow]Skipped {skipped} file(s) that failed to parse.[/yellow]")
 @@ -393,10 +418,16 @@ def _rebuild_graph_and_git(
@@ -226,7 +226,7 @@ index ed1b58ca..1dd532e8 100644
  ) -> tuple[list, dict[str, bytes], Any, Any, int, dict[str, dict]]:
      """Re-traverse + parse the repo, rebuild the graph (+ framework edges), and
      re-index git metadata for the changed files.
- 
+
 +    ``git_tier`` is the persisted ``state.json:git_tier`` value: a fast-mode
 +    (ESSENTIAL) repo must not pay per-file blame on every update for signals
 +    its index never had. Unknown/missing values fall back to FULL, matching
@@ -240,7 +240,7 @@ index ed1b58ca..1dd532e8 100644
      try:
          from repowise.core.ingestion.git_indexer import GitIndexer
 +        from repowise.core.ingestion.git_indexer.tiers import GitIndexTier
- 
+
 +        try:
 +            tier = GitIndexTier(git_tier) if git_tier else GitIndexTier.FULL
 +        except ValueError:
@@ -259,7 +259,7 @@ index ed1b58ca..1dd532e8 100644
 @@ -425,6 +462,16 @@ def _rebuild_graph_and_git(
      except Exception as exc:
          console.print(f"[yellow]Git re-index skipped: {exc}[/yellow]")
- 
+
 +    # Pre-compute centrality/community metrics with the init path's fan-out
 +    # parallelism. Without this, persist_graph_nodes computes the same
 +    # metrics lazily one-by-one. Runs after the co-change edge refresh so
@@ -271,8 +271,8 @@ index ed1b58ca..1dd532e8 100644
 +        console.print(f"[yellow]Metric pre-computation skipped: {exc}[/yellow]")
 +
      return parsed_files, source_map, graph_builder, repo_structure, file_count, git_meta_map
- 
- 
+
+
 @@ -453,6 +500,7 @@ def _run_partial_analysis(
              graph_builder.graph(),
              git_meta_map=git_meta_map,
@@ -284,7 +284,7 @@ index ed1b58ca..1dd532e8 100644
 @@ -675,6 +723,13 @@ def _run_full_health_rescore(
          repo_path, exclude_patterns
      )
- 
+
 +    # Fan-out metric precompute (mirrors _rebuild_graph_and_git) — the
 +    # rescore persists graph nodes too, which reads every metric.
 +    try:
@@ -305,7 +305,7 @@ index ed1b58ca..1dd532e8 100644
              analyzer_config = (
 @@ -1082,26 +1138,15 @@ def update_command(
          console.print(f"  [{color}]{fd.status:>10}[/{color}]  {fd.path}")
- 
+
      # Re-parse changed files and rebuild graph for affected pages
 -    from repowise.core.generation import ContextAssembler, GenerationConfig, PageGenerator
 -
@@ -321,22 +321,22 @@ index ed1b58ca..1dd532e8 100644
 -        reasoning=resolve_reasoning(reasoning, cfg),
 -        enable_onboarding=enable_onboarding_cfg,
 -    )
- 
+
      # Read exclude patterns from config (set during init or via web UI)
      exclude_patterns: list[str] = list(cfg.get("exclude_patterns") or [])
- 
+
      parsed_files, source_map, graph_builder, repo_structure, file_count, git_meta_map = (
 -        _rebuild_graph_and_git(repo_path, file_diffs, cfg, exclude_patterns)
 +        _rebuild_graph_and_git(
 +            repo_path, file_diffs, cfg, exclude_patterns, git_tier=state.get("git_tier")
 +        )
      )
- 
+
      # Determine affected pages (auto-scale budget if not explicitly set)
 @@ -1145,6 +1190,23 @@ def update_command(
          )
          return
- 
+
 +    # The generation/LLM layer is only needed past this point — importing it
 +    # above the index-only branch would make every index-only update (the
 +    # post-commit hook's hot path) pay the import for code it never runs.
@@ -355,7 +355,7 @@ index ed1b58ca..1dd532e8 100644
 +    )
 +
      provider = resolve_provider(provider_name, model, repo_path=repo_path)
- 
+
      # Attach a DB-backed CostTracker so every LLM call made during this update
 diff --git a/packages/cli/src/repowise/cli/editor_integrations/claude.py b/packages/cli/src/repowise/cli/editor_integrations/claude.py
 index 42c6cda6..ba721988 100644
@@ -379,11 +379,11 @@ index a6310d50..e8cf602c 100644
 --- a/packages/cli/src/repowise/cli/editor_integrations/codex.py
 +++ b/packages/cli/src/repowise/cli/editor_integrations/codex.py
 @@ -123,6 +123,7 @@ def maybe_generate_agents_md(
- 
+
      from repowise.cli.editor_files import should_generate_editor_file
      from repowise.cli.helpers import run_async
 +    from repowise.cli.ui import OWL_SPINNER
- 
+
      if not should_generate_editor_file(
          repo_path,
 @@ -132,7 +133,7 @@ def maybe_generate_agents_md(
@@ -441,34 +441,34 @@ index 5814f1c1..9e2a57fa 100644
 +++ b/packages/cli/src/repowise/cli/ui/brand.py
 @@ -3,8 +3,8 @@
  from __future__ import annotations
- 
+
  from rich.console import Console
 +from rich.markup import escape
  from rich.rule import Rule
 -from rich.text import Text
- 
+
  # ---------------------------------------------------------------------------
  # Brand / theme
 @@ -18,24 +18,33 @@ WARN = "yellow"
  ERR = "bold red"
- 
+
  # ---------------------------------------------------------------------------
 -# ASCII art  —  bold half-block, compact lowercase, 2 lines
 +# Banner  —  owl mascot + heatmap wordmark (art lives in ui/mascot.py)
  # ---------------------------------------------------------------------------
- 
+
 -_LOGO = " █▀█ █▀▀ █▀█ █▀█ █ █ █ ▀ █▀▀ █▀▀\n █▀▄ ██▄ █▀▀ █▄█ ▀▄▀▄▀ █ ▄▄█ ██▄"
 +# Breathing room required beyond the rendered banner width before we pick the
 +# full variant; below that we fall back to compact (same design, 1-char strokes).
 +_BANNER_WIDTH_MARGIN = 4
- 
- 
+
+
  def print_banner(console: Console, repo_name: str | None = None) -> None:
 -    """Print the repowise logo, tagline, and optional repo name."""
 +    """Print the repowise owl banner, tagline, and optional repo name."""
      from repowise.cli import __version__
 +    from repowise.cli.ui import mascot
- 
+
 +    compact = console.width < mascot.banner_width() + _BANNER_WIDTH_MARGIN
      console.print()
 -    console.print(Text(_LOGO, style=BRAND_STYLE))
@@ -489,8 +489,8 @@ index 5814f1c1..9e2a57fa 100644
 -        console.print(f"  Repository: [bold]{repo_name}[/bold]")
 +        console.print(f" Repository: [bold]{escape(repo_name)}[/bold]", highlight=False)
      console.print()
- 
- 
+
+
 diff --git a/packages/cli/src/repowise/cli/ui/mascot.py b/packages/cli/src/repowise/cli/ui/mascot.py
 new file mode 100644
 index 00000000..ca2e7c9e
@@ -715,11 +715,11 @@ index 1d09e8f4..31ddff66 100644
 +++ b/packages/cli/src/repowise/cli/ui/result_panels.py
 @@ -10,6 +10,7 @@ from rich.table import Table
  from rich.text import Text
- 
+
  from repowise.cli.ui.brand import BRAND
 +from repowise.cli.ui.mascot import EYES_HAPPY, mini
- 
- 
+
+
  def build_analysis_summary_panel(
 @@ -79,10 +80,12 @@ def build_completion_panel(
      *,
@@ -727,7 +727,7 @@ index 1d09e8f4..31ddff66 100644
  ) -> Panel:
 -    """Build a bordered summary panel.
 +    """Build a bordered summary panel, titled with the happy owl.
- 
+
      *metrics* is a list of ``(label, value)`` pairs.
      *next_steps* is an optional list of ``(command, description)`` pairs.
 +    The mascot prefix lives here (not at call sites) so every completion
@@ -736,7 +736,7 @@ index 1d09e8f4..31ddff66 100644
      table = Table(box=None, padding=(0, 2), show_header=False)
      table.add_column("Metric", style="dim", min_width=20)
 @@ -101,7 +104,7 @@ def build_completion_panel(
- 
+
      return Panel(
          Group(*parts),
 -        title=f"[bold]{title}[/bold]",
@@ -811,7 +811,7 @@ index de9bb014..e87adeb0 100644
 +++ b/packages/core/src/repowise/core/analysis/dead_code/analyzer.py
 @@ -12,7 +12,10 @@ this package.
  from __future__ import annotations
- 
+
  import fnmatch
 +import os
 +import re
@@ -819,11 +819,11 @@ index de9bb014..e87adeb0 100644
 +from functools import lru_cache
  from pathlib import Path
  from typing import Any
- 
+
 @@ -321,6 +324,20 @@ def _is_synthetic_node(node: str) -> bool:
      return node.startswith("external:") or node.startswith("framework:")
- 
- 
+
+
 +@lru_cache(maxsize=8)
 +def _never_flag_regex(patterns: tuple[str, ...]) -> re.Pattern[str]:
 +    """Compile *patterns* into one alternation regex equivalent to fnmatch.
@@ -858,17 +858,17 @@ index 7396669a..dfaaedb2 100644
 --- a/packages/core/src/repowise/core/analysis/health/duplication/detector.py
 +++ b/packages/core/src/repowise/core/analysis/health/duplication/detector.py
 @@ -34,7 +34,7 @@ from repowise.core.cancellation import check_cancelled
- 
+
  from .limits import DuplicationDiagnostics, DuplicationLimits, looks_minified
  from .rabin_karp import WindowHash, index_by_hash, rolling_hashes
 -from .tokenizer import Token, tokenize_file
 +from .tokenizer import tokenize_file
- 
+
  log = structlog.get_logger(__name__)
- 
+
 @@ -132,19 +132,21 @@ def _co_change_score(
- 
- 
+
+
  def _tokens_equal(
 -    a_tokens: list[Token],
 -    b_tokens: list[Token],
@@ -893,8 +893,8 @@ index 7396669a..dfaaedb2 100644
 -            return False
 -    return True
 +    return a_kinds[a_start : a_start + window] == b_kinds[b_start : b_start + window]
- 
- 
+
+
  def _merge_adjacent_pairs(raw: list[ClonePair]) -> list[ClonePair]:
 @@ -195,6 +197,7 @@ def detect_clones(
      window_tokens: int = DEFAULT_WINDOW_TOKENS,
@@ -903,11 +903,11 @@ index 7396669a..dfaaedb2 100644
 +    cache_dir: Path | None = None,
  ) -> DuplicationReport:
      """Run the duplication pipeline over the supplied parsed files.
- 
+
 @@ -216,14 +219,28 @@ def detect_clones(
      lim = limits or DuplicationLimits()
      diag = DuplicationDiagnostics()
- 
+
 -    per_file_tokens, per_file_nloc, all_windows = _collect_windows(
 -        parsed_files, window_tokens, lim, diag
 +    cache = None
@@ -929,11 +929,11 @@ index 7396669a..dfaaedb2 100644
 +        )
      if not all_windows:
          return DuplicationReport(diagnostics=diag.as_log_fields())
- 
+
      bucket = index_by_hash(all_windows)
 -    raw_pairs = _pairs_from_buckets(bucket, per_file_tokens, window_tokens, lim, diag)
 +    raw_pairs = _pairs_from_buckets(bucket, per_file_kinds, window_tokens, lim, diag)
- 
+
      final = _finalize_pairs(_merge_adjacent_pairs(raw_pairs), min_lines, meta_map)
      pairs_by_file, duplication_pct = _aggregate(final, per_file_nloc)
 @@ -246,15 +263,23 @@ def _collect_windows(
@@ -944,7 +944,7 @@ index 7396669a..dfaaedb2 100644
 +    cache: Any | None = None,
 +) -> tuple[dict[str, list[str]], dict[str, int], list[WindowHash]]:
      """Tokenize each file once and emit its rolling-hash windows.
- 
+
      Files are dropped (and counted in *diag*) when they are unreadable,
      minified/generated, shorter than one window, or exceed the per-file
      token cap. Collection stops cleanly once the repo-wide window budget
@@ -961,11 +961,11 @@ index 7396669a..dfaaedb2 100644
 +    per_file_kinds: dict[str, list[str]] = {}
      per_file_nloc: dict[str, int] = {}
      all_windows: list[WindowHash] = []
- 
+
 @@ -272,25 +297,57 @@ def _collect_windows(
              diag.skipped_minified += 1
              continue
- 
+
 -        toks = tokenize_file(language, source)
 -        if len(toks) < window_tokens:
 +        cached = None
@@ -1008,27 +1008,27 @@ index 7396669a..dfaaedb2 100644
 +        if len(kinds) > limits.max_tokens_per_file:
              diag.skipped_token_cap += 1
              continue
- 
+
 -        windows = rolling_hashes(path, toks, window_tokens)
          if len(all_windows) + len(windows) > limits.max_total_windows:
              diag.window_budget_hit = True
              break
- 
+
 -        per_file_tokens[path] = toks
 -        per_file_nloc[path] = _nloc(source)
 +        per_file_kinds[path] = kinds
 +        per_file_nloc[path] = nloc
          all_windows.extend(windows)
          diag.files_tokenized += 1
- 
+
      diag.total_windows = len(all_windows)
 -    return per_file_tokens, per_file_nloc, all_windows
 +    return per_file_kinds, per_file_nloc, all_windows
- 
- 
+
+
  # ---------------------------------------------------------------------------
 @@ -300,7 +357,7 @@ def _collect_windows(
- 
+
  def _pairs_from_buckets(
      bucket: dict[int, list[WindowHash]],
 -    per_file_tokens: dict[str, list[Token]],
@@ -1042,10 +1042,10 @@ index 7396669a..dfaaedb2 100644
              break
 -        _verify_bucket(windows, per_file_tokens, window_tokens, seen, raw_pairs)
 +        _verify_bucket(windows, per_file_kinds, window_tokens, seen, raw_pairs)
- 
+
      return raw_pairs
- 
- 
+
+
  def _verify_bucket(
      windows: list[WindowHash],
 -    per_file_tokens: dict[str, list[Token]],
@@ -1205,7 +1205,7 @@ index d0e27ef5..24ab7d59 100644
 +        # repo's ``.repowise``). None disables caching — the duplication
 +        # pass then re-tokenizes everything, exactly as before.
 +        self.duplication_cache_dir = duplication_cache_dir
- 
+
      def analyze(
          self,
 @@ -309,7 +314,11 @@ class HealthAnalyzer:
@@ -1238,7 +1238,7 @@ index db00b92d..0f891ca5 100644
 --- a/packages/core/src/repowise/core/generation/__init__.py
 +++ b/packages/core/src/repowise/core/generation/__init__.py
 @@ -5,105 +5,79 @@ Jinja2-templated prompts and BaseProvider.generate().
- 
+
  Import direction (strictly one-way):
      ingestion.models ← generation.models ← context_assembler ← page_generator
 +
@@ -1247,7 +1247,7 @@ index db00b92d..0f891ca5 100644
 +``context_assembler``/``page_generator``/``editor_files`` — they load on first
 +attribute access instead.
  """
- 
+
 -from .context_assembler import (
 -    ApiContractContext,
 -    ArchitectureDiagramContext,
@@ -1366,7 +1366,7 @@ index db00b92d..0f891ca5 100644
 +    globals()[name] = value  # cache: subsequent access skips __getattr__
 +    return value
 +
- 
+
 -__all__ = [
 -    "BucketAllocation",
 -    "GENERATION_LEVELS",
@@ -1438,14 +1438,14 @@ index 1911fb07..75192e73 100644
          used = 0
 @@ -158,8 +164,8 @@ class ContextAssembler:
          depth = self._select_generation_depth(path, git_meta, pagerank.get(path, 0.0))
- 
+
          # Graph intelligence: call graph, heritage, community metadata
 -        call_graph_entries = extract_call_graph(path, graph)
 -        heritage_entries = extract_heritage(path, graph)
 +        call_graph_entries = extract_call_graph(path, graph, symbol_index)
 +        heritage_entries = extract_heritage(path, graph, symbol_index)
          community_label, community_cohesion = extract_community_meta(path, graph)
- 
+
          return FilePageContext(
 diff --git a/packages/core/src/repowise/core/generation/context/graph_intelligence.py b/packages/core/src/repowise/core/generation/context/graph_intelligence.py
 index a6fa3048..a9e69af5 100644
@@ -1453,8 +1453,8 @@ index a6fa3048..a9e69af5 100644
 +++ b/packages/core/src/repowise/core/generation/context/graph_intelligence.py
 @@ -9,15 +9,50 @@ from __future__ import annotations
  from typing import Any
- 
- 
+
+
 -def extract_call_graph(file_path: str, graph: Any) -> list[dict]:
 -    """Extract symbol-level call edges for symbols defined in this file."""
 -    entries: list[dict] = []
@@ -1509,8 +1509,8 @@ index a6fa3048..a9e69af5 100644
                  if edata.get("edge_type") == "calls":
 @@ -56,15 +91,15 @@ def extract_call_graph(file_path: str, graph: Any) -> list[dict]:
      return unique[:15]
- 
- 
+
+
 -def extract_heritage(file_path: str, graph: Any) -> list[dict]:
 +def extract_heritage(
 +    file_path: str,
@@ -1568,8 +1568,8 @@ index ff088069..80ea7ce8 100644
 +++ b/packages/core/src/repowise/core/generation/page_generator/levels.py
 @@ -130,6 +130,59 @@ async def _prefetch_dependency_summaries(run: _GenerationRun) -> None:
          log.debug("rag.batch_dep_prefetch_failed", error=str(exc))
- 
- 
+
+
 +async def _prefetch_rag_context(
 +    run: _GenerationRun, items: list[tuple[Any, FilePageContext]]
 +) -> bool:
@@ -1625,11 +1625,11 @@ index ff088069..80ea7ce8 100644
 +
  async def build_level2_coros(run: _GenerationRun) -> list[tuple[str, Any]]:
      """Level 2 (file_page): topo-ordered context assembly + tier routing.
- 
+
 @@ -141,7 +194,13 @@ async def build_level2_coros(run: _GenerationRun) -> list[tuple[str, Any]]:
      _topo_order_code_files(run)
      await _prefetch_dependency_summaries(run)
- 
+
 -    coros: list[tuple[str, Any]] = []
 +    # One pass over the graph's symbol nodes feeds every file's call-graph /
 +    # heritage extraction (instead of a full node scan per file).
@@ -1693,7 +1693,7 @@ index 264a6f6f..344bfda4 100644
 +                # close() is a no-op on a coroutine that already ran.
 +                coro.close()
 +                raise
- 
+
          tasks = [guarded_named(pid, c) for pid, c in named_coros]
          results = await asyncio.gather(*tasks)
 diff --git a/packages/core/src/repowise/core/ingestion/call_resolver.py b/packages/core/src/repowise/core/ingestion/call_resolver.py
@@ -1711,7 +1711,7 @@ index 8d3577d9..392c553a 100644
 @@ -71,6 +72,11 @@ class CallResolver:
          # Per-file method index: {file_path: {(class_name, method_name): symbol_id}}
          self._file_methods: dict[str, dict[tuple[str, str], str]] = {}
- 
+
 +        # Global method index: {(class_name, method_name): [(file_path, symbol_id)]}
 +        # in file-insertion order — replaces the trait-dispatch scan over
 +        # every file's method dict with one short-list lookup.
@@ -1719,18 +1719,18 @@ index 8d3577d9..392c553a 100644
 +
          # Global symbol index: {name: [symbol_ids]} — for Tier 3
          self._global_symbols: dict[str, list[str]] = defaultdict(list)
- 
+
 @@ -80,14 +86,27 @@ class CallResolver:
          # Import graph: {file_path: set of imported file paths}
          self._import_targets = import_targets
- 
+
 -        # Import name mapping: {file_path: {local_name: source_file}}
 -        self._import_names: dict[str, dict[str, str]] = defaultdict(dict)
 +        # Shared import-name maps (built once per GraphBuilder.build() and
 +        # injected; standalone construction builds them locally).
 +        if import_maps is None:
 +            from .import_index import build_import_name_maps
- 
+
 +            import_maps = build_import_name_maps(parsed_files)
 +        # Import name mapping: {file_path: {local_name: source_file}}
 +        self._import_names: dict[str, dict[str, str]] = import_maps.import_names
@@ -1750,12 +1750,12 @@ index 8d3577d9..392c553a 100644
 +        # hash-randomized per process).
 +        self._merged_import_symbols: dict[str, dict[str, str]] = {}
 +        self._merged_import_methods: dict[str, dict[tuple[str, str], str]] = {}
- 
+
          # Barrel re-export origins: {barrel_file: {name: origin_file}}
          self._barrel_origins: dict[str, dict[str, str]] = defaultdict(dict)
 @@ -366,7 +385,10 @@ class CallResolver:
          return None
- 
+
      def _build_indices(self, parsed_files: dict[str, ParsedFile]) -> None:
 -        """Build all lookup indices from parsed file data."""
 +        """Build symbol lookup indices from parsed file data.
@@ -1766,20 +1766,20 @@ index 8d3577d9..392c553a 100644
              file_syms: dict[str, str] = {}
              file_methods: dict[tuple[str, str], str] = {}
 @@ -377,7 +399,9 @@ class CallResolver:
- 
+
                  # Method index: (class_name, method_name) → symbol_id
                  if sym.parent_name:
 -                    file_methods[(sym.parent_name, sym.name)] = sym.id
 +                    key = (sym.parent_name, sym.name)
 +                    file_methods[key] = sym.id
 +                    self._global_methods[key].append((path, sym.id))
- 
+
                  # Global indices
                  self._global_symbols[sym.name].append(sym.id)
 @@ -387,25 +411,35 @@ class CallResolver:
              self._file_symbols[path] = file_syms
              self._file_methods[path] = file_methods
- 
+
 -            # Build import-name mapping using per-import resolved_file
 -            for imp in parsed.imports:
 -                if imp.resolved_file is None:
@@ -1827,13 +1827,13 @@ index 8d3577d9..392c553a 100644
 +                    merged.setdefault(key, sym_id)
 +            self._merged_import_methods[file_path] = merged
 +        return merged
- 
+
      def resolve_file(self, file_path: str, calls: list[CallSite]) -> list[ResolvedCall]:
          """Resolve all calls in a single file to symbol-level edges."""
 @@ -504,13 +538,10 @@ class CallResolver:
              if target_name in source_syms:
                  return ResolvedCall(caller_id, source_syms[target_name], 0.90, call.line)
- 
+
 -        # 2b: Check all imported files for the symbol
 -        for imported_file in self._import_targets.get(file_path, set()):
 -            if imported_file.startswith("external:"):
@@ -1845,13 +1845,13 @@ index 8d3577d9..392c553a 100644
 +        merged_syms = self._merged_symbols_for(file_path)
 +        if target_name in merged_syms:
 +            return ResolvedCall(caller_id, merged_syms[target_name], 0.85, call.line)
- 
+
          # Tier 3: global unique match — only within the same language
          candidates = self._global_symbols.get(target_name, [])
 @@ -591,22 +622,20 @@ class CallResolver:
          if key in file_methods:
              return ResolvedCall(caller_id, file_methods[key], 0.93, call.line)
- 
+
 -        # Check imported files for (class, method) pairs
 -        for imported_file in self._import_targets.get(file_path, set()):
 -            if imported_file.startswith("external:"):
@@ -1863,7 +1863,7 @@ index 8d3577d9..392c553a 100644
 +        merged_methods = self._merged_methods_for(file_path)
 +        if key in merged_methods:
 +            return ResolvedCall(caller_id, merged_methods[key], 0.88, call.line)
- 
+
          # Strategy 2b: trait method dispatch — receiver is a type that
          # implements a trait; the method may be defined on the trait's
 -        # impl block in another file.
@@ -1877,7 +1877,7 @@ index 8d3577d9..392c553a 100644
 -            if key in methods:
 -                return ResolvedCall(caller_id, methods[key], 0.75, call.line)
 +            return ResolvedCall(caller_id, sym_id, 0.75, call.line)
- 
+
          # Strategy 3: receiver is "self" or "this" — look in same class
          if receiver_name in ("self", "this"):
 diff --git a/packages/core/src/repowise/core/ingestion/extractors/heritage/__init__.py b/packages/core/src/repowise/core/ingestion/extractors/heritage/__init__.py
@@ -1885,8 +1885,8 @@ index aa464034..cff6d725 100644
 --- a/packages/core/src/repowise/core/ingestion/extractors/heritage/__init__.py
 +++ b/packages/core/src/repowise/core/ingestion/extractors/heritage/__init__.py
 @@ -60,22 +60,18 @@ HERITAGE_EXTRACTORS: dict[str, Callable[..., None]] = {
- 
- 
+
+
  def extract_heritage(
 -    tree: object,
 -    query: object,
@@ -1898,7 +1898,7 @@ index aa464034..cff6d725 100644
 -    run_query: Callable,
  ) -> list[HeritageRelation]:
      """Extract inheritance/implementation relationships from class definitions.
- 
+
 -    Walks the same @symbol.def captures used by _extract_symbols, extracting
 -    superclass/interface/trait information from the definition AST nodes.
 +    Walks the same @symbol.def captures used by _extract_symbols (the parser
@@ -1915,12 +1915,12 @@ index aa464034..cff6d725 100644
 @@ -88,7 +84,7 @@ def extract_heritage(
      relations: list[HeritageRelation] = []
      seen: set[tuple[int, str]] = set()
- 
+
 -    for capture_dict in run_query(query, tree.root_node):  # type: ignore[attr-defined]
 +    for capture_dict in matches:
          def_nodes = capture_dict.get("symbol.def", [])
          name_nodes = capture_dict.get("symbol.name", [])
- 
+
 diff --git a/packages/core/src/repowise/core/ingestion/git_commit_index.py b/packages/core/src/repowise/core/ingestion/git_commit_index.py
 index 01719a3f..5fb248ab 100644
 --- a/packages/core/src/repowise/core/ingestion/git_commit_index.py
@@ -1932,11 +1932,11 @@ index 01719a3f..5fb248ab 100644
 +    provenance_classifier: object | None = None,
  ) -> dict[str, list[_CommitRec]]:
      """Bucket every commit in the recent history by the files it touched.
- 
+
 @@ -66,6 +67,13 @@ def load_commit_index(
      without re-walking the full window. Default (``None``) processes the whole
      depth.
- 
+
 +    *provenance_classifier* (an
 +    :class:`~.git_indexer.agent_provenance.AgentProvenanceClassifier`) labels
 +    each commit's agent provenance once per commit — pure in-memory regex on
@@ -1955,13 +1955,13 @@ index 01719a3f..5fb248ab 100644
 +
 +    if provenance_classifier is None:
 +        provenance_classifier = AgentProvenanceClassifier()
- 
+
      try:
          raw = repo.git.log(  # type: ignore[attr-defined]
 @@ -114,6 +126,16 @@ def load_commit_index(
              continue
          commits_parsed += 1
- 
+
 +        # Agent provenance — classified ONCE per commit here (not per touched
 +        # file): the per-file records below share the result by reference.
 +        prov = provenance_classifier.classify(  # type: ignore[attr-defined]
@@ -1983,7 +1983,7 @@ index 01719a3f..5fb248ab 100644
 +                    agent_tier=prov.autonomy_tier,
                  )
              )
- 
+
 @@ -174,6 +198,10 @@ def load_commit_index(
                      "ts": header["ts"],
                      "subject": header["subject"],
@@ -1994,7 +1994,7 @@ index 01719a3f..5fb248ab 100644
 +                    "agent_confidence": prov.confidence,
                  }
              )
- 
+
 diff --git a/packages/core/src/repowise/core/ingestion/git_indexer/README.md b/packages/core/src/repowise/core/ingestion/git_indexer/README.md
 index c9fefa60..775a9604 100644
 --- a/packages/core/src/repowise/core/ingestion/git_indexer/README.md
@@ -2007,13 +2007,13 @@ index c9fefa60..775a9604 100644
 +  window, the most cost-effective defect predictor;
 +- **agent provenance** — which coding agent (if any) authored each commit, at
 +  what autonomy tier, plus per-file `agent_authored_pct` rollups.
- 
+
  ## Window anchoring (`REPOWISE_GIT_WINDOW_ANCHOR`)
- 
+
 @@ -94,6 +96,41 @@ live `repowise risk` path) is reconstructed **in memory** here: walking commits
  oldest→newest, each author's prior-commit count is the running tally. Empty in
  rename-tracking mode (which uses the per-file walk, not the batched index).
- 
+
 +## Agent provenance
 +
 +`agent_provenance.py` labels every walked commit
@@ -2050,7 +2050,7 @@ index c9fefa60..775a9604 100644
 +MCP `get_context` ownership block.
 +
  ## Internal layout
- 
+
  | Module | Contents |
 @@ -102,6 +139,7 @@ rename-tracking mode (which uses the per-file walk, not the batched index).
  | `_constants.py` | commit-depth defaults, decay half-lives, the bug-fix keyword classifier (`is_fix_commit`, mirrors the benchmark) + `PRIOR_DEFECT_WINDOW_DAYS`, skip heuristics, GitPython noise patch |
@@ -2066,7 +2066,7 @@ index 3a361f9a..2546ec4e 100644
 +++ b/packages/core/src/repowise/core/ingestion/git_indexer/__init__.py
 @@ -20,6 +20,11 @@ This package was split out of a single 1k-line module; the public import path
  from __future__ import annotations
- 
+
  from ._constants import HOTSPOT_HALFLIFE_DAYS, is_fix_commit
 +from .agent_provenance import (
 +    AgentProvenance,
@@ -2376,7 +2376,7 @@ index 59e81574..938ef0a4 100644
 --- a/packages/core/src/repowise/core/ingestion/git_indexer/enrich.py
 +++ b/packages/core/src/repowise/core/ingestion/git_indexer/enrich.py
 @@ -208,15 +208,18 @@ def compute_percentiles(metadata_list: list[dict]) -> None:
- 
+
      total = len(metadata_list)
      for rank, idx in enumerate(sorted_by_churn):
 -        metadata_list[idx]["churn_percentile"] = rank / total if total > 0 else 0.0
@@ -2398,7 +2398,7 @@ index 59e81574..938ef0a4 100644
 +        # change_entropy percentile default — overwritten below for files
 +        # carrying a positive entropy signal.
 +        meta.setdefault("change_entropy_pct", 0.0)
- 
+
      # change_entropy percentile (mirrors churn_percentile). Rank ONLY files
      # that carry a positive entropy signal; files with zero entropy — every
 @@ -224,8 +227,6 @@ def compute_percentiles(metadata_list: list[dict]) -> None:
@@ -2434,7 +2434,7 @@ index 9f50dd7f..3fe4c8ca 100644
 +    provenance_classifier: Any | None = None,
  ) -> tuple[list[_CommitRec], str | None]:
      """Run a per-file ``git log --numstat`` and parse it into commit records.
- 
+
 @@ -176,6 +183,16 @@ def _parse_per_file_log(
              subject=header["subject"],
              body=header["body"],
@@ -2459,19 +2459,19 @@ index 9f50dd7f..3fe4c8ca 100644
 +    provenance_classifier: Any | None = None,
  ) -> dict:
      """Index a single file's git history. Runs in executor.
- 
+
 @@ -239,6 +257,7 @@ def index_file(
              file_path,
              commit_limit=commit_limit,
              follow_renames=follow_renames,
 +            provenance_classifier=provenance_classifier,
          )
- 
+
      if not commits:
 @@ -291,6 +310,18 @@ def index_file(
          total_churn = meta["lines_added_90d"] + meta["lines_deleted_90d"]
          meta["avg_commit_size"] = total_churn / c90 if c90 > 0 else 0.0
- 
+
 +        # Agent-provenance rollup: share of this file's indexed commits that
 +        # are agent-attributed, plus the per-autonomy-tier breakdown. The
 +        # per-commit labels were classified once during the walk; this is a
@@ -2506,24 +2506,24 @@ index 0cd84ed1..58ed967f 100644
 +        prov_clf = self._provenance_classifier()
          if not self.follow_renames:
              from ..git_commit_index import load_commit_index
- 
+
 @@ -128,31 +130,35 @@ class GitIndexer:
                  self.commit_limit,
                  set(indexable_files),
                  commit_sink=commit_sink,
 +                provenance_classifier=prov_clf,
              )
- 
+
          include_blame = self.tier.includes_blame
          as_of_ts = self._resolve_as_of_ts(repo, commit_index)
 +        get_thread_repo, close_thread_repos = self._thread_repo_pool()
- 
+
          def _index_one_sync(file_path: str) -> dict:
 -            """Use a per-thread Repo to avoid shared-handle issues on Windows."""
 -            try:
 -                import git as gitpython
 +            """Use a per-thread Repo to avoid shared-handle issues on Windows.
- 
+
 -                thread_repo = gitpython.Repo(self.repo_path, search_parent_directories=True)
 -                try:
 -                    precomputed = commit_index.get(file_path) if commit_index else None
@@ -2560,18 +2560,18 @@ index 0cd84ed1..58ed967f 100644
 +                )
              except Exception:
                  return {"file_path": file_path}
- 
+
 @@ -212,6 +218,7 @@ class GitIndexer:
          # Abandon any timed-out threads immediately instead of letting
          # asyncio.run() block for minutes during default-executor cleanup.
          executor.shutdown(wait=False, cancel_futures=True)
 +        close_thread_repos()
- 
+
          results: list[dict] = []
          for r in metadata_list:
 @@ -279,7 +286,14 @@ class GitIndexer:
          return summary, results
- 
+
      async def index_changed_files(self, changed_file_paths: list[str]) -> list[dict]:
 -        """Incremental update: re-index only changed files."""
 +        """Incremental update: re-index only changed files.
@@ -2604,7 +2604,7 @@ index 0cd84ed1..58ed967f 100644
 +            )
 +        as_of_ts = self._resolve_as_of_ts(repo, commit_index)
 +        get_thread_repo, close_thread_repos = self._thread_repo_pool()
- 
+
          def _index_one_sync(file_path: str) -> dict:
              try:
 -                import git as gitpython
@@ -2637,17 +2637,17 @@ index 0cd84ed1..58ed967f 100644
 +                )
              except Exception:
                  return {"file_path": file_path}
- 
+
 @@ -325,7 +350,10 @@ class GitIndexer:
                      return {"file_path": file_path}
- 
+
          tasks = [index_one(fp) for fp in changed_file_paths]
 -        results_raw = await asyncio.gather(*tasks, return_exceptions=True)
 +        try:
 +            results_raw = await asyncio.gather(*tasks, return_exceptions=True)
 +        finally:
 +            close_thread_repos()
- 
+
          results: list[dict] = []
          for r in results_raw:
 @@ -373,7 +401,12 @@ class GitIndexer:
@@ -2667,7 +2667,7 @@ index 0cd84ed1..58ed967f 100644
 @@ -386,6 +419,22 @@ class GitIndexer:
      # Internal methods
      # ------------------------------------------------------------------
- 
+
 +    def _provenance_classifier(self) -> Any:
 +        """Config-aware agent-provenance classifier, built once per index run.
 +
@@ -2690,7 +2690,7 @@ index 0cd84ed1..58ed967f 100644
 @@ -417,6 +466,42 @@ class GitIndexer:
          except Exception:
              return None
- 
+
 +    def _thread_repo_pool(self) -> tuple[Callable[[], Any], Callable[[], None]]:
 +        """Return ``(get_thread_repo, close_all)`` for per-thread Repo reuse.
 +
@@ -2744,7 +2744,7 @@ index 420d3fda..b6050f70 100644
 +# ride the same record for agent-provenance classification: a service identity
 +# as committer over a human author means an agent pushed/amended the change.
 +_LOG_FORMAT = "%x00%H%x1f%aN%x1f%aE%x1f%cN%x1f%cE%x1f%ct%x1f%P%x1f%s%x1f%b"
- 
+
  # A git ``--numstat`` line: ``<added>\t<deleted>\t<path>`` where added/deleted
  # are decimal counts or ``-`` for binary files. Used to split the trailing
 @@ -60,6 +62,10 @@ class _CommitRec:
@@ -2755,16 +2755,16 @@ index 420d3fda..b6050f70 100644
 +    # the record so per-file rollups don't re-run the regex per touched file).
 +    agent: str | None = None
 +    agent_tier: int | None = None
- 
- 
+
+
  def _parse_commit_record(record: str) -> tuple[dict, list[str]] | None:
 @@ -67,7 +73,7 @@ def _parse_commit_record(record: str) -> tuple[dict, list[str]] | None:
- 
+
      A record (after the leading record separator is stripped) looks like::
- 
+
 -        <sha>\\x1f<an>\\x1f<ae>\\x1f<ct>\\x1f<parents>\\x1f<subject>\\x1f<body>\\n<numstat...>
 +        <sha>\\x1f<an>\\x1f<ae>\\x1f<cn>\\x1f<ce>\\x1f<ct>\\x1f<parents>\\x1f<subject>\\x1f<body>\\n<numstat...>
- 
+
      The body is multi-line, so the trailing ``--numstat`` block is identified
      by the first line matching :data:`_NUMSTAT_RE`; everything before it is
 @@ -76,12 +82,12 @@ def _parse_commit_record(record: str) -> tuple[dict, list[str]] | None:
@@ -2781,7 +2781,7 @@ index 420d3fda..b6050f70 100644
 -    body_and_numstat = _FIELD_SEP.join(parts[6:])
 +    # 9th field exactly (join is defensive against an unexpected stray sep).
 +    body_and_numstat = _FIELD_SEP.join(parts[8:])
- 
+
      body_lines: list[str] = []
      numstat_lines: list[str] = []
 @@ -103,6 +109,8 @@ def _parse_commit_record(record: str) -> tuple[dict, list[str]] | None:
@@ -3079,19 +3079,19 @@ index 73789287..06748cd3 100644
 +++ b/packages/core/src/repowise/core/ingestion/graph/_edges.py
 @@ -62,6 +62,8 @@ class EdgesMixin:
                      count += 1
- 
+
          log.info("Co-change edges added", count=count)
 +        if count:
 +            self._invalidate_subgraph_caches()
          return count
- 
+
      def update_co_change_edges(self, updated_meta: dict, min_count: int = 3) -> None:
 @@ -72,6 +74,7 @@ class EdgesMixin:
                  edges_to_remove.append((u, v))
          self._graph.remove_edges_from(edges_to_remove)
          self.add_co_change_edges(updated_meta, min_count)
 +        self._invalidate_subgraph_caches()
- 
+
      def add_dynamic_edges(self, edges: list) -> None:
          """Add dynamic-hint edges to the graph. Each edge is a DynamicEdge."""
 @@ -97,6 +100,8 @@ class EdgesMixin:
@@ -3100,7 +3100,7 @@ index 73789287..06748cd3 100644
                  self._graph.nodes[e.source]["is_test"] = True
 +        if edges:
 +            self._invalidate_subgraph_caches()
- 
+
      def add_framework_edges(self, tech_stack: list[str] | None = None) -> int:
          """Add synthetic edges for framework-mediated relationships.
 @@ -124,4 +129,5 @@ class EdgesMixin:
@@ -3115,7 +3115,7 @@ index 052a8de7..377c52f1 100644
 +++ b/packages/core/src/repowise/core/ingestion/graph/_metrics.py
 @@ -76,17 +76,35 @@ class MetricsMixin:
      # ------------------------------------------------------------------
- 
+
      def file_subgraph(self) -> nx.DiGraph:
 -        """Return a subgraph containing only file-level nodes and import edges."""
 -        g = self.graph()
@@ -3157,7 +3157,7 @@ index 052a8de7..377c52f1 100644
 +            sub.remove_edges_from(edges_to_remove)
 +            self._file_subgraph_cache = sub
 +            return sub
- 
+
      def symbol_subgraph(self) -> nx.DiGraph:
          """Return a subgraph of symbol nodes connected by call + heritage edges.
 @@ -94,17 +112,27 @@ class MetricsMixin:
@@ -3195,7 +3195,7 @@ index 052a8de7..377c52f1 100644
 +            sub.remove_edges_from(edges_to_remove)
 +            self._symbol_subgraph_cache = sub
 +            return sub
- 
+
      # ------------------------------------------------------------------
      # File-level metrics
 @@ -136,15 +164,10 @@ class MetricsMixin:
@@ -3214,7 +3214,7 @@ index 052a8de7..377c52f1 100644
 -            self._betweenness_cache = nx.betweenness_centrality(g, normalized=True)
 +        self._betweenness_cache = self._betweenness_with_disk_cache("file", g)
          return self._betweenness_cache
- 
+
      def in_degree(self) -> dict[str, int]:
 @@ -239,16 +262,51 @@ class MetricsMixin:
          if self._symbol_betweenness_cache is not None:
@@ -3270,7 +3270,7 @@ index 052a8de7..377c52f1 100644
 +            except Exception as exc:
 +                log.debug("centrality_cache_store_failed", kind=kind, error=str(exc))
 +        return values
- 
+
      # ------------------------------------------------------------------
      # Execution flows + bulk priming
 diff --git a/packages/core/src/repowise/core/ingestion/graph/_resolvers.py b/packages/core/src/repowise/core/ingestion/graph/_resolvers.py
@@ -3280,7 +3280,7 @@ index b0580416..62c94ae5 100644
 @@ -16,6 +16,16 @@ log = structlog.get_logger(__name__)
  class ResolveMixin:
      """Symbol-level edge resolution passes run during ``build()``."""
- 
+
 +    def _shared_import_maps(self) -> Any:
 +        """Build the import-name maps once per build; both resolvers share them."""
 +        maps = getattr(self, "_import_name_maps", None)
@@ -3297,18 +3297,18 @@ index b0580416..62c94ae5 100644
 @@ -24,7 +34,9 @@ class ResolveMixin:
          """Resolve heritage relations and add EXTENDS/IMPLEMENTS edges."""
          from ..heritage_resolver import HeritageResolver
- 
+
 -        resolver = HeritageResolver(self._parsed_files, import_targets)
 +        resolver = HeritageResolver(
 +            self._parsed_files, import_targets, import_maps=self._shared_import_maps()
 +        )
          total_resolved = 0
- 
+
          files_with_heritage = [
 @@ -135,7 +147,12 @@ class ResolveMixin:
          """Run three-tier call resolution and add CALLS edges to the graph."""
          from ..call_resolver import CallResolver
- 
+
 -        resolver = CallResolver(self._parsed_files, import_targets, repo_path=str(self._repo_path) if self._repo_path else None)
 +        resolver = CallResolver(
 +            self._parsed_files,
@@ -3317,7 +3317,7 @@ index b0580416..62c94ae5 100644
 +            import_maps=self._shared_import_maps(),
 +        )
          total_resolved = 0
- 
+
          files_with_calls = [
 diff --git a/packages/core/src/repowise/core/ingestion/graph/builder.py b/packages/core/src/repowise/core/ingestion/graph/builder.py
 index 9f6223d4..862b5ef0 100644
@@ -3345,9 +3345,9 @@ index 9f6223d4..862b5ef0 100644
 +                self._centrality_cache = CentralityCache(centrality_cache_dir)
 +            except Exception:
 +                self._centrality_cache = None
- 
+
          import pathspec
- 
+
 @@ -68,6 +80,16 @@ class GraphBuilder(MetricsMixin, ResolveMixin, EdgesMixin, SerializeMixin, Rehyd
          self._symbol_pagerank_cache: dict[str, float] | None = None
          self._symbol_betweenness_cache: dict[str, float] | None = None
@@ -3362,7 +3362,7 @@ index 9f6223d4..862b5ef0 100644
 +        # Shared import-name maps (built once per build(), injected into the
 +        # call + heritage resolvers; reset whenever files change).
 +        self._import_name_maps: Any | None = None
- 
+
      def set_tsconfig_resolver(self, resolver: Any) -> None:
          """Attach a :class:`TsconfigResolver` for TS/JS path-alias resolution."""
 @@ -86,6 +108,20 @@ class GraphBuilder(MetricsMixin, ResolveMixin, EdgesMixin, SerializeMixin, Rehyd
@@ -3383,7 +3383,7 @@ index 9f6223d4..862b5ef0 100644
 +        """
 +        self._file_subgraph_cache = None
 +        self._symbol_subgraph_cache = None
- 
+
      def release_graph(self) -> None:
          """Drop the in-memory NetworkX object after metrics are materialized.
 @@ -102,6 +138,7 @@ class GraphBuilder(MetricsMixin, ResolveMixin, EdgesMixin, SerializeMixin, Rehyd
@@ -3391,7 +3391,7 @@ index 9f6223d4..862b5ef0 100644
          self._graph = nx.DiGraph()
          self._built = True
 +        self._invalidate_subgraph_caches()  # they hold the old structure — free it
- 
+
      # ------------------------------------------------------------------
      # Building
 diff --git a/packages/core/src/repowise/core/ingestion/heritage_resolver.py b/packages/core/src/repowise/core/ingestion/heritage_resolver.py
@@ -3399,13 +3399,13 @@ index 6b08f17d..62b7bbde 100644
 --- a/packages/core/src/repowise/core/ingestion/heritage_resolver.py
 +++ b/packages/core/src/repowise/core/ingestion/heritage_resolver.py
 @@ -23,6 +23,7 @@ from __future__ import annotations
- 
+
  from collections import defaultdict
  from dataclasses import dataclass
 +from typing import Any
- 
+
  import structlog
- 
+
 @@ -75,6 +76,8 @@ class HeritageResolver:
          self,
          parsed_files: dict[str, ParsedFile],
@@ -3418,7 +3418,7 @@ index 6b08f17d..62b7bbde 100644
 @@ -85,8 +88,19 @@ class HeritageResolver:
          # Import graph
          self._import_targets = import_targets
- 
+
 -        # Import name mapping (reuses resolved_file from Import objects)
 -        self._import_names: dict[str, dict[str, str]] = defaultdict(dict)
 +        # Import name mapping — shared with CallResolver (built once per
@@ -3434,13 +3434,13 @@ index 6b08f17d..62b7bbde 100644
 +        # Tier-2b lookup; sorted-path merge order, first-wins (see
 +        # CallResolver for rationale).
 +        self._merged_import_types: dict[str, dict[str, str]] = {}
- 
+
          # Keep reference for cross-language checks in Tier 3
          self._parsed_files = parsed_files
 @@ -105,18 +119,18 @@ class HeritageResolver:
- 
+
              self._file_types[path] = file_types
- 
+
 -            # Build import name mapping using resolved_file
 -            for imp in parsed.imports:
 -                if imp.resolved_file is None:
@@ -3464,13 +3464,13 @@ index 6b08f17d..62b7bbde 100644
 +                    merged.setdefault(name, sym_id)
 +            self._merged_import_types[file_path] = merged
 +        return merged
- 
+
      def resolve_file(
          self, file_path: str, relations: list[HeritageRelation]
 @@ -162,19 +176,16 @@ class HeritageResolver:
                      line=rel.line,
                  )
- 
+
 -        # Tier 2b: scan all imported files
 -        for imported_file in self._import_targets.get(file_path, set()):
 -            if imported_file.startswith("external:"):
@@ -3494,7 +3494,7 @@ index 6b08f17d..62b7bbde 100644
 +                confidence=0.85,
 +                line=rel.line,
 +            )
- 
+
          # Tier 3: global unique match — only within the same language
          candidates = self._global_types.get(parent_name, [])
 diff --git a/packages/core/src/repowise/core/ingestion/import_index.py b/packages/core/src/repowise/core/ingestion/import_index.py
@@ -3741,7 +3741,7 @@ index c49f403f..d827a4a8 100644
 @@ -257,7 +257,13 @@ class ASTParser:
          parse_errors = _collect_error_nodes(root)
          query = self._get_query(lang, language, grammar_tag)
- 
+
 -        symbols = self._extract_symbols(tree, query, config, file_info, src)
 +        # Execute the compiled query ONCE per file. The five extraction
 +        # passes below all consume the same capture dicts read-only;
@@ -3767,11 +3767,11 @@ index c49f403f..d827a4a8 100644
          docstring = extract_module_docstring(root, src, lang)
 -        type_refs = self._extract_type_refs(tree, query, src, lang)
 +        type_refs = self._extract_type_refs(matches, src, lang)
- 
+
          if len(symbols) > _SYMBOL_COUNT_WARN_THRESHOLD:
              log.warning(
 @@ -310,19 +316,15 @@ class ASTParser:
- 
+
      def _extract_symbols(
          self,
 -        tree: object,
@@ -3786,14 +3786,14 @@ index c49f403f..d827a4a8 100644
 -
          symbols: list[Symbol] = []
          seen: set[tuple[int, str]] = set()  # (start_line, name) — dedup decorated dupes
- 
+
 -        for capture_dict in _run_query(query, tree.root_node):  # type: ignore[attr-defined]
 +        for capture_dict in matches:
              def_nodes = capture_dict.get("symbol.def", [])
              name_nodes = capture_dict.get("symbol.name", [])
              params_nodes = capture_dict.get("symbol.params", [])
 @@ -502,19 +504,15 @@ class ASTParser:
- 
+
      def _extract_imports(
          self,
 -        tree: object,
@@ -3808,14 +3808,14 @@ index c49f403f..d827a4a8 100644
 -
          imports: list[Import] = []
          seen_raws: set[str] = set()
- 
+
 -        for capture_dict in _run_query(query, tree.root_node):  # type: ignore[attr-defined]
 +        for capture_dict in matches:
              stmt_nodes = capture_dict.get("import.statement", [])
              module_nodes = capture_dict.get("import.module", [])
- 
+
 @@ -588,17 +586,13 @@ class ASTParser:
- 
+
      def _extract_calls(
          self,
 -        tree: object,
@@ -3831,19 +3831,19 @@ index c49f403f..d827a4a8 100644
 -            return []
 -
          from .language_data import get_builtin_calls
- 
+
          _call_builtins = get_builtin_calls(file_info.language)
 @@ -611,7 +605,7 @@ class ASTParser:
          calls: list[CallSite] = []
          seen: set[tuple[int, str, str | None]] = set()
- 
+
 -        for capture_dict in _run_query(query, tree.root_node):  # type: ignore[attr-defined]
 +        for capture_dict in matches:
              site_nodes = capture_dict.get("call.site", [])
              target_nodes = capture_dict.get("call.target", [])
              arg_nodes = capture_dict.get("call.arguments", [])
 @@ -676,8 +670,7 @@ class ASTParser:
- 
+
      def _extract_type_refs(
          self,
 -        tree: object,
@@ -3860,10 +3860,10 @@ index c49f403f..d827a4a8 100644
 -            return []
 -
          head_of = TYPE_HEAD_EXTRACTORS.get(lang, _head_type_identifier)
- 
+
          refs: list[TypeReference] = []
          seen: set[tuple[str, int]] = set()
- 
+
 -        for capture_dict in _run_query(query, tree.root_node):  # type: ignore[attr-defined]
 +        for capture_dict in matches:
              type_nodes = capture_dict.get("param.type", [])
@@ -3875,7 +3875,7 @@ index 594db4d2..657e1ed8 100644
 +++ b/packages/core/src/repowise/core/ingestion/resolvers/ts_workspace.py
 @@ -25,6 +25,7 @@ flattened to the first plausible source target. Packages without an
  from __future__ import annotations
- 
+
  import json
 +import os
  from dataclasses import dataclass, field
@@ -3883,8 +3883,8 @@ index 594db4d2..657e1ed8 100644
  from typing import TYPE_CHECKING, Any
 @@ -33,6 +34,81 @@ if TYPE_CHECKING:
      from .context import ResolverContext
- 
- 
+
+
 +# ---------------------------------------------------------------------------
 +# Single pruned filesystem scan
 +# ---------------------------------------------------------------------------
@@ -3965,7 +3965,7 @@ index 594db4d2..657e1ed8 100644
  # static analyser sees the original ``.ts`` file rather than a built
 @@ -453,7 +529,7 @@ def find_mdx_import_targets(ctx: "ResolverContext") -> set[str]:
      from .typescript import resolve_ts_js_import
- 
+
      targets: set[str] = set()
 -    for mdx in ctx.repo_path.rglob("*.mdx"):
 +    for mdx in _get_repo_scan(ctx).mdx_files:
@@ -3974,7 +3974,7 @@ index 594db4d2..657e1ed8 100644
          except Exception:
 @@ -537,34 +613,25 @@ def find_vitest_include_targets(ctx: "ResolverContext") -> set[str]:
          return set()
- 
+
      targets: set[str] = set()
 -    config_globs = ("vitest.config.ts", "vitest.config.js", "vitest.config.mts",
 -                    "vitest.config.mjs", "vitest.config.cjs", "vitest.config.cts",
@@ -4024,12 +4024,12 @@ index 594db4d2..657e1ed8 100644
 +                    if regex.match(candidate):
 +                        targets.add(candidate)
      return targets
- 
- 
+
+
 @@ -640,7 +707,10 @@ def find_npm_script_entry_targets(ctx: "ResolverContext") -> set[str]:
      if ctx.repo_path is None:
          return set()
- 
+
 -    repo_root = ctx.repo_path.resolve()
 +    # NOTE: not .resolve()d — the shared scan walks ctx.repo_path as given,
 +    # so relative_to() below must use the same base or it silently drops
@@ -4037,11 +4037,11 @@ index 594db4d2..657e1ed8 100644
 +    repo_root = ctx.repo_path
      path_set = ctx.path_set
      targets: set[str] = set()
- 
+
 @@ -656,10 +726,8 @@ def find_npm_script_entry_targets(ctx: "ResolverContext") -> set[str]:
              dirs_in_repo.setdefault(p[:slash], []).append(p)
              idx = slash + 1
- 
+
 -    for pkg_file in repo_root.rglob("package.json"):
 -        # Skip node_modules — those are dependency manifests, not ours.
 -        if "node_modules" in pkg_file.parts:
@@ -4057,7 +4057,7 @@ index 617afcfe..0e291191 100644
 +++ b/packages/core/src/repowise/core/persistence/crud/_shared.py
 @@ -1,8 +1,9 @@
  """Shared internals for the ``crud`` package.
- 
+
  Holds the datetime parser, batch-size constant, the job-status whitelist, and
 -the generic SELECT-then-INSERT/UPDATE loop (:func:`_batch_upsert`) that the
 -per-domain batch upserts delegate to. Private to the package.
@@ -4065,12 +4065,12 @@ index 617afcfe..0e291191 100644
 +(:func:`_batch_upsert_keyed`) that the per-domain batch upserts delegate to.
 +Private to the package.
  """
- 
+
  from __future__ import annotations
 @@ -28,39 +29,53 @@ def _parse_dt(ts: str) -> datetime:
      return dt
- 
- 
+
+
 -async def _batch_upsert(
 +async def _batch_upsert_keyed(
      session: AsyncSession,
@@ -4087,7 +4087,7 @@ index 617afcfe..0e291191 100644
  ) -> None:
 -    """Generic SELECT-then-INSERT/UPDATE loop shared by the batch upserts.
 +    """Generic batch upsert with ONE existence query for the whole batch.
- 
+
 -    For each item, look up the existing row with the filter expressions from
 -    ``key_fn(item)``; if found, mutate it via ``update_fn(existing, item)``,
 -    otherwise ``session.add(insert_fn(item))``.
@@ -4098,7 +4098,7 @@ index 617afcfe..0e291191 100644
 +    *prefilter* (typically ``repository_id == X``) are fetched once and
 +    matched in memory: ``item_key_fn(item)`` must equal ``row_key_fn(row)``
 +    exactly when the legacy ``key_fn`` filter would have found that row.
- 
+
 -    Flushes once after the whole sequence, or once per ``batch_size`` chunk when
 -    *batch_size* is given (matching the SELECT-then-write semantics the callers
 -    relied on before this was extracted — including no flush at all on an empty
@@ -4147,11 +4147,11 @@ index 97107fda..5766e39e 100644
  )
 -from ._shared import _batch_upsert
 +from ._shared import _batch_upsert_keyed
- 
+
  # ---------------------------------------------------------------------------
  # ExternalSystem CRUD
 @@ -153,14 +153,13 @@ async def batch_upsert_symbols(
- 
+
      Accepts ingestion.models.Symbol dataclass instances (duck-typed).
      """
 -    await _batch_upsert(
@@ -4179,7 +4179,7 @@ index dc2ef020..04877177 100644
  )
 -from ._shared import _BATCH_SIZE, _batch_upsert
 +from ._shared import _BATCH_SIZE, _batch_upsert_keyed
- 
+
  # ---------------------------------------------------------------------------
  # GitMetadata CRUD
 @@ -106,14 +106,13 @@ async def upsert_git_metadata_bulk(
@@ -4249,11 +4249,11 @@ index 977d429a..3ded527e 100644
  )
 -from ._shared import _BATCH_SIZE, _batch_upsert
 +from ._shared import _BATCH_SIZE, _batch_upsert_keyed
- 
+
  # ---------------------------------------------------------------------------
  # Graph CRUD (batch)
 @@ -59,14 +59,13 @@ async def batch_upsert_graph_nodes(
- 
+
      Uses SELECT-then-INSERT/UPDATE for dialect portability.
      """
 -    await _batch_upsert(
@@ -4321,7 +4321,7 @@ index 69edaece..82dc0190 100644
 @@ -403,6 +403,16 @@ class GitMetadata(Base):
      change_entropy: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
      change_entropy_pct: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
- 
+
 +    # Agent-provenance rollup: how much of this file's indexed history is
 +    # agent-attributed (deterministic local-channel classification — identity
 +    # fields, message footers, co-author trailers; see
@@ -4338,7 +4338,7 @@ index 69edaece..82dc0190 100644
 @@ -463,6 +473,16 @@ class GitCommit(Base):
      change_risk_score: Mapped[float | None] = mapped_column(Float, nullable=True)
      change_risk_level: Mapped[str | None] = mapped_column(String(16), nullable=True)
- 
+
 +    # Agent provenance: which coding agent (if any) authored this commit, at
 +    # what autonomy tier (1 near-autonomous bot account · 2 human-driven agent
 +    # · 3 assisted/co-authored), via which attribution channel, and with what
@@ -4359,7 +4359,7 @@ index 95507eb2..e5d1d970 100644
 @@ -52,6 +52,28 @@ class VectorStore(ABC):
          """Embed *query* and return the *limit* nearest pages."""
          ...
- 
+
 +    async def search_many(
 +        self, queries: list[str], limit: int = 10
 +    ) -> list[list[SearchResult]]:
@@ -4392,7 +4392,7 @@ index b97e0463..02188d18 100644
 @@ -34,12 +34,7 @@ class InMemoryVectorStore(VectorStore):
          for (page_id, _text, metadata), vector in zip(items, vectors, strict=True):
              self._store[page_id] = (vector, dict(metadata))
- 
+
 -    async def search(self, query: str, limit: int = 10) -> list[SearchResult]:
 -        if not self._store:
 -            return []
@@ -4406,7 +4406,7 @@ index b97e0463..02188d18 100644
 @@ -63,6 +58,23 @@ class InMemoryVectorStore(VectorStore):
              )
          return results
- 
+
 +    async def search(self, query: str, limit: int = 10) -> list[SearchResult]:
 +        if not self._store:
 +            return []
@@ -4426,15 +4426,15 @@ index b97e0463..02188d18 100644
 +
      async def delete(self, page_id: str) -> None:
          self._store.pop(page_id, None)
- 
+
 diff --git a/packages/core/src/repowise/core/persistence/vector_store/lancedb_store.py b/packages/core/src/repowise/core/persistence/vector_store/lancedb_store.py
 index 84f1f415..4d521c1b 100644
 --- a/packages/core/src/repowise/core/persistence/vector_store/lancedb_store.py
 +++ b/packages/core/src/repowise/core/persistence/vector_store/lancedb_store.py
 @@ -10,6 +10,17 @@ from ._base import VectorStore
  __all__ = ["LanceDBVectorStore"]
- 
- 
+
+
 +def _paths_in_filter(paths: list[str]) -> str:
 +    """Build an SQL-injection-safe ``target_path IN (...)`` LanceDB filter.
 +
@@ -4448,11 +4448,11 @@ index 84f1f415..4d521c1b 100644
 +
  class LanceDBVectorStore(VectorStore):
      """Vector store backed by LanceDB (embedded, local file storage).
- 
+
 @@ -154,14 +165,7 @@ class LanceDBVectorStore(VectorStore):
          ]
          await self._upsert_rows(rows)
- 
+
 -    async def search(self, query: str, limit: int = 10) -> list[SearchResult]:
 -        await self._ensure_connected()
 -        if self._table is None:
@@ -4468,7 +4468,7 @@ index 84f1f415..4d521c1b 100644
 @@ -185,6 +189,32 @@ class LanceDBVectorStore(VectorStore):
              for r in raw
          ]
- 
+
 +    async def search(self, query: str, limit: int = 10) -> list[SearchResult]:
 +        await self._ensure_connected()
 +        if self._table is None:
@@ -4499,7 +4499,7 @@ index 84f1f415..4d521c1b 100644
          await self._ensure_connected()
          if self._table is not None:
 @@ -230,3 +260,35 @@ class LanceDBVectorStore(VectorStore):
- 
+
          summary = rows[0].get("content_snippet") or ""
          return {"summary": str(summary), "key_exports": []}
 +
@@ -4540,8 +4540,8 @@ index 4a5f7f40..8c441ed3 100644
 +++ b/packages/core/src/repowise/core/persistence/vector_store/pgvector_store.py
 @@ -20,6 +20,23 @@ def _encode(vector: list[float]) -> str:
      return "[" + ",".join(str(v) for v in vector) + "]"
- 
- 
+
+
 +def _summary_payload(content: object, metadata: object) -> dict:
 +    """Build the ``{'summary', 'key_exports'}`` payload from a wiki_pages row."""
 +    key_exports: list[str] = []
@@ -4561,7 +4561,7 @@ index 4a5f7f40..8c441ed3 100644
 +
  class PgVectorStore(VectorStore):
      """Vector store that writes embeddings to the ``wiki_pages.embedding`` column.
- 
+
 @@ -71,8 +88,9 @@ class PgVectorStore(VectorStore):
              "UPDATE wiki_pages SET embedding = CAST(:emb AS vector) WHERE id = :pid"
          )
@@ -4572,12 +4572,12 @@ index 4a5f7f40..8c441ed3 100644
 +            # round-trip per row.
 +            await session.execute(stmt, params)
              await session.commit()
- 
+
      async def search(self, query: str, limit: int = 10) -> list[SearchResult]:
 @@ -108,6 +126,51 @@ class PgVectorStore(VectorStore):
              for r in raw
          ]
- 
+
 +    async def search_many(
 +        self, queries: list[str], limit: int = 10
 +    ) -> list[list[SearchResult]]:
@@ -4625,11 +4625,11 @@ index 4a5f7f40..8c441ed3 100644
 +
      async def delete(self, page_id: str) -> None:
          from sqlalchemy.sql import text as sa_text
- 
+
 @@ -153,17 +216,36 @@ class PgVectorStore(VectorStore):
          if row is None:
              return None
- 
+
 -        content = str(row[0] or "")[:500]
 -        key_exports: list[str] = []
 -        if row[1] and isinstance(row[1], dict):
@@ -4655,7 +4655,7 @@ index 4a5f7f40..8c441ed3 100644
 +            "SELECT target_path, content, metadata FROM wiki_pages "
 +            "WHERE target_path IN :paths"
 +        ).bindparams(bindparam("paths", expanding=True))
- 
+
 -            try:
 -                meta = json.loads(row[1])
 -                key_exports = list(meta.get("exports", []))
@@ -4664,7 +4664,7 @@ index 4a5f7f40..8c441ed3 100644
 +        async with self._session_factory() as session:
 +            rows = await session.execute(stmt, {"paths": list(paths)})
 +            raw = rows.fetchall()
- 
+
 -        return {"summary": content, "key_exports": key_exports}
 +        out: dict[str, dict] = {}
 +        for r in raw:
@@ -4681,8 +4681,8 @@ index 454dac6b..fc71d80d 100644
 +++ b/packages/core/src/repowise/core/pipeline/persist.py
 @@ -108,6 +108,114 @@ async def persist_graph_nodes(
          logger.warning("graph_metrics_materialize_skipped", error=str(exc))
- 
- 
+
+
 +# Chunk size for IN (...) deletes — stays under SQLite's host-parameter limit.
 +_PRUNE_CHUNK = 500
 +
@@ -4823,7 +4823,7 @@ index 8a099766..5e07fcaa 100644
              module_map=module_map,
 +            duplication_cache_dir=(repo_path / ".repowise") if repo_path is not None else None,
          )
- 
+
          # Load per-file override rules from `.repowise/health-rules.json`.
 diff --git a/packages/core/src/repowise/core/pipeline/phases/ingestion.py b/packages/core/src/repowise/core/pipeline/phases/ingestion.py
 index 693acf59..525a5a36 100644
@@ -4831,7 +4831,7 @@ index 693acf59..525a5a36 100644
 +++ b/packages/core/src/repowise/core/pipeline/phases/ingestion.py
 @@ -7,6 +7,7 @@ orchestrator.py) imports these phase functions. No CLI/click/rich imports.
  from __future__ import annotations
- 
+
  import asyncio
 +import contextlib
  import os
@@ -4839,8 +4839,8 @@ index 693acf59..525a5a36 100644
  from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 @@ -85,6 +86,85 @@ def _parse_one(path_and_fi_and_bytes: tuple) -> Any:
          return (fi.abs_path, str(exc))
- 
- 
+
+
 +def _split_cached(
 +    repo_path: Path,
 +    fi_and_bytes: list[tuple],
@@ -4926,7 +4926,7 @@ index 693acf59..525a5a36 100644
 @@ -156,70 +236,82 @@ async def _run_ingestion(
      if progress:
          progress.on_phase_start("parse", len(file_infos))
- 
+
 -    # Read source bytes up front (I/O, sequential — fast enough; keeps worker
 +    # Read source bytes up front in a thread pool (I/O-bound; keeps worker
      # args small: FileInfo + bytes, both picklable plain dataclasses/bytes).
@@ -4939,7 +4939,7 @@ index 693acf59..525a5a36 100644
 -            if progress:
 -                progress.on_item_done("parse")
 +    fi_and_bytes: list[tuple] = _read_sources(file_infos, progress)
- 
+
      parsed_files: list[Any] = []
      source_map: dict[str, bytes] = {}
 -    graph_builder = GraphBuilder(repo_path=repo_path, exclude_patterns=exclude_patterns)
@@ -4948,10 +4948,10 @@ index 693acf59..525a5a36 100644
 +        exclude_patterns=exclude_patterns,
 +        centrality_cache_dir=repo_path / ".repowise",
 +    )
- 
+
      loop = asyncio.get_running_loop()
 -    workers = max(1, os.cpu_count() or 4)
- 
+
 -    _use_process_pool = True
 +    # Content-hash parse cache: unchanged files skip the worker pool
 +    # entirely (an incremental update re-ingests the whole repo for one
@@ -4960,7 +4960,7 @@ index 693acf59..525a5a36 100644
 +    workers = max(1, min(os.cpu_count() or 4, len(to_parse) or 1))
 +
      parse_results: list[Any] = []
- 
+
 -    try:
 -        with ProcessPoolExecutor(max_workers=workers) as pool:
 -            tasks = [loop.run_in_executor(pool, _parse_one, item) for item in fi_and_bytes]
@@ -5037,7 +5037,7 @@ index 693acf59..525a5a36 100644
 +        merged[idx] = result
 +        if not isinstance(result, tuple | Exception):
 +            _cache_parsed(parse_cache, result, content_hash)
- 
+
      # Aggregate results into GraphBuilder on the main loop (not thread-safe).
 -    for idx, result in enumerate(parse_results):
 +    for idx in range(len(fi_and_bytes)):
@@ -5056,16 +5056,16 @@ index 693acf59..525a5a36 100644
 @@ -227,6 +319,8 @@ async def _run_ingestion(
          # attached above; only the fallback path ticks here (handled in
          # its own loop). No tick needed in aggregation.
- 
+
 +    if parse_cache is not None:
 +        parse_cache.save()
      _phase_done(progress, "parse")
- 
+
      # ---- tsconfig path-alias resolver (before graph build) ------------------
 @@ -434,51 +528,60 @@ async def reparse_for_resume(
      if progress:
          progress.on_phase_start("parse", len(file_infos))
- 
+
 -    fi_and_bytes: list[tuple] = []
 -    for fi in file_infos:
 -        try:
@@ -5075,13 +5075,13 @@ index 693acf59..525a5a36 100644
 -            if progress:
 -                progress.on_item_done("parse")
 +    fi_and_bytes: list[tuple] = _read_sources(file_infos, progress)
- 
+
      parsed_files: list[Any] = []
      source_map: dict[str, bytes] = {}
      loop = asyncio.get_running_loop()
 -    workers = max(1, os.cpu_count() or 4)
 -    parse_results: list[Any] = []
- 
+
 -    try:
 -        with ProcessPoolExecutor(max_workers=workers) as pool:
 -            tasks = [loop.run_in_executor(pool, _parse_one, item) for item in fi_and_bytes]
@@ -5105,7 +5105,7 @@ index 693acf59..525a5a36 100644
 +    parse_cache, cached_hits, to_parse = _split_cached(repo_path, fi_and_bytes, progress)
 +    workers = max(1, min(os.cpu_count() or 4, len(to_parse) or 1))
 +    parse_results: list[Any] = []
- 
+
 -    for idx, result in enumerate(parse_results):
 +    if to_parse:
 +        try:
@@ -5153,5 +5153,5 @@ index 693acf59..525a5a36 100644
 +    if parse_cache is not None:
 +        parse_cache.save()
      _phase_done(progress, "parse")
- 
+
      tech_items: list = []

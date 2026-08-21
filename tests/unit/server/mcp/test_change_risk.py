@@ -280,9 +280,7 @@ async def test_impacted_tests_falls_back_to_the_graph_without_a_map(tmp_path, mo
     factory = await _factory_with_repo(None)
     async with factory() as s:
         for path, is_test in (("tests/test_round_trips.py", True), ("src/app.py", False)):
-            s.add(
-                GraphNode(repository_id="repo1", node_id=path, node_type="file", is_test=is_test)
-            )
+            s.add(GraphNode(repository_id="repo1", node_id=path, node_type="file", is_test=is_test))
         s.add(
             GraphEdge(
                 repository_id="repo1",
@@ -342,7 +340,9 @@ async def test_impacted_tests_overflow_cap_is_honest(tmp_path, monkeypatch) -> N
 
 
 @pytest.mark.asyncio
-async def test_impacted_tests_no_session_factory_degrades_to_no_index(tmp_path, monkeypatch) -> None:
+async def test_impacted_tests_no_session_factory_degrades_to_no_index(
+    tmp_path, monkeypatch
+) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
     _git(["init", "-q"], repo)

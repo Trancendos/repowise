@@ -380,7 +380,9 @@ def _prompt_git(console: Console, scan: RepoScanInfo | None, result: dict[str, A
     commit_hint = ""
     if scan and scan.total_commits:
         commit_hint = f" (repo has ~{scan.total_commits:,} total commits)"
-    print_section(console, "Git analysis", f"Controls how deeply git history is analyzed{commit_hint}")
+    print_section(
+        console, "Git analysis", f"Controls how deeply git history is analyzed{commit_hint}"
+    )
     console.print()
 
     # Smart default based on repo size

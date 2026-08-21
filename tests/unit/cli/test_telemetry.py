@@ -198,9 +198,7 @@ class TestSpooledDelivery:
         assert spawned == []  # nothing happens until exit
         assert len(spool.claim()) == 1
 
-    def test_exit_spawns_the_flusher_once_events_are_queued(
-        self, monkeypatch: pytest.MonkeyPatch
-    ):
+    def test_exit_spawns_the_flusher_once_events_are_queued(self, monkeypatch: pytest.MonkeyPatch):
         spawned: list = []
         monkeypatch.setattr(emitter, "_spawn_flusher", lambda: spawned.append(True) or True)
         monkeypatch.setattr(emitter, "_under_test", lambda: False)

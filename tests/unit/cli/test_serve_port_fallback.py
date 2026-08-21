@@ -81,15 +81,15 @@ def test_is_port_free_ignores_time_wait() -> None:
     lis.bind((host, 0))
     port = lis.getsockname()[1]
     lis.listen(1)
-    
+
     cli = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cli.connect((host, port))
     conn, _ = lis.accept()
-    
+
     # Active close from the server side pushes the listener's port into TIME_WAIT
     lis.close()
     conn.close()
     cli.close()
-    
+
     # The probe should report it as free because it uses SO_REUSEADDR too
     assert serve_cmd._is_port_free(host, port) is True

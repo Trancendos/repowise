@@ -44,21 +44,19 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 class TestAxum:
     def test_route_to_handler(self, tmp_path: Path) -> None:
         (tmp_path / "handlers.rs").write_text(
-            "pub async fn list_users() -> &'static str { \"ok\" }\n"
+            'pub async fn list_users() -> &\'static str { "ok" }\n'
         )
         (tmp_path / "main.rs").write_text(
             "use axum::{Router, routing::get};\n"
             "mod handlers;\n"
             "fn app() -> Router {\n"
-            "  Router::new().route(\"/users\", get(list_users))\n"
+            '  Router::new().route("/users", get(list_users))\n'
             "}\n"
         )
         parsed = _build_parsed(tmp_path)
@@ -72,13 +70,11 @@ class TestAxum:
 
 class TestActix:
     def test_web_get_to_handler(self, tmp_path: Path) -> None:
-        (tmp_path / "handlers.rs").write_text(
-            "pub async fn index() -> &'static str { \"ok\" }\n"
-        )
+        (tmp_path / "handlers.rs").write_text('pub async fn index() -> &\'static str { "ok" }\n')
         (tmp_path / "main.rs").write_text(
             "use actix_web::{web, App};\n"
             "fn config(cfg: &mut web::ServiceConfig) {\n"
-            "  cfg.route(\"/\", web::get().to(index));\n"
+            '  cfg.route("/", web::get().to(index));\n'
             "}\n"
         )
         parsed = _build_parsed(tmp_path)
@@ -92,9 +88,7 @@ class TestActix:
 
 class TestAxumNest:
     def test_nest_to_handler(self, tmp_path: Path) -> None:
-        (tmp_path / "api.rs").write_text(
-            "pub fn api_routes() -> Router { Router::new() }\n"
-        )
+        (tmp_path / "api.rs").write_text("pub fn api_routes() -> Router { Router::new() }\n")
         (tmp_path / "main.rs").write_text(
             "use axum::Router;\n"
             "fn app() -> Router {\n"
@@ -112,9 +106,7 @@ class TestAxumNest:
 
 class TestAxumLayerAndFallback:
     def test_layer_to_middleware(self, tmp_path: Path) -> None:
-        (tmp_path / "middleware.rs").write_text(
-            "pub async fn auth_layer() {}\n"
-        )
+        (tmp_path / "middleware.rs").write_text("pub async fn auth_layer() {}\n")
         (tmp_path / "main.rs").write_text(
             "use axum::Router;\n"
             "fn app() -> Router {\n"
@@ -131,7 +123,7 @@ class TestAxumLayerAndFallback:
 
     def test_fallback_to_handler(self, tmp_path: Path) -> None:
         (tmp_path / "fallback.rs").write_text(
-            "pub async fn not_found() -> &'static str { \"404\" }\n"
+            'pub async fn not_found() -> &\'static str { "404" }\n'
         )
         (tmp_path / "main.rs").write_text(
             "use axum::Router;\n"
@@ -151,8 +143,7 @@ class TestAxumLayerAndFallback:
 class TestRocketMount:
     def test_rocket_mount_routes(self, tmp_path: Path) -> None:
         (tmp_path / "routes.rs").write_text(
-            '#[rocket::get("/health")]\n'
-            "pub fn health() -> &'static str { \"ok\" }\n"
+            '#[rocket::get("/health")]\n' 'pub fn health() -> &\'static str { "ok" }\n'
         )
         (tmp_path / "main.rs").write_text(
             "use rocket;\n"
@@ -169,9 +160,7 @@ class TestRocketMount:
         assert graph.has_edge("main.rs", "routes.rs")
 
     def test_rocket_mount_multiple_handlers(self, tmp_path: Path) -> None:
-        (tmp_path / "routes.rs").write_text(
-            "pub fn index() {}\npub fn about() {}\n"
-        )
+        (tmp_path / "routes.rs").write_text("pub fn index() {}\npub fn about() {}\n")
         (tmp_path / "main.rs").write_text(
             "use rocket;\n"
             "fn rocket() -> rocket::Rocket {\n"

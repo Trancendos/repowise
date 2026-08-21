@@ -134,25 +134,40 @@ RISK_PAYLOAD = {
             "trend": "increasing",
             "risk_type": "bug-prone",
             "change_pattern": "fix-heavy",
-            "change_magnitude": {"lines_added_90d": 900, "lines_deleted_90d": 400,
-                                 "avg_commit_size": 61.2},
+            "change_magnitude": {
+                "lines_added_90d": 900,
+                "lines_deleted_90d": 400,
+                "avg_commit_size": 61.2,
+            },
             "impact_surface": {"transitive_dependents": ["x.py"] * 200},
             # A {name: fix_count} dict, not a list — `_top_fix_symbols` builds
             # it from the persisted counts JSON.
-            "defect_profile": {"fix_count": 22, "last_fix_days_ago": 1, "bug_magnet": True,
-                               "top_symbols": {"_prune_stale_file_rows": 9,
-                                               "mark_tombstone_pages": 4}},
+            "defect_profile": {
+                "fix_count": 22,
+                "last_fix_days_ago": 1,
+                "bug_magnet": True,
+                "top_symbols": {"_prune_stale_file_rows": 9, "mark_tombstone_pages": 4},
+            },
             "health_score": 3.2,
             "coverage_pct": 61.0,
             "top_biomarkers": [
-                {"biomarker_type": "nested_complexity", "severity": "high",
-                 "function_name": "persist_analysis", "impact": 0.71},
-                {"biomarker_type": "coverage_gradient", "severity": "low",
-                 "function_name": None, "impact": 0.58},
+                {
+                    "biomarker_type": "nested_complexity",
+                    "severity": "high",
+                    "function_name": "persist_analysis",
+                    "impact": 0.71,
+                },
+                {
+                    "biomarker_type": "coverage_gradient",
+                    "severity": "low",
+                    "function_name": None,
+                    "impact": 0.58,
+                },
             ],
             "test_gap": False,
-            "security_signals": [{"kind": "sql-injection", "severity": "high",
-                                  "snippet": "sa_text(f'...')"}],
+            "security_signals": [
+                {"kind": "sql-injection", "severity": "high", "snippet": "sa_text(f'...')"}
+            ],
             "commit_count_capped": False,
             "episodes": 22,
             "_base_dep_count": 52,
@@ -160,8 +175,12 @@ RISK_PAYLOAD = {
         }
     },
     "global_hotspots": [
-        {"file_path": "packages/core/src/repowise/core/pipeline/incremental.py",
-         "hotspot_score": 0.99, "primary_owner": "Raghav Chamadiya", "fix_count": 17}
+        {
+            "file_path": "packages/core/src/repowise/core/pipeline/incremental.py",
+            "hotspot_score": 0.99,
+            "primary_owner": "Raghav Chamadiya",
+            "fix_count": 17,
+        }
     ],
     "_meta": META,
 }
@@ -179,23 +198,43 @@ PR_RISK_PAYLOAD = {
         # what let four of the six render as raw Python dict reprs: the fixture
         # was written to match the renderer's fallback chain, not the tool.
         "will_break_consumers": [
-            {"repo": "backend", "service": "billing-api", "distance": 1, "score": 0.8,
-             "via": "import"}
+            {
+                "repo": "backend",
+                "service": "billing-api",
+                "distance": 1,
+                "score": 0.8,
+                "via": "import",
+            }
         ],
         "missing_cross_repo_cochanges": [{"repo": "web", "service": "ui", "score": 0.4}],
         "breaking_changes": [
-            {"contract_id": "api:GET /v1/x", "type": "openapi", "kind": "removed_route",
-             "severity": "high", "detail": "route removed",
-             "impacted_consumers": [{"repo": "web", "service": "ui", "file": "a.ts"}]}
+            {
+                "contract_id": "api:GET /v1/x",
+                "type": "openapi",
+                "kind": "removed_route",
+                "severity": "high",
+                "detail": "route removed",
+                "impacted_consumers": [{"repo": "web", "service": "ui", "file": "a.ts"}],
+            }
         ],
         "conformance_violations": [
-            {"source": "cli", "target": "core", "rule": "cli !-> core",
-             "edge_kind": "import", "description": "layering rule"}
+            {
+                "source": "cli",
+                "target": "core",
+                "rule": "cli !-> core",
+                "edge_kind": "import",
+                "description": "layering rule",
+            }
         ],
         "dependency_cycles": [{"nodes": ["a.py", "b.py", "a.py"], "length": 2}],
         "governance_risk": [
-            {"file": "persist.py", "decision_id": "dr-7", "title": "persist tombstones",
-             "status": "accepted", "reason": "stale_governance"}
+            {
+                "file": "persist.py",
+                "decision_id": "dr-7",
+                "title": "persist tombstones",
+                "status": "accepted",
+                "reason": "stale_governance",
+            }
         ],
         "overall_risk_score": 7.4,
         "summary": "PR touches 1 file(s). ~1 downstream file(s) likely affected.",
@@ -283,9 +322,12 @@ def test_page_results_keep_exactly_the_payload_this_command_always_emitted():
 def test_a_symbol_spotlight_hit_carries_the_openable_file_beside_its_page_id():
     """``target_path`` on a symbol_spotlight is ``a.py::Foo`` — a page id, not
     something a reader can open — which is why the tool attaches ``file``."""
-    hit = {**PAGE_HIT, "page_type": "symbol_spotlight",
-           "target_path": "packages/cli/src/repowise/cli/output.py::resolve_console_width",
-           "file": "packages/cli/src/repowise/cli/output.py"}
+    hit = {
+        **PAGE_HIT,
+        "page_type": "symbol_spotlight",
+        "target_path": "packages/cli/src/repowise/cli/output.py::resolve_console_width",
+        "file": "packages/cli/src/repowise/cli/output.py",
+    }
     row = project({"results": [hit]}, "q", multi=False)["results"][0]
 
     assert row["path"].endswith("::resolve_console_width"), "the payload changed shape"
@@ -326,8 +368,12 @@ def test_hybrid_rows_say_which_shape_they_are():
 def test_a_path_hit_projects_to_a_path():
     out = project(PATH_PAYLOAD, "helpers.py", multi=False)
     assert out["results"] == [
-        {"type": "file", "score": 140.0, "title": FILE_HIT["title"],
-         "path": "packages/cli/src/repowise/cli/helpers.py"}
+        {
+            "type": "file",
+            "score": 140.0,
+            "title": FILE_HIT["title"],
+            "path": "packages/cli/src/repowise/cli/helpers.py",
+        }
     ]
 
 
@@ -348,8 +394,12 @@ def test_exact_match_false_is_not_mistaken_for_absent():
 
 def test_the_freshness_half_of_meta_survives_and_the_timing_half_does_not():
     out = project(CONCEPT_PAYLOAD, "width", multi=False)
-    assert out["index"] == {"indexed_commit": "abc123", "live_head": "def456",
-                            "index_behind": True, "index_age_days": 2}
+    assert out["index"] == {
+        "indexed_commit": "abc123",
+        "live_head": "def456",
+        "index_behind": True,
+        "index_age_days": 2,
+    }
     assert "timing_ms" not in json.dumps(out)
 
 
@@ -366,8 +416,14 @@ def test_an_absent_mode_means_concept_not_unknown():
 
 @pytest.mark.parametrize(
     ("requested", "sent"),
-    [("fulltext", "concept"), ("semantic", "concept"), ("symbol", "symbol"),
-     ("auto", "auto"), ("path", "path"), ("hybrid", "hybrid")],
+    [
+        ("fulltext", "concept"),
+        ("semantic", "concept"),
+        ("symbol", "symbol"),
+        ("auto", "auto"),
+        ("path", "path"),
+        ("hybrid", "hybrid"),
+    ],
 )
 def test_search_reaches_the_tool_with_the_mapped_mode(monkeypatch, repo, requested, sent):
     """The argument actually bound, read off the coroutine's own frame.
@@ -393,8 +449,9 @@ def test_search_reaches_the_tool_with_the_mapped_mode(monkeypatch, repo, request
     assert seen["query"] == "width"
 
 
-@pytest.mark.parametrize("mode", ["fulltext", "semantic", "symbol", "auto", "concept",
-                                  "path", "hybrid"])
+@pytest.mark.parametrize(
+    "mode", ["fulltext", "semantic", "symbol", "auto", "concept", "path", "hybrid"]
+)
 def test_every_mode_is_accepted_by_the_command(monkeypatch, repo, mode):
     """The legacy spellings are still the documented ones; nobody's script
     breaks. The tool's own spellings are accepted alongside them."""
@@ -404,16 +461,17 @@ def test_every_mode_is_accepted_by_the_command(monkeypatch, repo, mode):
 def test_the_table_path_prints_the_note_and_the_grep_hint(monkeypatch, repo):
     """A kept key that no renderer prints is the second silent failure mode of
     a trimmed projection, and the one a projection test cannot see."""
-    result = _search(monkeypatch, ["reslove_width", "--mode", "symbol"], repo,
-                     SYMBOL_MISS_PAYLOAD)
+    result = _search(monkeypatch, ["reslove_width", "--mode", "symbol"], repo, SYMBOL_MISS_PAYLOAD)
     assert "No indexed symbol exactly matches" in result.output
     assert "Retry with" in result.output
 
 
 def test_the_grep_hint_is_rewritten_into_cli_vocabulary(monkeypatch, repo):
     """The tools write their hints for an agent holding the MCP surface."""
-    payload = {**SYMBOL_MISS_PAYLOAD,
-               "grep_hint": "Nothing matched; pipe the hit into get_symbol for its body."}
+    payload = {
+        **SYMBOL_MISS_PAYLOAD,
+        "grep_hint": "Nothing matched; pipe the hit into get_symbol for its body.",
+    }
     result = _search(monkeypatch, ["x", "--mode", "symbol"], repo, payload)
     assert "repowise symbol" in result.output
     assert "get_symbol" not in result.output
@@ -435,8 +493,9 @@ def test_a_bracketed_snippet_is_not_eaten_by_rich(monkeypatch, repo):
 
 
 def test_symbol_mode_renders_the_symbol_table_not_the_page_table(monkeypatch, repo):
-    result = _search(monkeypatch, ["resolve_console_width", "--mode", "symbol"], repo,
-                     SYMBOL_PAYLOAD)
+    result = _search(
+        monkeypatch, ["resolve_console_width", "--mode", "symbol"], repo, SYMBOL_PAYLOAD
+    )
     assert "Qualified Name" in result.output
     assert "repowise.cli.output.resolve_console_width" in result.output
 
@@ -463,15 +522,15 @@ def test_an_error_payload_emits_a_document_and_exits_one(monkeypatch, repo):
     """A json path that exits after only a stderr notice is indistinguishable
     from a crash to whatever is reading the pipe."""
     payload = {"error": "no index yet", "remedy": "Run 'repowise init'."}
-    result = _search(monkeypatch, ["width", "--format", "json"], repo, payload,
-                     expect_exit=1)
+    result = _search(monkeypatch, ["width", "--format", "json"], repo, payload, expect_exit=1)
     assert json.loads(result.output)["error"] == "no index yet"
 
 
 def test_full_also_exits_one_on_an_error(monkeypatch, repo):
     """``--full`` is exactly the spelling a script reaches for."""
-    result = _search(monkeypatch, ["width", "--full"], repo, {"error": "no index yet"},
-                     expect_exit=1)
+    result = _search(
+        monkeypatch, ["width", "--full"], repo, {"error": "no index yet"}, expect_exit=1
+    )
     assert json.loads(result.output)["error"] == "no index yet"
 
 
@@ -514,9 +573,7 @@ def _fan(monkeypatch, tmp_path, per_repo, *, limit=10, fmt="table", full=False, 
         p = tmp_path / name
         (p / ".repowise").mkdir(parents=True)
         paths.append(p)
-    monkeypatch.setattr(
-        search_cmd, "_run_search", lambda rp, q, lim, tm: per_repo[rp.name]
-    )
+    monkeypatch.setattr(search_cmd, "_run_search", lambda rp, q, lim, tm: per_repo[rp.name])
     notices = _Notices()
     search_cmd._fan_out(paths, "q", limit, mode, "concept", fmt, full, notices)
     return notices
@@ -570,7 +627,7 @@ def test_one_failing_repo_does_not_take_the_fan_out_down(monkeypatch, tmp_path, 
 
 
 def test_every_repo_failing_is_an_error_not_an_empty_result(monkeypatch, tmp_path):
-    """"Nothing matched" and "nothing could be searched" are different answers,
+    """ "Nothing matched" and "nothing could be searched" are different answers,
     and the second one is a failure the exit code has to carry."""
     import click
 
@@ -608,8 +665,15 @@ def test_the_fan_out_reports_its_worst_repos_freshness(monkeypatch, tmp_path, ca
     nothing about staleness, while the single-repo path warns."""
     per_repo = {
         "api": {"results": [_hit("a.py", 1.0)], "_meta": {"index_age_days": 0}},
-        "web": {"results": [], "_meta": {"index_behind": True, "indexed_commit": "aaa",
-                                         "live_head": "bbb", "index_age_days": 9}},
+        "web": {
+            "results": [],
+            "_meta": {
+                "index_behind": True,
+                "indexed_commit": "aaa",
+                "live_head": "bbb",
+                "index_age_days": 9,
+            },
+        },
     }
     _fan(monkeypatch, tmp_path, per_repo, fmt="json")
 
@@ -634,8 +698,7 @@ def test_a_bracketed_error_does_not_take_the_fan_out_down(monkeypatch, tmp_path,
 
     buf = io.StringIO()
     real = Console(file=buf, width=200, no_color=True)
-    per_repo = {"api": {"error": "bad type list[/x] here"},
-                "web": {"results": [_hit("b.py", 1.0)]}}
+    per_repo = {"api": {"error": "bad type list[/x] here"}, "web": {"results": [_hit("b.py", 1.0)]}}
     paths = []
     for name in per_repo:
         p = tmp_path / name
@@ -687,8 +750,17 @@ def test_risk_projection_keeps_the_card_and_drops_only_the_bulk():
     card = out["targets"]["packages/core/src/repowise/core/pipeline/persist.py"]
     # A denylist: the failure mode of an allowlist is a silently discarded
     # answer, and this card is scalars rather than source.
-    for kept in ("defect_profile", "co_change_partners", "security_signals", "test_gap",
-                 "change_magnitude", "bus_factor", "trend", "risk_type", "episodes"):
+    for kept in (
+        "defect_profile",
+        "co_change_partners",
+        "security_signals",
+        "test_gap",
+        "change_magnitude",
+        "bus_factor",
+        "trend",
+        "risk_type",
+        "episodes",
+    ):
         assert kept in card, f"{kept} was discarded"
     assert "impact_surface" not in card
     assert "_base_dep_count" not in card
@@ -705,19 +777,33 @@ def test_risk_pr_mode_keeps_the_whole_directive():
 
 def test_risk_table_renders_the_directive_first(monkeypatch, repo):
     result = _invoke(
-        monkeypatch, risk_command,
-        ["--target", "packages/core/src/repowise/core/pipeline/persist.py",
-         "--changed-file", "packages/core/src/repowise/core/pipeline/persist.py"],
-        repo, PR_RISK_PAYLOAD,
+        monkeypatch,
+        risk_command,
+        [
+            "--target",
+            "packages/core/src/repowise/core/pipeline/persist.py",
+            "--changed-file",
+            "packages/core/src/repowise/core/pipeline/persist.py",
+        ],
+        repo,
+        PR_RISK_PAYLOAD,
     )
     out = result.output
     # Unconditional: a guarded `assert A < B if cond else True` degrades to
     # `assert True` the moment rich wraps the line the guard looked for.
     assert out.index("Directive") < out.index("Co-changes with")
-    for expected in ("Will break", "Tests to run", "Missing co-changes",
-                     "Conformance violations", "cli !-> core", "layering rule",
-                     "persist tombstones", "billing-api", "removed_route",
-                     "a.py -> b.py -> a.py"):
+    for expected in (
+        "Will break",
+        "Tests to run",
+        "Missing co-changes",
+        "Conformance violations",
+        "cli !-> core",
+        "layering rule",
+        "persist tombstones",
+        "billing-api",
+        "removed_route",
+        "a.py -> b.py -> a.py",
+    ):
         assert expected in out, f"{expected!r} is in the payload and nothing printed it"
     # The generic fallback used to print these blocks as Python dict reprs.
     assert "'contract_id':" not in out
@@ -741,22 +827,30 @@ def test_risk_table_prints_the_security_signal(monkeypatch, repo):
 def test_risk_names_a_target_the_tool_returned_no_card_for(monkeypatch, repo):
     """An excluded path is filtered out before the tool sees it. Rendering
     nothing reads as "clean"; it is not, it is "not assessed"."""
-    result = _invoke(monkeypatch, risk_command, ["--target", "vendor/x.py"], repo,
-                     {"targets": {}, "_meta": META})
+    result = _invoke(
+        monkeypatch, risk_command, ["--target", "vendor/x.py"], repo, {"targets": {}, "_meta": META}
+    )
     assert "vendor/x.py" in result.output
     assert "not indexed" in result.output
 
 
 def test_risk_target_json_is_one_document(monkeypatch, repo):
-    result = _invoke(monkeypatch, risk_command, ["--target", "a.py", "--format", "json"],
-                     repo, RISK_PAYLOAD)
+    result = _invoke(
+        monkeypatch, risk_command, ["--target", "a.py", "--format", "json"], repo, RISK_PAYLOAD
+    )
     targets = json.loads(result.output)["targets"]
     assert list(targets) == ["packages/core/src/repowise/core/pipeline/persist.py"]
 
 
 def test_risk_target_error_exits_one(monkeypatch, repo):
-    result = _invoke(monkeypatch, risk_command, ["--target", "a.py", "--format", "json"],
-                     repo, {"error": "no index yet"}, expect_exit=1)
+    result = _invoke(
+        monkeypatch,
+        risk_command,
+        ["--target", "a.py", "--format", "json"],
+        repo,
+        {"error": "no index yet"},
+        expect_exit=1,
+    )
     assert json.loads(result.output)["error"] == "no index yet"
 
 

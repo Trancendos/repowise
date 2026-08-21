@@ -112,9 +112,7 @@ def _unused_exports(graph: nx.DiGraph) -> set[str]:
 
 
 class TestRustIntegrationTestConsumer:
-    def test_function_only_called_from_integration_test_not_flagged(
-        self, tmp_path: Path
-    ) -> None:
+    def test_function_only_called_from_integration_test_not_flagged(self, tmp_path: Path) -> None:
         unused_exports = _unused_exports(_build_graph(tmp_path, _SOURCES))
         assert "build_report" not in unused_exports
 

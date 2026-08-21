@@ -236,7 +236,7 @@ def test_the_distill_hook_flag_names_every_surface_it_decides() -> None:
     from repowise.cli.commands.init_cmd.command import init_command
     from repowise.cli.helpers import HOOK_REPLACEMENT_SURFACES
 
-    (option,) = [o for o in init_command.params if o.name == "distill_hook"]
+    (option,) = (o for o in init_command.params if o.name == "distill_hook")
     for surface in HOOK_REPLACEMENT_SURFACES:
         assert surface in option.help, f"--distill-hook help never mentions {surface}"
 
@@ -302,9 +302,7 @@ def test_no_editor_setup_turns_off_every_replacing_surface(monkeypatch, tmp_path
 
     (tmp_path / ".repowise").mkdir()
 
-    offer_distill_rewrite_hook(
-        _silent_console(), [tmp_path], False, yes=True, no_editor_setup=True
-    )
+    offer_distill_rewrite_hook(_silent_console(), [tmp_path], False, yes=True, no_editor_setup=True)
 
     assert _all_same(_hook_verdicts(tmp_path), False)
 
@@ -425,9 +423,7 @@ def _select(monkeypatch, tmp_path: Path, answer, **kwargs):
         return answer(choices) if callable(answer) else answer
 
     monkeypatch.setattr(agent_selection, "interactive_agent_select", _fake)
-    options = select_agents_interactively(
-        _silent_console(), tmp_path, EditorSetupOptions(**kwargs)
-    )
+    options = select_agents_interactively(_silent_console(), tmp_path, EditorSetupOptions(**kwargs))
     return options, seen[0]
 
 
@@ -442,9 +438,7 @@ def test_checklist_unticking_an_agent_disables_its_project_file(monkeypatch, tmp
 
 
 def test_checklist_ticking_everything_disables_nothing(monkeypatch, tmp_path) -> None:
-    options, _ = _select(
-        monkeypatch, tmp_path, lambda choices: {choice.id for choice in choices}
-    )
+    options, _ = _select(monkeypatch, tmp_path, lambda choices: {choice.id for choice in choices})
 
     from repowise.cli.editor_integrations.defaults import get_default_editor_integrations
 
@@ -482,9 +476,7 @@ def test_checklist_pre_ticks_an_agent_an_explicit_flag_asked_for(monkeypatch, tm
     Otherwise accepting the checklist would silently undo the flag the user
     passed on the same command line.
     """
-    _, choices = _select(
-        monkeypatch, tmp_path, set(), integration_overrides={"codex": True}
-    )
+    _, choices = _select(monkeypatch, tmp_path, set(), integration_overrides={"codex": True})
 
     codex = next(choice for choice in choices if choice.id == "codex")
     assert codex.enabled is True

@@ -994,9 +994,7 @@ async def _why_search(query: str, targets: list[str] | None, repo: str | None) -
     # distinct decisions — and only walk lineage for what survives.
     ranked = _rank_keyword_matches(all_decisions, query, target_set)
     if not ranked:
-        return await _why_no_match(
-            query, targets, ctx, repository, all_decisions, target_git
-        )
+        return await _why_no_match(query, targets, ctx, repository, all_decisions, target_git)
     collapsed = _collapse_restatements(ranked)[:_MAX_SEARCH_DECISIONS]
     decision_results, doc_results = await _semantic_lanes(ctx, query)
     lineage_by_id = await _lineage_for_matches(ctx, [d for d, _ in collapsed])

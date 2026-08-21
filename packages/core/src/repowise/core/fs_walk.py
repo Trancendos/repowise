@@ -217,9 +217,9 @@ def walk_repo(
             # they are a genuine external tree, and cycle protection still
             # needs their realpath because ``os.walk`` will descend a junction
             # into one.
-            if _normcase(child_real) != _normcase(
-                os.path.join(parent_real, d)
-            ) and _is_within(child_real, root_real):
+            if _normcase(child_real) != _normcase(os.path.join(parent_real, d)) and _is_within(
+                child_real, root_real
+            ):
                 cycle_pruned.append(d)
                 continue
             if child_real in visited_real:

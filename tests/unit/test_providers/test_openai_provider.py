@@ -76,10 +76,13 @@ def test_gpt56_family_ladder_drops_minimal_and_max():
         ).supported_reasoning_modes() == ("auto", "none", "low", "medium", "high", "xhigh")
 
     # The generic gpt-5 branch is a prefix of gpt-5.6 and must not win.
-    assert "minimal" in OpenAIProvider(
-        api_key="sk-test",
-        model="gpt-5.4-nano",
-    ).supported_reasoning_modes()
+    assert (
+        "minimal"
+        in OpenAIProvider(
+            api_key="sk-test",
+            model="gpt-5.4-nano",
+        ).supported_reasoning_modes()
+    )
 
 
 def test_gpt54_model():
