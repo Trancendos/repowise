@@ -119,9 +119,7 @@ class TestEquivalence:
 
 
 class TestFallsBackToTheOrm:
-    def test_a_configured_db_url_is_not_a_local_file(
-        self, indexed_repo: Path, monkeypatch
-    ) -> None:
+    def test_a_configured_db_url_is_not_a_local_file(self, indexed_repo: Path, monkeypatch) -> None:
         """The one way a naive version breaks in production.
 
         ``resolve_db_url`` honours these, so a hosted or postgres setup must

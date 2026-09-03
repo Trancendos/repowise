@@ -59,9 +59,7 @@ async def test_all_markers_are_structured_not_just_the_first_five(tmp_path):
     (tmp_path / "app.py").write_text(_source(), encoding="utf-8")
     provider = _RecordingProvider()
 
-    decisions = await DecisionExtractor(
-        repo_path=tmp_path, provider=provider
-    ).scan_inline_markers()
+    decisions = await DecisionExtractor(repo_path=tmp_path, provider=provider).scan_inline_markers()
 
     assert len(decisions) == _MARKER_COUNT
     # 12 markers at 5 per call.

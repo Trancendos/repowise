@@ -395,7 +395,9 @@ def _render(projected: dict) -> None:
     if docs:
         console.print("\n[bold]Related documentation[/bold]")
         for d in docs:
-            console.print(f"  [cyan]{d.get('title', '')}[/cyan] [dim]{d.get('page_type', '')}[/dim]")
+            console.print(
+                f"  [cyan]{d.get('title', '')}[/cyan] [dim]{d.get('page_type', '')}[/dim]"
+            )
 
     episodes = projected.get("episodes") or []
     if episodes:

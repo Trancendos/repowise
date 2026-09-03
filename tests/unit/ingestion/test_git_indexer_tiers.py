@@ -182,7 +182,9 @@ class _FakeJobStore:
         from datetime import UTC, datetime
 
         now = datetime.now(UTC)
-        return JobRecord(jid, repository_id, phase, JobState.PENDING, None, now, now, None, metadata or {})
+        return JobRecord(
+            jid, repository_id, phase, JobState.PENDING, None, now, now, None, metadata or {}
+        )
 
     async def update_state(self, job_id, state, *, cursor=None, error=None):
         self.states.append((job_id, state.value))

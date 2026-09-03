@@ -33,9 +33,7 @@ class TestReadGoModules:
     def test_finds_root_and_nested_modules(self, tmp_path: Path) -> None:
         (tmp_path / "go.mod").write_text("module github.com/me/root\n")
         (tmp_path / "services" / "foo").mkdir(parents=True)
-        (tmp_path / "services" / "foo" / "go.mod").write_text(
-            "module github.com/me/foo\n"
-        )
+        (tmp_path / "services" / "foo" / "go.mod").write_text("module github.com/me/foo\n")
         modules = read_go_modules(tmp_path)
         # Longest first: foo's path is shorter than root's? Both equal length
         # — but ``github.com/me/foo`` (19) vs ``github.com/me/root`` (20).
@@ -100,9 +98,7 @@ class TestResolveGoImportAll:
         for f in files:
             self._write(tmp_path, f, "package filecache\n")
         ctx = _ctx(tmp_path, files, go_modules=(("", "github.com/gohugoio/hugo"),))
-        result = resolve_go_import_all(
-            "github.com/gohugoio/hugo/cache/filecache", "main.go", ctx
-        )
+        result = resolve_go_import_all("github.com/gohugoio/hugo/cache/filecache", "main.go", ctx)
         assert set(result) == set(files)
 
     def test_external_is_single_node(self, tmp_path: Path) -> None:

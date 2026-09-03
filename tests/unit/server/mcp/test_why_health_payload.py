@@ -92,9 +92,7 @@ async def test_health_takes_the_front_of_each_list_without_re_sorting_it(
     stale, proposed, ungoverned = oversized_health
     result = await get_why()
 
-    assert [d["id"] for d in result["stale_decisions"]] == [
-        d.id for d in stale[:_MAX_HEALTH_STALE]
-    ]
+    assert [d["id"] for d in result["stale_decisions"]] == [d.id for d in stale[:_MAX_HEALTH_STALE]]
     assert [d["id"] for d in result["proposed_awaiting_review"]] == [
         d.id for d in proposed[:_MAX_HEALTH_PROPOSED]
     ]

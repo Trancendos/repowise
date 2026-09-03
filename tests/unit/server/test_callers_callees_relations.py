@@ -105,9 +105,7 @@ async def test_callers_are_calls_only(client: AsyncClient, app) -> None:
 
 
 @pytest.mark.asyncio
-async def test_caller_count_is_the_true_total_not_the_row_cap(
-    client: AsyncClient, app
-) -> None:
+async def test_caller_count_is_the_true_total_not_the_row_cap(client: AsyncClient, app) -> None:
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 
@@ -119,9 +117,7 @@ async def test_caller_count_is_the_true_total_not_the_row_cap(
 
 
 @pytest.mark.asyncio
-async def test_relations_carry_the_kinds_the_drawer_was_missing(
-    client: AsyncClient, app
-) -> None:
+async def test_relations_carry_the_kinds_the_drawer_was_missing(client: AsyncClient, app) -> None:
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 

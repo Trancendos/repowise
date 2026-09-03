@@ -33,9 +33,7 @@ def extract_php_bindings(stmt_node: Node, src: str) -> tuple[list[str], list[Nam
             effective_local = alias if alias else local
             names.append(effective_local)
             bindings.append(
-                NamedBinding(
-                    local_name=effective_local, exported_name=qualified, source_file=None
-                )
+                NamedBinding(local_name=effective_local, exported_name=qualified, source_file=None)
             )
 
     return names, bindings

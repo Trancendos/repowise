@@ -220,18 +220,18 @@ def test_rust_flat_match_complexity():
         pytest.skip("rust complex_match not detected")
     # complex_match: match has an arm with nested `if`, so arms count
     # individually. CCN = 1 (base) + 3 arms + 1 (if in arm) = 5
-    assert cplx.ccn > flat.ccn, (
-        f"complex match CCN ({cplx.ccn}) should exceed flat match CCN ({flat.ccn})"
-    )
+    assert (
+        cplx.ccn > flat.ccn
+    ), f"complex match CCN ({cplx.ccn}) should exceed flat match CCN ({flat.ccn})"
 
     multi = _find(results, "multi_stmt_match")
     if multi is None:
         pytest.skip("rust multi_stmt_match not detected")
     # multi_stmt_match: arm with multi-statement block → complex match
     # CCN = 1 (base) + 3 arms = 4
-    assert multi.ccn > flat.ccn, (
-        f"multi-stmt match CCN ({multi.ccn}) should exceed flat match CCN ({flat.ccn})"
-    )
+    assert (
+        multi.ccn > flat.ccn
+    ), f"multi-stmt match CCN ({multi.ccn}) should exceed flat match CCN ({flat.ccn})"
 
 
 def test_unsupported_language_returns_empty():

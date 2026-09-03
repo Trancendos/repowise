@@ -42,7 +42,7 @@ class FileStat:
     path: str
     pagerank_pct: float = 0.0  # 0..100
     betweenness: float = 0.0
-    degree: int = 0            # in + out
+    degree: int = 0  # in + out
     complexity: str = "simple"
     is_entry_point: bool = False
     is_test: bool = False
@@ -64,7 +64,7 @@ class FileSignal:
     is_dead: bool
     on_tour: bool
     entry_dist: int | None  # BFS hops from nearest entry point; None = unreachable
-    on_flow: bool           # entry_dist is not None
+    on_flow: bool  # entry_dist is not None
 
 
 def _bfs_distances(
@@ -129,7 +129,9 @@ def _minmax(values: list[float]) -> tuple[float, float]:
     return lo, (hi if hi > lo else lo + 1.0)
 
 
-def _file_raw(sig: FileSignal, deg_lo: float, deg_span: float, bet_lo: float, bet_span: float) -> float:
+def _file_raw(
+    sig: FileSignal, deg_lo: float, deg_span: float, bet_lo: float, bet_span: float
+) -> float:
     pr = sig.pagerank_pct / 100.0
     deg_n = (sig.degree - deg_lo) / deg_span
     bet_n = (sig.betweenness - bet_lo) / bet_span

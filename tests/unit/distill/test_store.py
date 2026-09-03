@@ -149,17 +149,26 @@ def test_distill_summary_excludes_mcp_rows(store: OmissionStore) -> None:
 
     # Distill surface rows…
     store.record_saving(
-        filter_name="test_output", source="cli", command="pytest",
-        raw_tokens=1000, distilled_tokens=100,
+        filter_name="test_output",
+        source="cli",
+        command="pytest",
+        raw_tokens=1000,
+        distilled_tokens=100,
     )
     store.record_saving(
-        filter_name="git_log", source="hook-bash", command="git log",
-        raw_tokens=500, distilled_tokens=50,
+        filter_name="git_log",
+        source="hook-bash",
+        command="git log",
+        raw_tokens=500,
+        distilled_tokens=50,
     )
     # …and an MCP counterfactual row in the same ledger, which distill must skip.
     store.record_saving(
-        filter_name="get_context", source="mcp:get_context", command=None,
-        raw_tokens=4000, distilled_tokens=400,
+        filter_name="get_context",
+        source="mcp:get_context",
+        command=None,
+        raw_tokens=4000,
+        distilled_tokens=400,
     )
 
     summary = distill_summary(store._conn)
@@ -176,16 +185,25 @@ def test_mcp_savings_summary_counterfactual_precedence(store: OmissionStore) -> 
     # Counterfactual ledger rows for two tools (these subsume their own
     # truncation, since delivered is measured post-truncation).
     store.record_saving(
-        filter_name="get_symbol", source="mcp:get_symbol", command=None,
-        raw_tokens=3000, distilled_tokens=300,
+        filter_name="get_symbol",
+        source="mcp:get_symbol",
+        command=None,
+        raw_tokens=3000,
+        distilled_tokens=300,
     )
     store.record_saving(
-        filter_name="get_symbol", source="mcp:get_symbol", command=None,
-        raw_tokens=1000, distilled_tokens=200,
+        filter_name="get_symbol",
+        source="mcp:get_symbol",
+        command=None,
+        raw_tokens=1000,
+        distilled_tokens=200,
     )
     store.record_saving(
-        filter_name="get_context", source="mcp:get_context", command=None,
-        raw_tokens=2000, distilled_tokens=500,
+        filter_name="get_context",
+        source="mcp:get_context",
+        command=None,
+        raw_tokens=2000,
+        distilled_tokens=500,
     )
     # Truncation drops: get_symbol also has drops (must NOT be added on top —
     # counterfactual wins); get_risk has ONLY drops (its sole signal).
@@ -199,14 +217,20 @@ def test_mcp_savings_summary_counterfactual_precedence(store: OmissionStore) -> 
 
     # get_symbol → counterfactual saved 2700+800=3500, drops ignored.
     assert by_tool["get_symbol"] == {
-        "tool": "get_symbol", "events": 2, "tokens": 3500, "kind": "counterfactual",
+        "tool": "get_symbol",
+        "events": 2,
+        "tokens": 3500,
+        "kind": "counterfactual",
     }
     # get_context → counterfactual saved 1500.
     assert by_tool["get_context"]["tokens"] == 1500
     assert by_tool["get_context"]["kind"] == "counterfactual"
     # get_risk → truncation only.
     assert by_tool["get_risk"] == {
-        "tool": "get_risk", "events": 1, "tokens": 700, "kind": "truncation",
+        "tool": "get_risk",
+        "events": 1,
+        "tokens": 700,
+        "kind": "truncation",
     }
     # queries counts counterfactual events only; tokens is the merged total.
     assert summary["queries"] == 3

@@ -1020,9 +1020,7 @@ _CONTAINER_USE_LANGUAGES: frozenset[str] = frozenset({"csharp"})
 # matched: ``@SuppressWarnings`` says nothing on its own, and only the
 # ``"unused"`` argument is the author stating that the symbol is deliberately
 # uncalled. Matched against the raw decorator text rather than its base.
-_DELIBERATELY_UNUSED_ANNOTATIONS: tuple[tuple[str, str], ...] = (
-    ("SuppressWarnings", "unused"),
-)
+_DELIBERATELY_UNUSED_ANNOTATIONS: tuple[tuple[str, str], ...] = (("SuppressWarnings", "unused"),)
 
 
 # Default dynamic patterns (plugins, handlers, etc.)

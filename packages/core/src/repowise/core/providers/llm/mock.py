@@ -38,13 +38,9 @@ from repowise.core.reasoning import ReasoningMode
 # of working directory. Goes up: mock.py → providers/ → core/ → repowise/ →
 # src/ → packages/core/ → (repo root) → tests/providers/fixtures/
 _FIXTURE_DIR = (
-    Path(__file__).parent  # providers/
-    .parent                # core/
-    .parent                # repowise/
-    .parent                # src/
-    .parent                # packages/core/
-    .parent                # packages/
-    .parent                # repo root
+    Path(
+        __file__
+    ).parent.parent.parent.parent.parent.parent.parent  # providers/  # core/  # repowise/  # src/  # packages/core/  # packages/  # repo root
     / "tests"
     / "providers"
     / "fixtures"

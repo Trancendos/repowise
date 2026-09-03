@@ -330,9 +330,7 @@ def _show_generation_checks(result: Any) -> None:
     except Exception as exc:
         # A first index that could not check itself must not read like one that
         # checked itself clean. The run still exits 0; the wiki is written.
-        console.print(
-            f"[{ERR}]Generation checks did not run:[/] {type(exc).__name__}: {exc}"
-        )
+        console.print(f"[{ERR}]Generation checks did not run:[/] {type(exc).__name__}: {exc}")
 
 
 def show_workspace_completion(

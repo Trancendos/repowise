@@ -48,9 +48,7 @@ class TestHeuristicLabelStripping:
         # to their informative segment.
         ingest = [f"acme/src/ingestion/p{i}.py" for i in range(4)]
         persist = [f"acme/src/persistence/p{i}.py" for i in range(4)]
-        generic = frozenset(
-            s.lower() for s in dominant_segments(ingest + persist)
-        )
+        generic = frozenset(s.lower() for s in dominant_segments(ingest + persist))
         assert "acme" in generic and "src" in generic
         assert _heuristic_label(ingest, 0, generic) == "ingestion"
         assert _heuristic_label(persist, 1, generic) == "persistence"
@@ -58,9 +56,7 @@ class TestHeuristicLabelStripping:
     def test_no_extra_generic_preserves_legacy_behavior(self):
         # Default empty set: byte-identical to the pre-change heuristic.
         paths = [f"web/components/c{i}.tsx" for i in range(4)]
-        assert _heuristic_label(paths, 0) == _heuristic_label(
-            paths, 0, frozenset()
-        )
+        assert _heuristic_label(paths, 0) == _heuristic_label(paths, 0, frozenset())
 
     def test_stem_fallback_skips_dominant_segment(self):
         # Strategy 3 (filename stems) must not resurrect a stripped segment.
@@ -107,9 +103,9 @@ class TestDetectFileCommunitiesLabels:
         labels = [ci.label for ci in info.values()]
         for label in labels:
             for noise in ("acme", "src", "acmepkg"):
-                assert noise not in label.split("/"), (
-                    f"dominant segment {noise!r} leaked into label {label!r}"
-                )
+                assert noise not in label.split(
+                    "/"
+                ), f"dominant segment {noise!r} leaked into label {label!r}"
         # The informative segments survive somewhere in the labels.
         joined = " ".join(labels)
         assert "ingestion" in joined and "web" in joined

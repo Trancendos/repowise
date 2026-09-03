@@ -89,7 +89,9 @@ def _add_foreign_call(g: nx.DiGraph, src: str, foreign_file: str, callee_name: s
         g.add_node(foreign_file, node_type="file")
     cid = f"{foreign_file}::{callee_name}"
     if cid not in g:
-        g.add_node(cid, node_type="symbol", kind="function", name=callee_name, file_path=foreign_file)
+        g.add_node(
+            cid, node_type="symbol", kind="function", name=callee_name, file_path=foreign_file
+        )
     g.add_edge(src, cid, edge_type="calls")
 
 
@@ -295,7 +297,9 @@ def test_shared_helper_groups_callers_together():
 
 def test_dominant_token_helper():
     # Plurality vote: one outlier doesn't kill the shared token.
-    assert _dominant_token(["filter_dicts", "filter_path", "filter_rows", "is_excluded"]) == "filter"
+    assert (
+        _dominant_token(["filter_dicts", "filter_path", "filter_rows", "is_excluded"]) == "filter"
+    )
     # Stopword verbs and short tokens don't win.
     assert _dominant_token(["get_repo", "get_spec"]) == ""
     # No token shared by >= 2 symbols.
@@ -324,9 +328,7 @@ def test_cochange_edge_groups_commit_coupled_symbols():
     # No call edges; the only cohesion is git co-change. Lines of fn_0..3 are
     # all touched by commit "ca", fn_4..7 by "cb" -> two co-change cliques.
     g = _disconnected_blocks()
-    blame = _blame_index(
-        [(10 * i + 1, 10 * i + 10, "ca" if i < 4 else "cb") for i in range(8)]
-    )
+    blame = _blame_index([(10 * i + 1, 10 * i + 10, "ca" if i < 4 else "cb") for i in range(8)])
     out = _detect(g, "big.py", blame_index=blame)
     assert len(out) == 1
     s = out[0]
@@ -401,9 +403,7 @@ def test_foreign_module_proxy_is_used_when_imported_names_empty():
 
 def test_signals_are_deterministic():
     g = _disconnected_blocks()
-    blame = _blame_index(
-        [(10 * i + 1, 10 * i + 10, "ca" if i < 4 else "cb") for i in range(8)]
-    )
+    blame = _blame_index([(10 * i + 1, 10 * i + 10, "ca" if i < 4 else "cb") for i in range(8)])
     first = _detect(g, "big.py", blame_index=blame)
     second = _detect(g, "big.py", blame_index=blame)
     assert first[0].plan["groups"] == second[0].plan["groups"]

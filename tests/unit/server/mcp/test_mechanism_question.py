@@ -38,9 +38,9 @@ _NOT_MECHANISM = [
     "Where is filter_dicts_by_key defined?",
     "What are the definitions of render_widget in this repo?",
     "where is the compute_score function defined",  # 'compute' is a verb, still a lookup
-    "what does route_request return",               # 'route' is a verb, still a lookup
+    "what does route_request return",  # 'route' is a verb, still a lookup
     "which file defines reconcile_symbols_for_files",
-    "reconcile_symbols_for_files",                  # bare identifier
+    "reconcile_symbols_for_files",  # bare identifier
     # value / quantity: "how many/much/long/large" are value questions
     "How many definitions of get_symbol are there?",
     "how much memory does the ComplexityWalker use",

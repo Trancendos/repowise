@@ -131,10 +131,10 @@ async def aggregate_owners(
     """
 
     rows = (
-        await session.execute(
-            select(GitMetadata).where(GitMetadata.repository_id == repo_id)
-        )
-    ).scalars().all()
+        (await session.execute(select(GitMetadata).where(GitMetadata.repository_id == repo_id)))
+        .scalars()
+        .all()
+    )
 
     accs: dict[str, _OwnerAccumulator] = {}
     module_totals: dict[str, int] = defaultdict(int)
@@ -216,9 +216,7 @@ async def aggregate_owners(
                 if a_last_ts
                 else _as_utc(m.last_commit_at)
             )
-            if a_last is not None and (
-                acc.last_commit_at is None or a_last > acc.last_commit_at
-            ):
+            if a_last is not None and (acc.last_commit_at is None or a_last > acc.last_commit_at):
                 acc.last_commit_at = a_last
 
             a_first_ts = a.get("first_commit_ts")
@@ -271,10 +269,14 @@ async def aggregate_owners(
 
     # Pass 2: dead-code burden by primary_owner.
     dead_rows = (
-        await session.execute(
-            select(DeadCodeFinding).where(DeadCodeFinding.repository_id == repo_id)
+        (
+            await session.execute(
+                select(DeadCodeFinding).where(DeadCodeFinding.repository_id == repo_id)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     for d in dead_rows:
         if not d.primary_owner:
             continue
@@ -311,9 +313,7 @@ def silo_modules(acc: _OwnerAccumulator, module_totals: dict[str, int]) -> int:
     return siloed
 
 
-def module_share(
-    acc: _OwnerAccumulator, module_totals: dict[str, int]
-) -> dict[str, float]:
+def module_share(acc: _OwnerAccumulator, module_totals: dict[str, int]) -> dict[str, float]:
     """Per-module share of files owned by this person (0–1)."""
 
     out: dict[str, float] = {}

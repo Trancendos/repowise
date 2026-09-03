@@ -67,7 +67,7 @@ export function second() {
 
 # `${0%/*}` inside a Rust raw string. `/*` is not a comment here, and nothing
 # closes it, so the parent masked to EOF and lost every `fn` below.
-_RUST_SLASH_STAR_IN_A_RAW_STRING = '''\
+_RUST_SLASH_STAR_IN_A_RAW_STRING = """\
 fn shim() {
     let script = r#"#!/bin/sh
 record_dir=${0%/*}
@@ -79,7 +79,7 @@ printf '%s' "$@"
 fn after_the_raw_string() {
     ok()
 }
-'''
+"""
 
 # A triple quote is a Python/Kotlin/Java delimiter, not a Rust one. Same shape,
 # other delimiter: nothing closes it, so the parent masked to EOF. Verbatim from

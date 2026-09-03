@@ -78,12 +78,12 @@ async def _seed(session_factory, repo_id: str) -> None:
                 )
             )
         for src, tgt, etype in (
-            (_FILE, _OTHER, "imports"),          # the one real dependency
-            (_FILE, _SYMBOL, "defines"),         # containment, file -> symbol
-            (_FILE, _PARTNER, "co_changes"),     # temporal
-            (_CALLER, _SYMBOL, "calls"),         # the one real caller
-            (_SYMBOL, _METHOD, "has_method"),    # containment, class -> member
-            (_CALLER, _METHOD, "calls"),         # the method's one real caller
+            (_FILE, _OTHER, "imports"),  # the one real dependency
+            (_FILE, _SYMBOL, "defines"),  # containment, file -> symbol
+            (_FILE, _PARTNER, "co_changes"),  # temporal
+            (_CALLER, _SYMBOL, "calls"),  # the one real caller
+            (_SYMBOL, _METHOD, "has_method"),  # containment, class -> member
+            (_CALLER, _METHOD, "calls"),  # the method's one real caller
         ):
             session.add(
                 GraphEdge(
@@ -97,9 +97,7 @@ async def _seed(session_factory, repo_id: str) -> None:
 
 
 @pytest.mark.asyncio
-async def test_a_file_does_not_depend_on_its_own_symbols(
-    client: AsyncClient, app
-) -> None:
+async def test_a_file_does_not_depend_on_its_own_symbols(client: AsyncClient, app) -> None:
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 
@@ -129,9 +127,7 @@ async def test_the_file_dependent_count_matches_the_dependent_list(
 
 
 @pytest.mark.asyncio
-async def test_the_two_degree_blocks_on_the_file_response_agree(
-    client: AsyncClient, app
-) -> None:
+async def test_the_two_degree_blocks_on_the_file_response_agree(client: AsyncClient, app) -> None:
     """One response carries this number twice, under two different keys.
 
     ``health.signals`` renders as "N files depend on this" and ``graph`` as
@@ -165,9 +161,7 @@ async def test_symbol_degree_agrees_between_the_page_and_the_drawer(
     page = await client.get(
         "/api/symbols/detail", params={"repo_id": repo["id"], "symbol_id": _SYMBOL}
     )
-    drawer = await client.get(
-        f"/api/graph/{repo['id']}/metrics", params={"node_id": _SYMBOL}
-    )
+    drawer = await client.get(f"/api/graph/{repo['id']}/metrics", params={"node_id": _SYMBOL})
     assert page.status_code == 200
     assert drawer.status_code == 200
 
@@ -177,9 +171,7 @@ async def test_symbol_degree_agrees_between_the_page_and_the_drawer(
 
 
 @pytest.mark.asyncio
-async def test_a_symbols_declaring_file_is_not_a_caller(
-    client: AsyncClient, app
-) -> None:
+async def test_a_symbols_declaring_file_is_not_a_caller(client: AsyncClient, app) -> None:
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 
@@ -196,9 +188,7 @@ async def test_a_symbols_declaring_file_is_not_a_caller(
 
 
 @pytest.mark.asyncio
-async def test_a_methods_declaring_class_is_not_a_caller(
-    client: AsyncClient, app
-) -> None:
+async def test_a_methods_declaring_class_is_not_a_caller(client: AsyncClient, app) -> None:
     """The ``has_method`` half of containment, class -> member."""
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
@@ -215,16 +205,12 @@ async def test_a_methods_declaring_class_is_not_a_caller(
 
 
 @pytest.mark.asyncio
-async def test_rest_path_does_not_walk_a_co_change_hop(
-    client: AsyncClient, app
-) -> None:
+async def test_rest_path_does_not_walk_a_co_change_hop(client: AsyncClient, app) -> None:
     """The REST twin of the MCP tool fixed in #1470."""
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 
-    resp = await client.get(
-        f"/api/graph/{repo['id']}/path", params={"from": _FILE, "to": _PARTNER}
-    )
+    resp = await client.get(f"/api/graph/{repo['id']}/path", params={"from": _FILE, "to": _PARTNER})
     assert resp.status_code == 200
     body = resp.json()
 
@@ -236,9 +222,7 @@ async def test_rest_path_does_not_walk_a_co_change_hop(
 
 
 @pytest.mark.asyncio
-async def test_path_still_resolves_through_the_symbol_layer(
-    client: AsyncClient, app
-) -> None:
+async def test_path_still_resolves_through_the_symbol_layer(client: AsyncClient, app) -> None:
     """``defines`` is the only bridge from a file to its symbols.
 
     Nothing points from a symbol back to a file, so excluding containment
@@ -248,23 +232,17 @@ async def test_path_still_resolves_through_the_symbol_layer(
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 
-    resp = await client.get(
-        f"/api/graph/{repo['id']}/path", params={"from": _FILE, "to": _SYMBOL}
-    )
+    resp = await client.get(f"/api/graph/{repo['id']}/path", params={"from": _FILE, "to": _SYMBOL})
     assert resp.status_code == 200
     assert resp.json()["path"] == [_FILE, _SYMBOL]
 
 
 @pytest.mark.asyncio
-async def test_ego_graph_excludes_a_co_change_partner(
-    client: AsyncClient, app
-) -> None:
+async def test_ego_graph_excludes_a_co_change_partner(client: AsyncClient, app) -> None:
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 
-    resp = await client.get(
-        f"/api/graph/{repo['id']}/ego", params={"node_id": _FILE, "hops": 1}
-    )
+    resp = await client.get(f"/api/graph/{repo['id']}/ego", params={"node_id": _FILE, "hops": 1})
     assert resp.status_code == 200
     body = resp.json()
 

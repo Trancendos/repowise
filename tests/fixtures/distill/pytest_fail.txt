@@ -682,14 +682,14 @@ ___________________________ test_assertion_failure ____________________________
 ..\..\AppData\Local\Temp\distill_fixture_tests\test_sample.py:23: in test_assertion_failure
     assert result == expected
 E   AssertionError: assert {'layers': ['... 'pages': 412} == {'layers': ['... 'pages': 415}
-E     
+E
 E     Omitting 1 identical items, use -vv to show
 E     Differing items:
 E     {'pages': 412} != {'pages': 415}
 E     {'layers': ['web', 'server']} != {'layers': ['web', 'server', 'core']}
-E     
+E
 E     Full diff:...
-E     
+E
 E     ...Full output truncated (12 lines hidden), use '-vv' to show
 __________________________ test_unhandled_exception ___________________________
 ..\..\AppData\Local\Temp\distill_fixture_tests\test_sample.py:27: in test_unhandled_exception

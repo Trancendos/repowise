@@ -38,9 +38,7 @@ class TestBuildIndex:
         ]
         for f in files:
             _write(tmp_path, f, "package filecache\n")
-        ctx = _ctx(
-            tmp_path, files, go_modules=(("", "github.com/gohugoio/hugo"),)
-        )
+        ctx = _ctx(tmp_path, files, go_modules=(("", "github.com/gohugoio/hugo"),))
         index = build_go_package_index(ctx)
         pkg = index.packages["cache/filecache"]
         assert pkg.pkg_name == "filecache"
@@ -99,15 +97,9 @@ class TestBuildIndex:
         index = build_go_package_index(ctx)
         # The nested module's package gets the nested module's import path,
         # not root/services/foo.
-        assert (
-            index.files_for_import("github.com/me/foo")
-            == ("services/foo/handler.go",)
-        )
+        assert index.files_for_import("github.com/me/foo") == ("services/foo/handler.go",)
         # A package under the root module resolves via the root prefix.
-        assert (
-            index.files_for_import("github.com/me/root/libs/bar")
-            == ("libs/bar/util.go",)
-        )
+        assert index.files_for_import("github.com/me/root/libs/bar") == ("libs/bar/util.go",)
 
     def test_package_for_file(self, tmp_path: Path) -> None:
         files = ["pkg/lib/a.go", "pkg/lib/b.go"]

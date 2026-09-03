@@ -111,11 +111,7 @@ def test_assemble_file_page_does_not_retain_source(
         f"# header\n{body}".encode(),
     )
 
-    retained = [
-        f.name
-        for f in dataclasses.fields(ctx)
-        if body in str(getattr(ctx, f.name))
-    ]
+    retained = [f.name for f in dataclasses.fields(ctx) if body in str(getattr(ctx, f.name))]
     assert retained == []
 
 

@@ -162,10 +162,7 @@ class TestOwnFile:
         # The symbol names itself, which is not evidence that anything else does.
         source = _src(
             src__rec_py=(
-                "def walk(n):\n"
-                "    if n:\n"
-                "        return walk(n - 1)\n"
-                "    return 0\n"
+                "def walk(n):\n" "    if n:\n" "        return walk(n - 1)\n" "    return 0\n"
             )
         )
         finding = _finding("walk", file_path="src/rec.py", start_line=1, end_line=4)
@@ -192,13 +189,13 @@ class TestOwnFile:
         # recursive call read as an external use.
         source = _src(
             src__rec_py=(
-                'def progress():\n'
+                "def progress():\n"
                 '    print("\rworking\r", end="")\n'
-                '\n'
-                'def walk(n):\n'
-                '    if n:\n'
-                '        return walk(n - 1)\n'
-                '    return 0\n'
+                "\n"
+                "def walk(n):\n"
+                "    if n:\n"
+                "        return walk(n - 1)\n"
+                "    return 0\n"
             )
         )
         finding = _finding("walk", file_path="src/rec.py", start_line=4, end_line=7)
@@ -247,9 +244,7 @@ class TestOwnFile:
         assert "src/util.cpp:3" in func.evidence[-1]
 
     def test_one_object_listed_twice_collects_one_evidence_line(self):
-        source = _src(
-            src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n"
-        )
+        source = _src(src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n")
         finding = _finding("Registry")
         clamp_unverified_absence([finding, finding], source)
 
@@ -275,9 +270,7 @@ class TestScopeAndSafety:
         ],
     )
     def test_only_unused_exports_are_in_scope(self, kind):
-        source = _src(
-            src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n"
-        )
+        source = _src(src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n")
         finding = _finding("Registry", kind=kind, confidence=0.9)
         clamp_unverified_absence([finding], source)
 
@@ -287,9 +280,7 @@ class TestScopeAndSafety:
         # 0.5 is above the cap, so this one is in scope and falls to it. What
         # is being pinned is the direction: a clamp that could move a number
         # up would be a way to invent certainty rather than to withdraw it.
-        source = _src(
-            src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n"
-        )
+        source = _src(src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n")
         finding = _finding("Registry", confidence=0.5)
         clamp_unverified_absence([finding], source)
 
@@ -298,18 +289,14 @@ class TestScopeAndSafety:
     def test_a_finding_already_at_the_cap_is_left_alone(self):
         # Otherwise every low-confidence finding collects a second evidence
         # line saying something its confidence already said.
-        source = _src(
-            src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n"
-        )
+        source = _src(src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n")
         finding = _finding("Registry", confidence=RISK_CAP_CONFIDENCE)
         clamp_unverified_absence([finding], source)
 
         assert finding.evidence == []
 
     def test_no_finding_is_ever_removed(self):
-        source = _src(
-            src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n"
-        )
+        source = _src(src__lib_kt="class Registry\n", src__b_kt="fun f() = Registry()\n")
         findings = [_finding("Registry"), _finding("Stranded")]
         result = clamp_unverified_absence(findings, source)
 

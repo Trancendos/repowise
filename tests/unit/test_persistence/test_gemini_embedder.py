@@ -114,8 +114,8 @@ async def test_embed_raises_when_api_returns_wrong_width(monkeypatch):
         await emb.embed(["hello"])
 
     msg = str(exc_info.value)
-    assert "3" in msg                       # actual width named
-    assert "output_dimensionality" in msg   # tells user which parameter to fix
+    assert "3" in msg  # actual width named
+    assert "output_dimensionality" in msg  # tells user which parameter to fix
 
 
 async def test_embed_raises_when_api_returns_wrong_width_custom_dim(monkeypatch):
@@ -134,4 +134,3 @@ async def test_embed_width_check_not_triggered_on_empty():
     # embed([]) returns early without touching the SDK.
     emb = GeminiEmbedder(api_key="k")
     assert await emb.embed([]) == []
-

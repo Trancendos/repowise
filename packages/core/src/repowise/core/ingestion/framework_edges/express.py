@@ -96,9 +96,7 @@ def _add_express_edges(
                     count += 1
 
             local_funcs = {
-                sym.name: sym.id
-                for sym in parsed.symbols
-                if sym.kind in ("function", "method")
+                sym.name: sym.id for sym in parsed.symbols if sym.kind in ("function", "method")
             }
             receivers = {m.group(1) for m in _EXPRESS_RECEIVER_RE.finditer(text)}
             if local_funcs and receivers:

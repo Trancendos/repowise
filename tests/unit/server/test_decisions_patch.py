@@ -45,9 +45,7 @@ async def test_patch_decision_status_only(client: AsyncClient, app) -> None:
     assert body["status"] == "deprecated"
     # Linkage preserved.
     assert body["affected_modules"] == ["packages/core"]
-    assert body["affected_files"] == [
-        "packages/core/src/repowise/core/persistence/database.py"
-    ]
+    assert body["affected_files"] == ["packages/core/src/repowise/core/persistence/database.py"]
 
 
 @pytest.mark.asyncio

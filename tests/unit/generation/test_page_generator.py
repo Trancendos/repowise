@@ -239,9 +239,7 @@ async def test_artifact_violation_is_retried_once_and_recovers(sample_config):
     provider = MockProvider(responses=[_page(_BANNED_PHRASING), _page(_CLEAN_PAGE)])
     generator = PageGenerator(provider, ContextAssembler(sample_config), sample_config)
 
-    response = await generator._call_provider(
-        "module_page", "Document this module.", "request-id"
-    )
+    response = await generator._call_provider("module_page", "Document this module.", "request-id")
 
     assert response.content == _CLEAN_PAGE
     assert provider.call_count == 2
@@ -280,9 +278,7 @@ async def test_retry_carries_the_discarded_attempt_s_tokens(sample_config):
     provider = MockProvider(responses=[first, second])
     generator = PageGenerator(provider, ContextAssembler(sample_config), sample_config)
 
-    response = await generator._call_provider(
-        "module_page", "Document this module.", "request-id"
-    )
+    response = await generator._call_provider("module_page", "Document this module.", "request-id")
 
     assert response.content == _CLEAN_PAGE
     assert response.input_tokens == 107
@@ -299,9 +295,7 @@ async def test_a_repaired_page_is_marked_as_self_repaired(sample_config):
     provider = MockProvider(responses=[_page(_BANNED_PHRASING), _page(_CLEAN_PAGE)])
     generator = PageGenerator(provider, ContextAssembler(sample_config), sample_config)
 
-    response = await generator._call_provider(
-        "module_page", "Document this module.", "request-id"
-    )
+    response = await generator._call_provider("module_page", "Document this module.", "request-id")
     page = generator._build_generated_page(
         "module_page", "pkg/mod.py", "Mod", response, "source-hash", 3
     )
@@ -313,9 +307,7 @@ async def test_a_first_time_page_is_not_marked_as_self_repaired(sample_config):
     provider = MockProvider(responses=[_page(_CLEAN_PAGE)])
     generator = PageGenerator(provider, ContextAssembler(sample_config), sample_config)
 
-    response = await generator._call_provider(
-        "module_page", "Document this module.", "request-id"
-    )
+    response = await generator._call_provider("module_page", "Document this module.", "request-id")
     page = generator._build_generated_page(
         "module_page", "pkg/mod.py", "Mod", response, "source-hash", 3
     )
@@ -731,9 +723,7 @@ def test_build_system_prompt_strips_control_chars_from_language():
 def test_language_defaults_from_config_when_arg_omitted():
     # Callers that only build a GenerationConfig (server regenerate, pipeline
     # fallback) must still get the configured output language.
-    config = GenerationConfig(
-        max_tokens=256, token_budget=500, max_concurrency=1, language="ru"
-    )
+    config = GenerationConfig(max_tokens=256, token_budget=500, max_concurrency=1, language="ru")
     gen = PageGenerator(MockProvider(), ContextAssembler(config), config)
     prompt = gen._build_system_prompt("module_page")
     assert prompt.startswith("Generate all documentation content in Russian.")
@@ -900,9 +890,9 @@ async def test_generate_all_builds_kg_ctx_from_in_memory_kg_data():
         kg_data=kg_data,
     )
 
-    assert not [p for p in pages if p.page_type == "layer_page"], (
-        "layer pages are retired; nothing should emit one"
-    )
+    assert not [
+        p for p in pages if p.page_type == "layer_page"
+    ], "layer pages are retired; nothing should emit one"
     # The KG layer still reached generation: every file page carries it, and
     # the module page over those files inherits it from them.
     file_pages = [p for p in pages if p.page_type == "file_page"]

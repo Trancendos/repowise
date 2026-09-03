@@ -92,9 +92,7 @@ class JobStore(ABC):
         """
 
     @abstractmethod
-    async def find_resumable(
-        self, *, repository_id: str | None = None
-    ) -> list[JobRecord]:
+    async def find_resumable(self, *, repository_id: str | None = None) -> list[JobRecord]:
         """Return jobs in :attr:`JobState.RUNNING` (or ``PENDING``) that
         the orchestrator should offer to resume on startup.
 

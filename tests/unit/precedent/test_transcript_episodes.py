@@ -33,9 +33,7 @@ from repowise.core.sessions import INTENT_TURNS, get_adapter
 _TS = "2026-08-06T10:00:00.000Z"
 
 
-def _line(
-    kind: str, text: str = "", *, tools=(), session="s1", cwd=None, ts=_TS, **extra
-) -> str:
+def _line(kind: str, text: str = "", *, tools=(), session="s1", cwd=None, ts=_TS, **extra) -> str:
     """One Claude Code transcript line, in the shape the adapter parses."""
     content: list[dict] = []
     if text:
@@ -298,14 +296,26 @@ def test_a_session_read_across_two_runs_keeps_both_halves(tmp_path):
     first = _transcript(
         tmp_path,
         "s.jsonl",
-        [_line("assistant", "the first half", tools=[("Edit", {"file_path": str(root / "first.py")})])],
+        [
+            _line(
+                "assistant",
+                "the first half",
+                tools=[("Edit", {"file_path": str(root / "first.py")})],
+            )
+        ],
     )
     record_transcript_episodes(root, _fold(root, first))
 
     second = _transcript(
         tmp_path,
         "s.jsonl",
-        [_line("assistant", "the second half", tools=[("Edit", {"file_path": str(root / "second.py")})])],
+        [
+            _line(
+                "assistant",
+                "the second half",
+                tools=[("Edit", {"file_path": str(root / "second.py")})],
+            )
+        ],
     )
     record_transcript_episodes(root, _fold(root, second))
 
@@ -351,9 +361,7 @@ def test_observe_yields_every_event_unchanged(tmp_path):
         )
     rec = TranscriptEpisodeRecorder(root)
     with path.open(encoding="utf-8") as fh:
-        events = adapter.events_from_lines(
-            fh, prefilter=adapter.prefilter(INTENT_TURNS), path=path
-        )
+        events = adapter.events_from_lines(fh, prefilter=adapter.prefilter(INTENT_TURNS), path=path)
         seen = list(rec.observe(path, events))
 
     assert [e.text for e in seen] == [e.text for e in expected]
@@ -502,8 +510,7 @@ def test_the_episode_is_dated_from_the_session_not_the_index(tmp_path):
     (row,) = _rows(root, tier=TIER_TRANSCRIPT)
 
     assert row["birth_at"] == pytest.approx(
-        time.mktime(time.strptime("2026-08-06 10:00:00", "%Y-%m-%d %H:%M:%S"))
-        - time.timezone,
+        time.mktime(time.strptime("2026-08-06 10:00:00", "%Y-%m-%d %H:%M:%S")) - time.timezone,
         abs=2,
     )
     assert row["tier"] == TIER_TRANSCRIPT
@@ -543,9 +550,7 @@ def test_the_truncation_label_survives_a_run_that_reads_nothing(tmp_path):
     when the body is at its longest.
     """
     root = _repo(tmp_path)
-    path = _transcript(
-        tmp_path, "s.jsonl", [_line("assistant", "x" * (MAX_BODY_BYTES * 2))]
-    )
+    path = _transcript(tmp_path, "s.jsonl", [_line("assistant", "x" * (MAX_BODY_BYTES * 2))])
     record_transcript_episodes(root, _fold(root, path))
     (row,) = _rows(root, tier=TIER_TRANSCRIPT)
     assert "body truncated" in row["evidence"]

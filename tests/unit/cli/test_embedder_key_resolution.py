@@ -251,7 +251,7 @@ def test_the_tool_bridge_does_not_report_a_degraded_embedder(
 def test_the_degraded_message_names_the_places_it_searched(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """"Set OPENAI_API_KEY" is wrong advice for a user whose key is on disk.
+    """ "Set OPENAI_API_KEY" is wrong advice for a user whose key is on disk.
 
     It sends them to fix something that is already correct, which is how this
     defect survived a user looking straight at it.

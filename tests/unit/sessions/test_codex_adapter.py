@@ -177,8 +177,8 @@ def test_normalize_handles_mcp_function_call_and_output(adapter: CodexAdapter) -
                 "type": "function_call_output",
                 "call_id": "call_mcp_1",
                 "output": (
-                    'Wall time: 0.1 seconds\n'
-                    'Output:\n'
+                    "Wall time: 0.1 seconds\n"
+                    "Output:\n"
                     '{"result":{"results":[{"file":"app.py"}]}}'
                 ),
             },

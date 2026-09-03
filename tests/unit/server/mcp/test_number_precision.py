@@ -133,9 +133,7 @@ def _offending_floats(obj, path="$"):
 
 def test_the_detector_actually_detects():
     """Guard the guard — a walker that never fires would make this file inert."""
-    assert _offending_floats({"a": {"b": [0.791581408944753]}}) == [
-        ("$.a.b[0]", 0.791581408944753)
-    ]
+    assert _offending_floats({"a": {"b": [0.791581408944753]}}) == [("$.a.b[0]", 0.791581408944753)]
     assert _offending_floats({"a": float("nan")})
     assert _offending_floats({"ok": 0.7916, "n": 12, "flag": True}) == []
 
@@ -203,9 +201,9 @@ async def test_real_tool_payload_rounds_a_seeded_raw_double(setup_mcp):
         await session.commit()
 
     raw = await get_risk(["src/auth/service.py"])
-    assert raw["targets"]["src/auth/service.py"]["hotspot_score"] == _RAW_PERCENTILE, (
-        "fixture no longer carries the raw value — this test would be vacuous"
-    )
+    assert (
+        raw["targets"]["src/auth/service.py"]["hotspot_score"] == _RAW_PERCENTILE
+    ), "fixture no longer carries the raw value — this test would be vacuous"
 
     out = await tool_middleware(get_risk)(["src/auth/service.py"])
     assert out["targets"]["src/auth/service.py"]["hotspot_score"] == 0.7916

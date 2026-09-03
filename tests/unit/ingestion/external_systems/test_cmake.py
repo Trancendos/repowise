@@ -15,11 +15,15 @@ def _write(tmp_path: Path, rel: str, text: str) -> Path:
 
 
 def test_add_executable_with_inline_sources(tmp_path):
-    cml = _write(tmp_path, "CMakeLists.txt", """
+    cml = _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         cmake_minimum_required(VERSION 3.10)
         project(demo)
         add_executable(demo_app main.cc helper.cc helper.h)
-    """)
+    """,
+    )
     cm = cmake.parse_cmake_lists(cml, repo_root=tmp_path)
     assert cm.path == "CMakeLists.txt"
     assert len(cm.targets) == 1
@@ -31,12 +35,16 @@ def test_add_executable_with_inline_sources(tmp_path):
 
 
 def test_add_library_with_target_sources_public(tmp_path):
-    _write(tmp_path, "lib/CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "lib/CMakeLists.txt",
+        """
         add_library(libfoo STATIC)
         target_sources(libfoo PRIVATE foo.cc)
         target_sources(libfoo PUBLIC include/foo/foo.h)
         target_include_directories(libfoo PUBLIC include)
-    """)
+    """,
+    )
     cm = cmake.parse_cmake_lists(tmp_path / "lib/CMakeLists.txt", repo_root=tmp_path)
     t = cm.targets[0]
     assert t.kind == "library_static"
@@ -46,10 +54,14 @@ def test_add_library_with_target_sources_public(tmp_path):
 
 
 def test_add_subdirectory_reactor(tmp_path):
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_subdirectory(libfoo)
         add_subdirectory(app)
-    """)
+    """,
+    )
     _write(tmp_path, "libfoo/CMakeLists.txt", "add_library(foo SHARED foo.cc)")
     _write(tmp_path, "app/CMakeLists.txt", "add_executable(my_app main.cc)")
     files = cmake.discover_cmake_reactor(tmp_path)
@@ -64,7 +76,10 @@ def test_add_subdirectory_reactor(tmp_path):
 
 
 def test_if_block_marks_conditional_sources(tmp_path):
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(plat STATIC stub.cc)
         if(WIN32)
           target_sources(plat PRIVATE env_windows.cc)
@@ -72,7 +87,8 @@ def test_if_block_marks_conditional_sources(tmp_path):
         if(UNIX)
           target_sources(plat PRIVATE env_posix.cc)
         endif()
-    """)
+    """,
+    )
     cm = cmake.parse_cmake_lists(tmp_path / "CMakeLists.txt", repo_root=tmp_path)
     t = cm.targets[0]
     assert "env_windows.cc" in t.conditional_sources
@@ -81,10 +97,14 @@ def test_if_block_marks_conditional_sources(tmp_path):
 
 
 def test_find_package_emits_external_record(tmp_path):
-    cml = _write(tmp_path, "CMakeLists.txt", """
+    cml = _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         find_package(Boost 1.74 REQUIRED)
         find_package(OpenSSL REQUIRED)
-    """)
+    """,
+    )
     records = cmake.parse(cml, tmp_path)
     names = {r.name for r in records}
     assert names == {"Boost", "OpenSSL"}
@@ -94,20 +114,28 @@ def test_find_package_emits_external_record(tmp_path):
 
 
 def test_set_expansion(tmp_path):
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         set(LIB_SRC a.cc b.cc)
         add_library(thing STATIC ${LIB_SRC})
-    """)
+    """,
+    )
     cm = cmake.parse_cmake_lists(tmp_path / "CMakeLists.txt", repo_root=tmp_path)
     t = cm.targets[0]
     assert "a.cc" in t.sources and "b.cc" in t.sources
 
 
 def test_target_compile_definitions(tmp_path):
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(thing STATIC a.cc)
         target_compile_definitions(thing PRIVATE -DTHING_EXPORT_BUILD THING_API)
-    """)
+    """,
+    )
     cm = cmake.parse_cmake_lists(tmp_path / "CMakeLists.txt", repo_root=tmp_path)
     t = cm.targets[0]
     assert "THING_EXPORT_BUILD" in t.compile_defines

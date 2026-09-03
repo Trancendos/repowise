@@ -27,7 +27,9 @@ from repowise.server.deps import verify_api_key
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/feedback", tags=["feedback"], dependencies=[Depends(verify_api_key)])
+router = APIRouter(
+    prefix="/api/feedback", tags=["feedback"], dependencies=[Depends(verify_api_key)]
+)
 
 #: Hosted feedback sink. Persists the row and emails the maintainer list. No
 #: localhost override: feedback is only useful when it reaches the maintainers.

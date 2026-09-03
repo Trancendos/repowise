@@ -66,9 +66,7 @@ def generate_synthetic_repo(root: Path, n_files: int, n_commits: int) -> int:
         import_line = ""
         if i > 0:
             dep = i - 1
-            import_line = (
-                f"from pkg_{dep // files_per_pkg:03d}.mod_{dep:05d} import value_{dep}\n"
-            )
+            import_line = f"from pkg_{dep // files_per_pkg:03d}.mod_{dep:05d} import value_{dep}\n"
         mod.write_text(
             f'"""Synthetic module {i}."""\n'
             f"{import_line}\n"

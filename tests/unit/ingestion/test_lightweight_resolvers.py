@@ -251,9 +251,7 @@ class TestDartExtraction:
 
     def test_part_of_uri_and_name_forms(self) -> None:
         assert _modules(extract_dart_imports("part of 'lib.dart';\n")) == ["lib.dart"]
-        assert _modules(extract_dart_imports("part of my.library;\n")) == [
-            "library:my.library"
-        ]
+        assert _modules(extract_dart_imports("part of my.library;\n")) == ["library:my.library"]
 
 
 class TestDartResolution:
@@ -270,9 +268,10 @@ class TestDartResolution:
                 "lib/args.dart": "",
             },
         )
-        assert resolve_dart_import(
-            "package:args/src/parser.dart", "lib/args.dart", ctx
-        ) == "lib/src/parser.dart"
+        assert (
+            resolve_dart_import("package:args/src/parser.dart", "lib/args.dart", ctx)
+            == "lib/src/parser.dart"
+        )
 
     def test_monorepo_package_import(self, tmp_path: Path) -> None:
         ctx = _ctx(
@@ -284,9 +283,10 @@ class TestDartResolution:
                 "packages/app/lib/main.dart": "",
             },
         )
-        assert resolve_dart_import(
-            "package:core/core.dart", "packages/app/lib/main.dart", ctx
-        ) == "packages/core/lib/core.dart"
+        assert (
+            resolve_dart_import("package:core/core.dart", "packages/app/lib/main.dart", ctx)
+            == "packages/core/lib/core.dart"
+        )
 
     def test_foreign_package_is_labelled_external(self, tmp_path: Path) -> None:
         ctx = _ctx(tmp_path, {"pubspec.yaml": "name: app\n", "lib/main.dart": ""})
@@ -453,9 +453,7 @@ class TestHaskellResolution:
 
     def test_unknown_module_external(self, tmp_path: Path) -> None:
         ctx = _ctx(tmp_path, {"app/Main.hs": "module Main where\n"})
-        assert resolve_haskell_import("Network.Wai", "app/Main.hs", ctx) == (
-            "external:Network.Wai"
-        )
+        assert resolve_haskell_import("Network.Wai", "app/Main.hs", ctx) == ("external:Network.Wai")
 
 
 # ---------------------------------------------------------------------------
@@ -576,8 +574,8 @@ class TestLeanResolution:
 class TestErlangExtraction:
     def test_includes_and_behaviour(self) -> None:
         src = (
-            '-module(my_worker).\n'
-            '-behaviour(gen_server).\n'
+            "-module(my_worker).\n"
+            "-behaviour(gen_server).\n"
             '-include("records.hrl").\n'
             '-include_lib("kernel/include/logger.hrl").\n'
         )
@@ -622,9 +620,10 @@ class TestErlangResolution:
                 "apps/web/src/web.erl": "-module(web).\n",
             },
         )
-        assert resolve_erlang_import(
-            "lib:core/include/core.hrl", "apps/web/src/web.erl", ctx
-        ) == "apps/core/include/core.hrl"
+        assert (
+            resolve_erlang_import("lib:core/include/core.hrl", "apps/web/src/web.erl", ctx)
+            == "apps/core/include/core.hrl"
+        )
 
     def test_include_lib_foreign_app_external(self, tmp_path: Path) -> None:
         ctx = _ctx(tmp_path, {"src/a.erl": "-module(a).\n"})
@@ -649,9 +648,7 @@ class TestErlangResolution:
             tmp_path,
             {"src/my_behaviour.erl": "-module(my_behaviour).\n", "src/a.erl": "-module(a).\n"},
         )
-        assert resolve_erlang_import("my_behaviour", "src/a.erl", ctx) == (
-            "src/my_behaviour.erl"
-        )
+        assert resolve_erlang_import("my_behaviour", "src/a.erl", ctx) == ("src/my_behaviour.erl")
         assert resolve_erlang_import("gen_server", "src/a.erl", ctx) is None
 
 

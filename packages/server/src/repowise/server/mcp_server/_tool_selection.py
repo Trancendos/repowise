@@ -148,9 +148,7 @@ def resolve_enabled_tools(
             _log.warning("Ignoring unknown MCP tool in selection: %r", raw)
             return None
         if not usable(entry):
-            _log.warning(
-                "Ignoring workspace-only MCP tool %r outside workspace mode", raw
-            )
+            _log.warning("Ignoring workspace-only MCP tool %r outside workspace mode", raw)
             return None
         return raw
 
@@ -269,12 +267,8 @@ def describe_tool_surface(repo_path: str | None) -> dict[str, Any]:
     is_workspace = _is_workspace(repo_path)
     override = _read_config_override(repo_path)
 
-    default_surface = resolve_enabled_tools(
-        entries, is_workspace=is_workspace, override=None
-    )
-    enabled = resolve_enabled_tools(
-        entries, is_workspace=is_workspace, override=override
-    )
+    default_surface = resolve_enabled_tools(entries, is_workspace=is_workspace, override=None)
+    enabled = resolve_enabled_tools(entries, is_workspace=is_workspace, override=override)
 
     tools = [
         {

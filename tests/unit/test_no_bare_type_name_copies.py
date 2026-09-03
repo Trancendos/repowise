@@ -223,8 +223,6 @@ def test_builtin_type_lists_live_on_the_language_specs() -> None:
     )
 
 
-@pytest.mark.parametrize(
-    "name", ["bare_type_name", "strip_type_arguments", "strip_call_arguments"]
-)
+@pytest.mark.parametrize("name", ["bare_type_name", "strip_type_arguments", "strip_call_arguments"])
 def test_shared_module_exports_the_replacements(name: str) -> None:
     assert callable(getattr(type_names, name))

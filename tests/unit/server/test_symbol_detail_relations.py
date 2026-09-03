@@ -84,9 +84,7 @@ async def _seed(session_factory, repo_id: str) -> None:
 
 
 async def _detail(client: AsyncClient, repo_id: str) -> dict:
-    resp = await client.get(
-        "/api/symbols/detail", params={"repo_id": repo_id, "symbol_id": BASE}
-    )
+    resp = await client.get("/api/symbols/detail", params={"repo_id": repo_id, "symbol_id": BASE})
     assert resp.status_code == 200
     return resp.json()["graph"]
 
@@ -116,9 +114,7 @@ async def test_heritage_cannot_evict_the_real_callers(client: AsyncClient, app) 
 
 
 @pytest.mark.asyncio
-async def test_relations_carry_each_kind_with_its_true_total(
-    client: AsyncClient, app
-) -> None:
+async def test_relations_carry_each_kind_with_its_true_total(client: AsyncClient, app) -> None:
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 

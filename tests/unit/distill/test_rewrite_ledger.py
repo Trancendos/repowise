@@ -62,9 +62,7 @@ def _rows(repo: Path) -> dict[tuple[str, str], int]:
         con.close()
 
 
-def test_a_rewrite_is_counted_under_its_family(
-    repo: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_a_rewrite_is_counted_under_its_family(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _fire(repo, "pytest -q", monkeypatch)
     assert _rows(repo) == {(REWRITTEN, "test_output"): 1}
 
@@ -87,9 +85,7 @@ def test_a_shape_bail_is_told_apart_from_a_family_bail(
     assert rows[(BAILED, rewrite_hook.BAIL_UNRECOGNIZED)] == 1
 
 
-def test_counts_aggregate_rather_than_dedup(
-    repo: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_counts_aggregate_rather_than_dedup(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """An INSERT-OR-IGNORE would answer "one of each" and measure nothing."""
     for _ in range(3):
         _fire(repo, "./deploy.sh", monkeypatch)
@@ -106,9 +102,7 @@ def test_a_disabled_repo_says_so_rather_than_looking_unrecognized(
     assert _rows(repo) == {(BAILED, rewrite_hook.BAIL_DISABLED): 1}
 
 
-def test_a_family_turned_off_is_its_own_reason(
-    repo: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_a_family_turned_off_is_its_own_reason(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     (repo / ".repowise" / "config.yaml").write_text(
         "distill:\n  commands:\n    families:\n      test_output: off\n", encoding="utf-8"
     )

@@ -163,7 +163,9 @@ def _holder_graph(language: str, wire_call: bool) -> nx.DiGraph:
     )
     holder = "src/GuardExtensions.cs::BasketGuards"
     member = "src/GuardExtensions.cs::BasketGuards::EmptyBasketOnCheckout"
-    graph.add_node(member, node_type="symbol", file_path="src/GuardExtensions.cs", language=language)
+    graph.add_node(
+        member, node_type="symbol", file_path="src/GuardExtensions.cs", language=language
+    )
     graph.add_edge(holder, member, edge_type="has_method")
     if wire_call:
         graph.add_edge("src/Checkout.cs::Checkout", member, edge_type="calls")
@@ -195,7 +197,9 @@ def test_a_container_cannot_rescue_itself_from_the_inside():
     holder = "src/GuardExtensions.cs::BasketGuards"
     sibling = "src/GuardExtensions.cs::BasketGuards::Round"
     member = "src/GuardExtensions.cs::BasketGuards::EmptyBasketOnCheckout"
-    graph.add_node(sibling, node_type="symbol", file_path="src/GuardExtensions.cs", language="csharp")
+    graph.add_node(
+        sibling, node_type="symbol", file_path="src/GuardExtensions.cs", language="csharp"
+    )
     graph.add_edge(holder, sibling, edge_type="has_method")
     graph.add_edge(sibling, member, edge_type="calls")
 
@@ -217,7 +221,9 @@ def test_an_annotation_beside_suppresswarnings_does_not_leak_its_argument():
                         "name": "activate",
                         "kind": "function",
                         "visibility": "public",
-                        "decorators": ['@SuppressWarnings("rawtypes")\n@Named("unused-legacy-bean")'],
+                        "decorators": [
+                            '@SuppressWarnings("rawtypes")\n@Named("unused-legacy-bean")'
+                        ],
                         "start_line": 1,
                         "end_line": 5,
                         "complexity_estimate": 1,

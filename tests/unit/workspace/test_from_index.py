@@ -60,9 +60,7 @@ def _parsed(symbols: list[Symbol], rel_path: str = "app/routers/chat.py") -> Par
 
 
 def _ctx(content: str, rel_path: str = "app/routers/chat.py") -> ScanContext:
-    return ScanContext(
-        repo_alias="backend", rel_path=rel_path, suffix=".py", content=content
-    )
+    return ScanContext(repo_alias="backend", rel_path=rel_path, suffix=".py", content=content)
 
 
 def _ids(contracts) -> set[str]:
@@ -94,9 +92,7 @@ class TestFastApiFromDecorators:
 
     def test_duplicated_decorator_entries_yield_one_contract(self) -> None:
         # The parser can append the same decorator twice for one symbol.
-        parsed = _parsed(
-            [_symbol("chat", ['@router.post("")', '@router.post("")'])]
-        )
+        parsed = _parsed([_symbol("chat", ['@router.post("")', '@router.post("")'])])
         assert len(extract_http_providers(_ctx(self.CONTENT), parsed)) == 1
 
     def test_non_route_decorators_are_ignored(self) -> None:
@@ -136,9 +132,7 @@ def documented() -> None:
         assert extract_http_providers(_ctx(self.CONTENT), parsed) == []
 
     def test_a_real_decorator_in_the_same_file_still_counts(self) -> None:
-        parsed = _parsed(
-            [_symbol("real", ['@router.get("/real")'])], rel_path="extractors/http.py"
-        )
+        parsed = _parsed([_symbol("real", ['@router.get("/real")'])], rel_path="extractors/http.py")
         ids = _ids(extract_http_providers(_ctx(self.CONTENT), parsed))
         assert ids == {"http::GET::/api/real"}
 
@@ -154,9 +148,7 @@ class TestFlaskIsInherited:
         assert ids == {"http::GET::/health"}
 
     def test_methods_kwarg_yields_one_contract_per_verb(self) -> None:
-        parsed = _parsed(
-            [_symbol("users", ['@app.route("/users", methods=["POST", "PUT"])'])]
-        )
+        parsed = _parsed([_symbol("users", ['@app.route("/users", methods=["POST", "PUT"])'])])
         ids = _ids(extract_http_providers(_ctx(self.CONTENT), parsed))
         assert ids == {"http::POST::/users", "http::PUT::/users"}
 
@@ -278,23 +270,17 @@ class TestAgainstARealParseCache:
 
         index = load_repo_index(repo)
         ids = _ids(
-            HttpExtractor().extract(
-                repo, "backend", make_exclude_predicate(), None, index=index
-            )
+            HttpExtractor().extract(repo, "backend", make_exclude_predicate(), None, index=index)
         )
         assert "http::POST::/snapshots/{param}/chat" in ids
 
-    def test_routes_in_comments_and_docstrings_are_not_extracted(
-        self, repo: Path
-    ) -> None:
+    def test_routes_in_comments_and_docstrings_are_not_extracted(self, repo: Path) -> None:
         from repowise.core.workspace.extractors import HttpExtractor
         from repowise.core.workspace.extractors.base import make_exclude_predicate
 
         index = load_repo_index(repo)
         ids = _ids(
-            HttpExtractor().extract(
-                repo, "backend", make_exclude_predicate(), None, index=index
-            )
+            HttpExtractor().extract(repo, "backend", make_exclude_predicate(), None, index=index)
         )
         for fabricated in (
             "http::GET::/snapshots/{param}/chat/fabricated",

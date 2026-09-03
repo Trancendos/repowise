@@ -111,9 +111,7 @@ async def test_edges_composite_key(async_session):
     )
     await async_session.commit()
 
-    rows = (
-        (await session_exec(async_session, repo.id)).scalars().all()
-    )
+    rows = (await session_exec(async_session, repo.id)).scalars().all()
     by_type = {r.edge_type: r for r in rows}
     assert set(by_type) == {"imports", "calls"}
     assert by_type["imports"].confidence == 1.0

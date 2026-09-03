@@ -334,7 +334,6 @@ class TestKotlinRefusals:
         source = "class C {\n    fun f() {\n        val local: Logger = make()\n    }\n}"
         assert "local" not in fields(source, "kotlin", [(2, 4)])
 
-
     def test_a_chained_construction_types_nothing(self) -> None:
         """``val x = Builder().build()`` makes ``x`` whatever ``build()``
         returns, so typing it as a ``Builder`` is a wrong answer rather than a
@@ -397,7 +396,6 @@ class TestKotlinFieldScope:
         whatever punctuation follows."""
         source = "class C {\n    fun run(timeout: Duration = d) { }\n}"
         assert fields(source, "kotlin", []) == {}
-
 
 
 class TestSwiftShapes:
@@ -602,7 +600,9 @@ class TestClassScope:
         assert fields(source, "java", [])["factory"] == "NodeFactory"
 
     def test_an_inner_class_field_answers_for_the_inner_class(self) -> None:
-        source = "class C {\nprivate CacheLoader outer;\nclass D {\nprivate NodeFactory inner;\n}\n}"
+        source = (
+            "class C {\nprivate CacheLoader outer;\nclass D {\nprivate NodeFactory inner;\n}\n}"
+        )
         by_class = types_by_class(
             scan_declarations(source, "java"),
             {"f.java::C": (1, 6), "f.java::C::D": (3, 5)},

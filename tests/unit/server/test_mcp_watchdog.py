@@ -110,9 +110,7 @@ def test_dead_pid_is_died() -> None:
 
 
 def test_live_self_with_matching_token_is_not_died() -> None:
-    info = ProcInfo(
-        pid=os.getpid(), name="python", create_token=process_create_token(os.getpid())
-    )
+    info = ProcInfo(pid=os.getpid(), name="python", create_token=process_create_token(os.getpid()))
     assert _watchdog._ancestor_died(info) is False
 
 

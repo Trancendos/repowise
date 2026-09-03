@@ -198,11 +198,7 @@ def test_crossfn_scheduler_pattern_is_caught(tmp_path):
 
 def test_resolver_preserves_every_call_site_on_the_collapsed_edge(tmp_path):
     source = (
-        "def load(x):\n"
-        "    return x\n\n"
-        "def run(x):\n"
-        "    load(x)\n"
-        "    return load(x)\n"
+        "def load(x):\n" "    return x\n\n" "def run(x):\n" "    load(x)\n" "    return load(x)\n"
     )
     _walked, graph = _build(tmp_path, {"calls.py": source})
 
@@ -407,9 +403,9 @@ def test_unresolved_loop_call_does_not_reuse_same_name_outside_loop():
         functions=[], classes=[], perf_fn_facts=[PerfFnFacts("load", 1, (), "db")]
     )
 
-    assert collect_crossfn_io_in_loop(
-        [(_pf("owner.py"), owner), (_pf("db.py"), db_sink)], graph
-    ) == {}
+    assert (
+        collect_crossfn_io_in_loop([(_pf("owner.py"), owner), (_pf("db.py"), db_sink)], graph) == {}
+    )
 
 
 def test_dispatch_edge_connects_a_resolved_call_to_its_sink():

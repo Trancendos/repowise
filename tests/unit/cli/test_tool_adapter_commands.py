@@ -52,14 +52,22 @@ ANSWER_PAYLOAD = {
         }
     ],
     "quotes": [
-        {"path": "packages/cli/src/repowise/cli/output.py", "lines": [44, 44],
-         "quote": "NON_TTY_WIDTH = 400"}
+        {
+            "path": "packages/cli/src/repowise/cli/output.py",
+            "lines": [44, 44],
+            "quote": "NON_TTY_WIDTH = 400",
+        }
     ],
     "candidates": [{"path": "a.py", "lines": "1-20", "defines": "f:1"}],
     "symbol_bodies": {"a.py::f": "def f(): ..."},
     "best_guesses": [
-        {"file": "a.py", "why_relevant": "names the constant", "score": 2.1,
-         "domain_penalty": None, "excerpt": "y" * 1500}
+        {
+            "file": "a.py",
+            "why_relevant": "names the constant",
+            "score": 2.1,
+            "domain_penalty": None,
+            "excerpt": "y" * 1500,
+        }
     ],
     "next_action_hint": "Read a.py first.",
     "grounding": "extracted",
@@ -67,8 +75,13 @@ ANSWER_PAYLOAD = {
     "code_rationale": [{"path": "a.py", "lines": [1, 2], "comment": "c" * 400}],
     "more_definitions": ["a.py::g"],
     "omission_marker": "[repowise#ask1]",
-    "_meta": {"timing_ms": 12.5, "indexed_commit": "abc123", "live_head": "def456",
-              "index_behind": True, "index_age_days": 2},
+    "_meta": {
+        "timing_ms": 12.5,
+        "indexed_commit": "abc123",
+        "live_head": "def456",
+        "index_behind": True,
+        "index_age_days": 2,
+    },
 }
 
 CONTEXT_PAYLOAD = {
@@ -91,9 +104,15 @@ CONTEXT_PAYLOAD = {
             "callers": ["b.py::g"],
             "metrics": {"pagerank": 0.4},
             "skeleton": {
-                "mode": "smart", "tokens": 100, "full_tokens": 400,
-                "pct_of_full": 25.0, "bodies_kept": ["f"], "text": "z" * 10000,
-                "verified": True, "auto": True, "opt_out_hint": "h" * 100,
+                "mode": "smart",
+                "tokens": 100,
+                "full_tokens": 400,
+                "pct_of_full": 25.0,
+                "bodies_kept": ["f"],
+                "text": "z" * 10000,
+                "verified": True,
+                "auto": True,
+                "opt_out_hint": "h" * 100,
             },
             "episodes": 4,
         }
@@ -101,8 +120,13 @@ CONTEXT_PAYLOAD = {
     "truncated": False,
     "dropped_targets": ["b.py"],
     "dropped_symbols": {},
-    "_meta": {"timing_ms": 3.0, "indexed_commit": "abc123", "live_head": "abc123",
-              "index_behind": False, "index_age_days": 0},
+    "_meta": {
+        "timing_ms": 3.0,
+        "indexed_commit": "abc123",
+        "live_head": "abc123",
+        "index_behind": False,
+        "index_age_days": 0,
+    },
 }
 
 SYMBOL_PAYLOAD = {
@@ -121,8 +145,13 @@ SYMBOL_PAYLOAD = {
     "truncated": True,
     "continuation": "a.py:4-40",
     "verified": True,
-    "_meta": {"timing_ms": 1.0, "replaced_tokens": 9, "indexed_commit": "abc123",
-              "live_head": "abc123", "index_behind": False},
+    "_meta": {
+        "timing_ms": 1.0,
+        "replaced_tokens": 9,
+        "indexed_commit": "abc123",
+        "live_head": "abc123",
+        "index_behind": False,
+    },
 }
 
 #: The tool's *other* two response shapes. ``get_symbol`` serves three, and a
@@ -153,10 +182,17 @@ SUGGESTION_PAYLOAD = {
 
 def _decision(n: int) -> dict:
     return {
-        "id": f"id{n}", "title": f"Decision {n}", "status": "active",
-        "decision": "do the thing", "rationale": "because",
-        "context": "c" * 300, "consequences": ["x", "y"], "alternatives": [],
-        "lineage": [], "confidence": 0.9, "staleness_score": 0.1,
+        "id": f"id{n}",
+        "title": f"Decision {n}",
+        "status": "active",
+        "decision": "do the thing",
+        "rationale": "because",
+        "context": "c" * 300,
+        "consequences": ["x", "y"],
+        "alternatives": [],
+        "lineage": [],
+        "confidence": 0.9,
+        "staleness_score": 0.1,
         "affected_files": [f"f{i}.py" for i in range(20)],
         "affected_files_total": 20,
     }
@@ -169,23 +205,45 @@ WHY_PATH_PAYLOAD = {
     "decisions_total": 8,
     "alignment": {"score": "B", "explanation": "mostly governed"},
     "origin_story": {
-        "available": True, "primary_author": "Raghav", "author_commit_pct": 80.0,
-        "total_commits": 12, "first_commit": "2026-01-01", "last_commit": "2026-08-01",
-        "age_days": 200, "summary": "s" * 2000,
+        "available": True,
+        "primary_author": "Raghav",
+        "author_commit_pct": 80.0,
+        "total_commits": 12,
+        "first_commit": "2026-01-01",
+        "last_commit": "2026-08-01",
+        "age_days": 200,
+        "summary": "s" * 2000,
         "contributors": [{"name": "Raghav", "email": "r@e", "commit_count": 10}],
         "key_commits": [
-            {"sha": f"sha{i}", "date": "2026-01-01", "message": f"m{i}",
-             "author": "Raghav", "body": "b" * 300}
+            {
+                "sha": f"sha{i}",
+                "date": "2026-01-01",
+                "message": f"m{i}",
+                "author": "Raghav",
+                "body": "b" * 300,
+            }
             for i in range(7)
         ],
     },
-    "episodes": [{"tier": "git", "kind": "code_fix", "subject": "s", "recorded": "r",
-                  "evidence": "e", "scope": ["a.py"], "still_true": "yes"}],
+    "episodes": [
+        {
+            "tier": "git",
+            "kind": "code_fix",
+            "subject": "s",
+            "recorded": "r",
+            "evidence": "e",
+            "scope": ["a.py"],
+            "still_true": "yes",
+        }
+    ],
     "truncated": True,
     "omission_marker": "[repowise#abc]",
     "dropped_decisions": ["id7"],
-    "_meta": {"indexed_commit": "abc123", "live_head": "def456",
-              "stale_warning": "index is behind"},
+    "_meta": {
+        "indexed_commit": "abc123",
+        "live_head": "def456",
+        "stale_warning": "index is behind",
+    },
 }
 
 #: The path mode as it actually arrives for an *ungoverned* file: no decisions,
@@ -206,18 +264,35 @@ WHY_UNGOVERNED_PAYLOAD = {
             for i in range(7)
         ],
         "cross_references": [
-            {"source_file": "b.py", "sha": "shax", "message": "mentions a.py",
-             "author": "Raghav", "date": "2026-02-01", "matched_terms": ["a"]}
+            {
+                "source_file": "b.py",
+                "sha": "shax",
+                "message": "mentions a.py",
+                "author": "Raghav",
+                "date": "2026-02-01",
+                "matched_terms": ["a"],
+            }
         ],
         "git_log": [{"sha": "shay", "message": "live", "author": "Raghav", "date": "2026-03-01"}],
     },
-    "code_rationale": [{"path": "a.py", "lines": [10, 12], "comment": "why it is this way",
-                        "matched_terms": ["why"]}],
+    "code_rationale": [
+        {
+            "path": "a.py",
+            "lines": [10, 12],
+            "comment": "why it is this way",
+            "matched_terms": ["why"],
+        }
+    ],
     "target_context": {
         "b.py": {
             "governing_decisions": [{"title": "Decision 1", "status": "active"}],
-            "origin": {"available": True, "primary_author": "Raghav", "total_commits": 3,
-                       "age_days": 40, "summary": "s" * 2000},
+            "origin": {
+                "available": True,
+                "primary_author": "Raghav",
+                "total_commits": 3,
+                "age_days": 40,
+                "summary": "s" * 2000,
+            },
         }
     },
     "_meta": {"indexed_commit": "abc123", "live_head": "abc123"},
@@ -286,8 +361,12 @@ def test_ask_projection_drops_the_bulk_and_keeps_the_evidence():
     for dropped in ("retrieval", "candidates", "symbol_bodies", "_meta"):
         assert dropped not in out, f"{dropped} survived the trim"
     # The freshness half of _meta survives; the timing half does not.
-    assert out["index"] == {"indexed_commit": "abc123", "live_head": "def456",
-                            "index_behind": True, "index_age_days": 2}
+    assert out["index"] == {
+        "indexed_commit": "abc123",
+        "live_head": "def456",
+        "index_behind": True,
+        "index_age_days": 2,
+    }
 
 
 def test_ask_projection_strips_the_excerpt_from_every_best_guess():
@@ -313,7 +392,11 @@ def test_ask_projection_names_the_blocks_it_dropped():
     out = project_ask(ANSWER_PAYLOAD, "q?")
     assert out["note"].startswith("symbol_bodies")
     assert set(out["dropped_blocks"]) == {
-        "retrieval", "candidates", "symbol_bodies", "code_rationale", "more_definitions",
+        "retrieval",
+        "candidates",
+        "symbol_bodies",
+        "code_rationale",
+        "more_definitions",
     }
     assert out["grounding"] == "extracted"
     assert out["omission_marker"] == "[repowise#ask1]"
@@ -345,7 +428,9 @@ def test_context_projection_passes_a_requested_skeleton_through_whole():
     assert card["stale"] is False
     # ``is_stale: null`` means the tool could not judge, not "current".
     unknown = {"target": "a.py", "freshness": {"is_stale": None}}
-    assert "stale" not in project_context({"targets": {"a.py": unknown}}, ("a.py",))["targets"]["a.py"]
+    assert (
+        "stale" not in project_context({"targets": {"a.py": unknown}}, ("a.py",))["targets"]["a.py"]
+    )
     assert card["episodes"] == 4
     assert card["skeleton"] == CONTEXT_PAYLOAD["targets"]["a.py"]["skeleton"]
     assert "z" * 100 in card["skeleton"]["text"], "the requested source went missing"
@@ -446,8 +531,14 @@ def test_why_path_projection_caps_lists_and_says_what_it_capped():
     assert decision["rationale"] == "because"
     assert len(decision["affected_files"]) == 5
     assert decision["affected_files_total"] == 20
-    for dropped in ("context", "consequences", "alternatives", "lineage",
-                    "confidence", "staleness_score"):
+    for dropped in (
+        "context",
+        "consequences",
+        "alternatives",
+        "lineage",
+        "confidence",
+        "staleness_score",
+    ):
         assert dropped not in decision
 
 
@@ -677,9 +768,7 @@ def test_an_unindexed_repo_is_refused_before_any_tool_runs(monkeypatch, tmp_path
 
 
 @pytest.mark.parametrize("args", [[], ["--format", "json"], ["--full"]])
-def test_logs_are_silenced_at_every_format_not_only_the_machine_ones(
-    monkeypatch, repo, args
-):
+def test_logs_are_silenced_at_every_format_not_only_the_machine_ones(monkeypatch, repo, args):
     """``ask`` synthesises through a provider that logs to *stdout*.
 
     ``format_option``'s callback only fires for a machine-readable format, so
@@ -794,8 +883,13 @@ def test_why_renders_a_targets_own_history(monkeypatch, repo):
         "target_context": {
             "b.py": {
                 "governing_decisions": [],
-                "origin": {"available": True, "primary_author": "Raghav",
-                           "total_commits": 9, "age_days": 40, "summary": "s" * 2000},
+                "origin": {
+                    "available": True,
+                    "primary_author": "Raghav",
+                    "total_commits": 9,
+                    "age_days": 40,
+                    "summary": "s" * 2000,
+                },
             }
         },
     }
@@ -819,9 +913,7 @@ def test_why_does_not_say_nothing_recorded_under_what_it_just_recorded(monkeypat
 
 
 def test_symbol_renders_an_omission_refs_banked_content(monkeypatch, repo):
-    result = _invoke(
-        monkeypatch, symbol_command, ["repowise#a1b2c3d4e5f6"], repo, OMISSION_PAYLOAD
-    )
+    result = _invoke(monkeypatch, symbol_command, ["repowise#a1b2c3d4e5f6"], repo, OMISSION_PAYLOAD)
     assert "THE ACTUAL OMITTED TEXT" in result.stdout
     assert "git log --stat" in result.stdout
 

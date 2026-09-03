@@ -1,4 +1,4 @@
-﻿"""``repowise agents``, driven end to end through ``CliRunner``.
+"""``repowise agents``, driven end to end through ``CliRunner``.
 
 Every subcommand is exercised in **both** renderings. That is the point of the
 file rather than a nicety: the payload and the table are built from one dict, so
@@ -126,9 +126,7 @@ def test_add_is_idempotent_and_says_so(repo: Path) -> None:
     assert actions == {"unchanged"}
 
 
-def test_add_stands_down_when_the_host_plugin_already_provides_it(
-    repo: Path, monkeypatch
-) -> None:
+def test_add_stands_down_when_the_host_plugin_already_provides_it(repo: Path, monkeypatch) -> None:
     """The duplicate-registration fix, from the command's side.
 
     A machine with the Claude Code plugin installed already has the MCP server
@@ -169,9 +167,7 @@ def test_add_stands_down_when_the_host_plugin_already_provides_it(
     assert any("load repowise from both" in note for note in project["notes"])
 
 
-def test_the_stand_down_follows_the_scope_the_host_actually_covers(
-    repo: Path, monkeypatch
-) -> None:
+def test_the_stand_down_follows_the_scope_the_host_actually_covers(repo: Path, monkeypatch) -> None:
     """Hard-coding it to user scope is wrong in both directions.
 
     Claude Code's detection genuinely models a project-scoped plugin. Against
@@ -280,7 +276,7 @@ def test_refresh_repoints_a_stale_entry(repo: Path) -> None:
 
 
 def test_refresh_does_not_create_a_scope_that_was_not_wired(repo: Path) -> None:
-    """"Adds nothing" has to mean it per scope, not per agent.
+    """ "Adds nothing" has to mean it per scope, not per agent.
 
     Codex wired project-only must not have its per-machine hooks file written
     as a side effect of a refresh — otherwise ``doctor --repair`` buys a global
@@ -510,5 +506,7 @@ def test_removing_every_agent_clears_the_shared_agents_md(repo: Path) -> None:
     payload = _json(["agents", "remove", str(repo), "--target", "all", "--scope", "project"])
 
     assert not agents_md.exists(), "shared AGENTS.md survived removing every agent"
-    notes = [note for agent in payload["agents"] for w in agent["writes"].values() for note in w["notes"]]
+    notes = [
+        note for agent in payload["agents"] for w in agent["writes"].values() for note in w["notes"]
+    ]
     assert not any("still reads the same managed block" in note for note in notes)

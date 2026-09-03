@@ -451,7 +451,8 @@ def test_two_real_widths_are_never_compared(
             return [[0.0] * 1024 for _ in texts]
 
     monkeypatch.setattr(
-        "repowise.cli.providers.embedders.build_embedder", lambda _n, _p=None: _MisreportingEmbedder()
+        "repowise.cli.providers.embedders.build_embedder",
+        lambda _n, _p=None: _MisreportingEmbedder(),
     )
 
     assert _vector_dims(tmp_path) == (None, None)

@@ -88,9 +88,7 @@ class TestParsePoolWorkers:
         """The warning is the only feedback a misconfigured user gets."""
         monkeypatch.setenv(ing._PARSE_WORKERS_ENV, "-4")
         warned: list[tuple] = []
-        monkeypatch.setattr(
-            ing.logger, "warning", lambda event, **kw: warned.append((event, kw))
-        )
+        monkeypatch.setattr(ing.logger, "warning", lambda event, **kw: warned.append((event, kw)))
         ing.parse_pool_workers(5000)
         assert warned and warned[0][0] == "invalid_parse_workers_env"
         assert warned[0][1]["value"] == "-4"
@@ -102,9 +100,7 @@ class TestParsePoolWorkers:
         monkeypatch.setattr(ing.os, "cpu_count", lambda: 32)
         monkeypatch.setattr(ing.os, "process_cpu_count", lambda: 32, raising=False)
         warned: list[tuple] = []
-        monkeypatch.setattr(
-            ing.logger, "warning", lambda event, **kw: warned.append((event, kw))
-        )
+        monkeypatch.setattr(ing.logger, "warning", lambda event, **kw: warned.append((event, kw)))
         assert ing.parse_pool_workers(5000) == 8
         assert not warned
 
@@ -131,7 +127,9 @@ class TestBothCallSitesAreBounded:
         target = getattr(ing, func)
         src = inspect.getsource(target)
         assert "parse_pool_workers(" in src, f"{func} must size its pool via the shared helper"
-        assert "os.cpu_count()" not in src, f"{func} must not size its pool from the host core count"
+        assert (
+            "os.cpu_count()" not in src
+        ), f"{func} must not size its pool from the host core count"
 
     async def test_the_bound_reaches_the_real_executor(self, tmp_path, monkeypatch):
         """Record what ``ProcessPoolExecutor`` is really constructed with.

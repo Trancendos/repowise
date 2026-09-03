@@ -34,47 +34,49 @@ from typing import Any
 # bearing class as runtime-instantiated. Kept compact; full Spring
 # stereotype recognition + meta-annotation resolution lands in Phase 4
 # framework_edges. Anything matched here is "the runtime will load this".
-_STEREOTYPE_ANNOTATIONS: frozenset[str] = frozenset({
-    "Component",
-    "Service",
-    "Repository",
-    "Controller",
-    "RestController",
-    "Configuration",
-    "ControllerAdvice",
-    "RestControllerAdvice",
-    "SpringBootApplication",
-    "SpringBootConfiguration",
-    "EnableAutoConfiguration",
-    "Mapper",                   # MapStruct + MyBatis
-    "Entity",
-    "MappedSuperclass",
-    "Embeddable",
-    "Converter",
-    "QuarkusMain",
-    "QuarkusTest",
-    "QuarkusIntegrationTest",
-    "MicronautApplication",
-    "MicronautTest",
-    "WebMvcTest",
-    "DataJpaTest",
-    "WebServlet",
-    "WebFilter",
-    "WebListener",
-    "Path",                     # JAX-RS
-    "Provider",
-    "ApplicationScoped",
-    "RequestScoped",
-    "SessionScoped",
-    "Singleton",
-    "Stateless",
-    "Stateful",
-    "Dependent",
-    "Factory",
-    "Endpoint",
-    "RestControllerEndpoint",
-    "RegisterForReflection",
-})
+_STEREOTYPE_ANNOTATIONS: frozenset[str] = frozenset(
+    {
+        "Component",
+        "Service",
+        "Repository",
+        "Controller",
+        "RestController",
+        "Configuration",
+        "ControllerAdvice",
+        "RestControllerAdvice",
+        "SpringBootApplication",
+        "SpringBootConfiguration",
+        "EnableAutoConfiguration",
+        "Mapper",  # MapStruct + MyBatis
+        "Entity",
+        "MappedSuperclass",
+        "Embeddable",
+        "Converter",
+        "QuarkusMain",
+        "QuarkusTest",
+        "QuarkusIntegrationTest",
+        "MicronautApplication",
+        "MicronautTest",
+        "WebMvcTest",
+        "DataJpaTest",
+        "WebServlet",
+        "WebFilter",
+        "WebListener",
+        "Path",  # JAX-RS
+        "Provider",
+        "ApplicationScoped",
+        "RequestScoped",
+        "SessionScoped",
+        "Singleton",
+        "Stateless",
+        "Stateful",
+        "Dependent",
+        "Factory",
+        "Endpoint",
+        "RestControllerEndpoint",
+        "RegisterForReflection",
+    }
+)
 
 
 def _pkg_dir(node: str) -> str:
@@ -130,10 +132,7 @@ def _file_defines_entry_class(graph: Any, file_node: str) -> bool:
             if _annotation_base(dec) in _STEREOTYPE_ANNOTATIONS:
                 return True
         # ``main`` method — JAR / Kotlin file entry point.
-        if (
-            succ_data.get("kind") in ("method", "function")
-            and succ_data.get("name") == "main"
-        ):
+        if succ_data.get("kind") in ("method", "function") and succ_data.get("name") == "main":
             return True
     return False
 

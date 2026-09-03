@@ -102,9 +102,7 @@ async def test_matched_symbol_source_reaches_inline_body_depth(
     assert excerpt.count("\n") + 1 >= 50
 
 
-async def test_class_flood_does_not_upgrade_every_sibling(
-    session, repo_id, tmp_path
-) -> None:
+async def test_class_flood_does_not_upgrade_every_sibling(session, repo_id, tmp_path) -> None:
     """A class-name flood must not read a fuller body for every sibling method.
 
     When the question names a class, each method 'matches' through the parent's

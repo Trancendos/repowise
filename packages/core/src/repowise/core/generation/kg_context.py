@@ -110,9 +110,7 @@ class KnowledgeGraphContext:
             # Curated tour steps carry a single target_path; the older shape
             # listed nodeIds. Accept both.
             paths = [
-                node_id[5:]
-                for node_id in step.get("nodeIds", [])
-                if node_id.startswith("file:")
+                node_id[5:] for node_id in step.get("nodeIds", []) if node_id.startswith("file:")
             ]
             if step.get("target_path"):
                 paths.append(step["target_path"])
@@ -144,8 +142,7 @@ class KnowledgeGraphContext:
         incoming = self._edges_by_target.get(node_id, [])
         layer_node_ids = set(layer.get("nodeIds", []))
         cross_layer_in = [
-            e for e in incoming
-            if e.get("type") == "imports" and e["source"] not in layer_node_ids
+            e for e in incoming if e.get("type") == "imports" and e["source"] not in layer_node_ids
         ]
 
         if cross_layer_in:
@@ -163,12 +160,14 @@ class KnowledgeGraphContext:
             if other_id.startswith("file:") and other_id not in seen:
                 seen.add(other_id)
                 other_path = other_id[5:]
-                neighbors.append({
-                    "path": other_path,
-                    "name": other_path.rsplit("/", 1)[-1],
-                    "same_layer": other_id in layer_node_ids,
-                    "relationship": "imports" if e["source"] == node_id else "imported_by",
-                })
+                neighbors.append(
+                    {
+                        "path": other_path,
+                        "name": other_path.rsplit("/", 1)[-1],
+                        "same_layer": other_id in layer_node_ids,
+                        "relationship": "imports" if e["source"] == node_id else "imported_by",
+                    }
+                )
 
         return KGFileContext(
             layer_name=layer.get("name", ""),
@@ -176,10 +175,14 @@ class KnowledgeGraphContext:
             layer_description=layer.get("description", ""),
             role=role,
             neighbors=neighbors[:10],
-            tour_step={"order": tour["order"], "title": tour["title"],
-                       # Curated steps state their evidence in "reason".
-                       "description": (tour.get("description") or tour.get("reason") or "")[:300]}
-            if tour else None,
+            tour_step={
+                "order": tour["order"],
+                "title": tour["title"],
+                # Curated steps state their evidence in "reason".
+                "description": (tour.get("description") or tour.get("reason") or "")[:300],
+            }
+            if tour
+            else None,
             tags=node.get("tags", []),
             node_summary=node.get("summary", ""),
         )
@@ -243,6 +246,12 @@ class KnowledgeGraphContext:
                         name = source_layer.get("name", "Unknown")
                         deps_in[name] = deps_in.get(name, 0) + 1
 
-        out_list = [{"target_layer": k, "edge_count": v} for k, v in sorted(deps_out.items(), key=lambda x: -x[1])]
-        in_list = [{"source_layer": k, "edge_count": v} for k, v in sorted(deps_in.items(), key=lambda x: -x[1])]
+        out_list = [
+            {"target_layer": k, "edge_count": v}
+            for k, v in sorted(deps_out.items(), key=lambda x: -x[1])
+        ]
+        in_list = [
+            {"source_layer": k, "edge_count": v}
+            for k, v in sorted(deps_in.items(), key=lambda x: -x[1])
+        ]
         return out_list, in_list

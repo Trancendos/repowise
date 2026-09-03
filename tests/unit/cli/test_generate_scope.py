@@ -173,9 +173,7 @@ def test_resolve_scope_uses_ranked_seed_verbatim() -> None:
         PageRecord("file_page:a.py", "file_page", "a.py", is_template=True),
         PageRecord("file_page:b.py", "file_page", "b.py", is_template=True),
     ]
-    deps = build_page_dependencies(
-        module_groups=[], scc_groups=[], repo_wide_ids=()
-    )
+    deps = build_page_dependencies(module_groups=[], scc_groups=[], repo_wide_ids=())
     # An all-selecting intent would pick both; the ranked seed overrides it.
     plan = resolve_scope(
         records=records,

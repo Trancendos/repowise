@@ -216,8 +216,7 @@ class TestPythonImports:
         b.build()
         # Only the defines edge for the synthetic __module__ symbol
         import_edges = [
-            (u, v) for u, v, d in b.graph().edges(data=True)
-            if d.get("edge_type") == "imports"
+            (u, v) for u, v, d in b.graph().edges(data=True) if d.get("edge_type") == "imports"
         ]
         assert len(import_edges) == 0
 
@@ -299,7 +298,8 @@ class TestStemDisambiguation:
             b.add_file(_parsed("main.py", imports=[_imp("widget")]))
             b.build()
             edges = [
-                (u, v) for u, v, d in b.graph().out_edges("main.py", data=True)
+                (u, v)
+                for u, v, d in b.graph().out_edges("main.py", data=True)
                 if d.get("edge_type") == "imports"
             ]
             return edges[0][1] if edges else None
@@ -341,8 +341,7 @@ class TestStemDisambiguation:
         b.build()  # must not raise
         # No import edge — stem "anything" is unresolvable
         import_edges = [
-            (u, v) for u, v, d in b.graph().edges(data=True)
-            if d.get("edge_type") == "imports"
+            (u, v) for u, v, d in b.graph().edges(data=True) if d.get("edge_type") == "imports"
         ]
         assert len(import_edges) == 0
 
@@ -722,8 +721,7 @@ class TestCppCompileCommandsResolution:
         b.build()
         # No import edge, no exception
         import_edges = [
-            (u, v) for u, v, d in b.graph().edges(data=True)
-            if d.get("edge_type") == "imports"
+            (u, v) for u, v, d in b.graph().edges(data=True) if d.get("edge_type") == "imports"
         ]
         assert len(import_edges) == 0
 

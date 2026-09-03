@@ -57,9 +57,7 @@ async def health_overview(
     # two — so the route was paying for each of them twice per request.
     metrics = await crud.get_health_metrics(session, repo_id)
     findings = await crud.get_health_findings(session, repo_id)
-    summary = await crud.get_health_summary(
-        session, repo_id, metrics=metrics, findings=findings
-    )
+    summary = await crud.get_health_summary(session, repo_id, metrics=metrics, findings=findings)
 
     # Hotspot health is recomputed from the metrics already loaded above rather
     # than read off the latest snapshot. The snapshot was described here as

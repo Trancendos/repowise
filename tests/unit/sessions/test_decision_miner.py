@@ -129,11 +129,7 @@ def test_a_brief_that_corrects_still_yields_its_explicit_choices():
 
 def test_two_corrections_in_one_message_are_both_quoted():
     """One declarative opener must not discard the real correction behind it."""
-    events = [
-        _user(
-            "No releases yet. Never run the formatter here, CI only checks lint."
-        )
-    ]
+    events = [_user("No releases yet. Never run the formatter here, CI only checks lint.")]
     (candidate,) = mine_events(events, REPO_PREFIX)
     assert candidate.quotes == [
         "No releases yet.",

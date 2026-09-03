@@ -65,9 +65,7 @@ async def test_lowercase_prose_yields_no_decisions(tmp_path):
     )
     provider = _StubProvider([{"title": "Ghost", "decision": "ghost"}])
 
-    decisions = await DecisionExtractor(
-        repo_path=tmp_path, provider=provider
-    ).scan_inline_markers()
+    decisions = await DecisionExtractor(repo_path=tmp_path, provider=provider).scan_inline_markers()
 
     assert decisions == []
     assert provider.calls == 0

@@ -70,7 +70,9 @@ async def symbolless_file(session, populated_db, tmp_path):
 
 def test_markdown_preview_returns_the_heading_spine(tmp_path) -> None:
     """Headings are a real table of contents: the cheapest true summary."""
-    (tmp_path / "r.md").write_text("# Title\n\nbody\n\n## One\n\nmore\n\n## Two\n", encoding="utf-8")
+    (tmp_path / "r.md").write_text(
+        "# Title\n\nbody\n\n## One\n\nmore\n\n## Two\n", encoding="utf-8"
+    )
     preview = _file_preview(tmp_path, "r.md")
     assert preview["headings"] == ["# Title", "## One", "## Two"]
     assert preview["lines"] > 0
@@ -130,9 +132,7 @@ def test_long_lines_are_capped(tmp_path) -> None:
 # --- the preview in the card -----------------------------------------------
 
 
-async def test_symbolless_file_card_carries_a_preview(
-    session, repository, symbolless_file
-) -> None:
+async def test_symbolless_file_card_carries_a_preview(session, repository, symbolless_file) -> None:
     """End to end: the card answers "what is in this file" without a Read."""
     card = await _resolve_one_target(
         session,

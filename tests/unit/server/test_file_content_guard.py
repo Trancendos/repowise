@@ -84,9 +84,7 @@ async def test_refuses_dotfiles_holding_credentials(
         await _index_file(app.state.session_factory, repo["id"], path)
 
     for path in (".repowise/.env", ".git/config"):
-        resp = await client.get(
-            f"/api/repos/{repo['id']}/file-content", params={"file_path": path}
-        )
+        resp = await client.get(f"/api/repos/{repo['id']}/file-content", params={"file_path": path})
         assert resp.status_code == 400, path
         assert "sk-ant-secret" not in resp.text
         assert "token" not in resp.text
@@ -106,9 +104,7 @@ async def test_refuses_unindexed_file(client: AsyncClient, app, tmp_path: Path) 
 
 
 @pytest.mark.asyncio
-async def test_refuses_traversal_outside_the_root(
-    client: AsyncClient, app, tmp_path: Path
-) -> None:
+async def test_refuses_traversal_outside_the_root(client: AsyncClient, app, tmp_path: Path) -> None:
     repo = await create_test_repo(client, tmp_path)
     (tmp_path / "outside.txt").write_text("nope\n")
 

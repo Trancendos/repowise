@@ -21,9 +21,7 @@ async def compute_knowledge_map(session: AsyncSession, repo_id: str) -> dict[str
 
     Returns an empty dict when no git metadata is available.
     """
-    git_res = await session.execute(
-        select(GitMetadata).where(GitMetadata.repository_id == repo_id)
-    )
+    git_res = await session.execute(select(GitMetadata).where(GitMetadata.repository_id == repo_id))
     all_git = git_res.scalars().all()
 
     if not all_git:

@@ -52,9 +52,9 @@ class TestSignaturesMode:
         result = build_skeleton(source, symbols, mode="signatures")
         assert result.mode == "signatures"
         # Exit criterion: a ~600-line file compresses to <=~15% of full tokens.
-        assert result.skeleton_tokens <= result.full_tokens * 0.15, (
-            f"{result.skeleton_tokens}/{result.full_tokens} = {result.pct_of_full:.1f}%"
-        )
+        assert (
+            result.skeleton_tokens <= result.full_tokens * 0.15
+        ), f"{result.skeleton_tokens}/{result.full_tokens} = {result.pct_of_full:.1f}%"
         # Every signature line is present verbatim.
         lines = source.splitlines()
         for sym in symbols:

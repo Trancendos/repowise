@@ -493,9 +493,7 @@ async def load_stored_function_mod_p80(repo_path: Any, *, log: LogFn | None = No
         return None
 
 
-async def load_stored_coverage_map(
-    repo_path: Any, *, log: LogFn | None = None
-) -> dict[str, dict]:
+async def load_stored_coverage_map(repo_path: Any, *, log: LogFn | None = None) -> dict[str, dict]:
     """Load the persisted coverage map for health scoring on an incremental run.
 
     The incremental health pass re-scores changed files only, but if it builds
@@ -540,9 +538,7 @@ async def load_stored_coverage_map(
         coverage_map: dict[str, dict] = {}
         for row in rows:
             try:
-                covered = (
-                    json.loads(row.covered_lines_json) if row.covered_lines_json else []
-                )
+                covered = json.loads(row.covered_lines_json) if row.covered_lines_json else []
             except (ValueError, TypeError):
                 covered = []
             coverage_map[row.file_path] = {

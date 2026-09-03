@@ -99,9 +99,7 @@ class TestRebuild:
 
 
 class TestUpdateDoesNotFlattenTheTree:
-    async def test_re_upserting_one_page_with_no_placement_is_repaired(
-        self, async_session, wiki
-    ):
+    async def test_re_upserting_one_page_with_no_placement_is_repaired(self, async_session, wiki):
         """The exact incremental-update shape: one regenerated page arrives
         carrying the placement a partial set could work out, which is none."""
         before = await _placement(async_session, wiki)
@@ -185,7 +183,9 @@ class TestAddRemoveRename:
         placed = await _placement(async_session, wiki)
         known = set(placed)
         assert [
-            (pid, parent) for pid, (parent, _, _) in placed.items() if parent and parent not in known
+            (pid, parent)
+            for pid, (parent, _, _) in placed.items()
+            if parent and parent not in known
         ] == []
 
     async def test_removing_the_module_reparents_its_files(self, async_session, wiki):

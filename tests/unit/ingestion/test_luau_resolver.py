@@ -170,12 +170,8 @@ class TestAbsoluteInstancePath:
     }
   }
 }"""
-        ctx = _repo_ctx(
-            tmp_path, {"src/shared/Util.luau"}, {"default.project.json": project}
-        )
-        got = resolve_luau_import(
-            "game.ReplicatedStorage.Shared.Util", "src/client/main.luau", ctx
-        )
+        ctx = _repo_ctx(tmp_path, {"src/shared/Util.luau"}, {"default.project.json": project})
+        got = resolve_luau_import("game.ReplicatedStorage.Shared.Util", "src/client/main.luau", ctx)
         assert got == "src/shared/Util.luau"
 
     def test_get_service_idiom_resolves(self, tmp_path) -> None:
@@ -184,9 +180,7 @@ class TestAbsoluteInstancePath:
     "ReplicatedStorage": { "Shared": { "$path": "src/shared" } }
   }
 }"""
-        ctx = _repo_ctx(
-            tmp_path, {"src/shared/Util.luau"}, {"default.project.json": project}
-        )
+        ctx = _repo_ctx(tmp_path, {"src/shared/Util.luau"}, {"default.project.json": project})
         got = resolve_luau_import(
             'game:GetService("ReplicatedStorage").Shared.Util',
             "src/client/main.luau",
@@ -218,16 +212,12 @@ class TestAbsoluteInstancePath:
     def test_missing_project_file_falls_back_to_external(self, tmp_path) -> None:
         # Current behavior preserved: no default.project.json → external node.
         ctx = _repo_ctx(tmp_path, {"src/shared/Util.luau"}, {})
-        got = resolve_luau_import(
-            "game.ReplicatedStorage.Shared.Util", "src/client/main.luau", ctx
-        )
+        got = resolve_luau_import("game.ReplicatedStorage.Shared.Util", "src/client/main.luau", ctx)
         assert got == "external:game.ReplicatedStorage.Shared.Util"
 
     def test_unmapped_instance_path_goes_external(self, tmp_path) -> None:
         project = '{ "tree": { "ReplicatedStorage": { "$path": "src/shared" } } }'
-        ctx = _repo_ctx(
-            tmp_path, {"src/shared/Util.luau"}, {"default.project.json": project}
-        )
+        ctx = _repo_ctx(tmp_path, {"src/shared/Util.luau"}, {"default.project.json": project})
         got = resolve_luau_import("game.Workspace.Thing", "src/main.luau", ctx)
         assert got == "external:game.Workspace.Thing"
 

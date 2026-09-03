@@ -15,9 +15,16 @@ from repowise.core.ingestion.resolvers.context import ResolverContext
 
 def _file_info(rel: str, abs_path: str, language: str) -> FileInfo:
     return FileInfo(
-        path=rel, abs_path=abs_path, language=language,
-        size_bytes=100, git_hash="", last_modified=datetime.now(),
-        is_test=False, is_config=False, is_api_contract=False, is_entry_point=False,
+        path=rel,
+        abs_path=abs_path,
+        language=language,
+        size_bytes=100,
+        git_hash="",
+        last_modified=datetime.now(),
+        is_test=False,
+        is_config=False,
+        is_api_contract=False,
+        is_entry_point=False,
     )
 
 
@@ -37,6 +44,7 @@ def _build_parsed(repo: Path) -> dict[str, ParsedFile]:
         # Build a minimal ParsedFile by reusing parser on empty Java syntax
         # — but we only need file_info, so synthesize directly.
         from repowise.core.ingestion.models import ParsedFile as _ParsedFileT
+
         out[rel] = _ParsedFileT(file_info=fi, symbols=[], imports=[], exports=[])
     return out
 
@@ -46,9 +54,7 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     stem_map: dict[str, list[str]] = {}
     for p in path_set:
         stem_map.setdefault(Path(p).stem.lower(), []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 def _seed_graph(parsed: dict[str, ParsedFile]) -> nx.DiGraph:
@@ -117,8 +123,8 @@ class TestJakarta:
             "package com.x;\n"
             "import jakarta.ws.rs.Path;\n"
             "import jakarta.ws.rs.GET;\n"
-            "@Path(\"/books\") public class Books {\n"
-            "  @GET public String list() { return \"\"; }\n"
+            '@Path("/books") public class Books {\n'
+            '  @GET public String list() { return ""; }\n'
             "}\n"
         )
         parsed = _build_parsed(tmp_path)
@@ -156,14 +162,14 @@ class TestQuarkus:
             "package com.x;\n"
             "import org.eclipse.microprofile.reactive.messaging.Outgoing;\n"
             "public class Producer {\n"
-            "  @Outgoing(\"orders\") public String emit() { return \"\"; }\n"
+            '  @Outgoing("orders") public String emit() { return ""; }\n'
             "}\n"
         )
         (tmp_path / "Consumer.java").write_text(
             "package com.x;\n"
             "import org.eclipse.microprofile.reactive.messaging.Incoming;\n"
             "public class Consumer {\n"
-            "  @Incoming(\"orders\") public void on(String s) {}\n"
+            '  @Incoming("orders") public void on(String s) {}\n'
             "}\n"
         )
         parsed = _build_parsed(tmp_path)
@@ -178,7 +184,7 @@ class TestMicronaut:
         (tmp_path / "Hi.java").write_text(
             "package com.x;\n"
             "import io.micronaut.http.annotation.Controller;\n"
-            "@Controller(\"/hi\") public class Hi {}\n"
+            '@Controller("/hi") public class Hi {}\n'
         )
         parsed = _build_parsed(tmp_path)
         graph = _seed_graph(parsed)
@@ -192,15 +198,13 @@ class TestAndroidManifest:
         # Source class
         src_dir = tmp_path / "app" / "src" / "main" / "java" / "com" / "x"
         src_dir.mkdir(parents=True)
-        (src_dir / "MainActivity.java").write_text(
-            "package com.x;\npublic class MainActivity {}\n"
-        )
+        (src_dir / "MainActivity.java").write_text("package com.x;\npublic class MainActivity {}\n")
         # Manifest
         manifest_dir = tmp_path / "app" / "src" / "main"
         (manifest_dir / "AndroidManifest.xml").write_text(
-            "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
+            '<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n'
             "  <application>\n"
-            "    <activity android:name=\"com.x.MainActivity\" />\n"
+            '    <activity android:name="com.x.MainActivity" />\n'
             "  </application>\n"
             "</manifest>\n"
         )

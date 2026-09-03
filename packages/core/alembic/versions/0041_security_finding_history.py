@@ -43,8 +43,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     with op.batch_alter_table("security_findings") as batch_op:
-        batch_op.drop_constraint(
-            "uq_security_finding_provenance", type_="unique"
-        )
+        batch_op.drop_constraint("uq_security_finding_provenance", type_="unique")
         batch_op.drop_column("commit_at")
         batch_op.drop_column("commit_sha")

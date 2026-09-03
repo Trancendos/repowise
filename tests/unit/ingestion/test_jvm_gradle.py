@@ -118,8 +118,7 @@ class TestJvmGradleIndex:
 
     def test_project_dir_override(self, tmp_path: Path) -> None:
         (tmp_path / "settings.gradle.kts").write_text(
-            'include("mymod")\n'
-            'project(":mymod").projectDir = file("custom/location")\n'
+            'include("mymod")\n' 'project(":mymod").projectDir = file("custom/location")\n'
         )
         (tmp_path / "build.gradle.kts").write_text("// root\n")
         java_path = _make_java_class(tmp_path, "custom/location", "com.example", "Custom")

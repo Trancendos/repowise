@@ -50,9 +50,7 @@ def test_it_scans_through_the_traverser_and_writes_what_changed(
     assert Path(seen["repo_path"]) == tmp_path
 
 
-def test_a_failure_never_fails_the_update(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_a_failure_never_fails_the_update(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """An unreadable tree or a missing index must not abort ``update``.
 
     Nothing downstream consumes the result, and the next update retries, so

@@ -24,6 +24,7 @@ from tests.unit.dead_code._helpers import _build_graph, _old_date
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _stale_file_node(name: str, *, symbols: list | None = None) -> dict:
     """Attributes for a file that looks clearly unused (no commits in a year)."""
     return {
@@ -114,9 +115,9 @@ def test_confidence_summary_partitions_total_findings_default():
     report = analyzer.analyze({"detect_unused_exports": False, "detect_zombie_packages": False})
 
     s = report.confidence_summary
-    assert s["high"] + s["medium"] + s["low"] == report.total_findings, (
-        f"confidence_summary buckets {s} do not sum to total_findings={report.total_findings}"
-    )
+    assert (
+        s["high"] + s["medium"] + s["low"] == report.total_findings
+    ), f"confidence_summary buckets {s} do not sum to total_findings={report.total_findings}"
 
 
 def test_confidence_summary_partitions_total_findings_low_floor():
@@ -150,9 +151,9 @@ def test_confidence_summary_partitions_total_findings_low_floor():
     )
 
     s = report.confidence_summary
-    assert s["high"] + s["medium"] + s["low"] == report.total_findings, (
-        f"confidence_summary buckets {s} do not sum to total_findings={report.total_findings}"
-    )
+    assert (
+        s["high"] + s["medium"] + s["low"] == report.total_findings
+    ), f"confidence_summary buckets {s} do not sum to total_findings={report.total_findings}"
     # The deprecated symbol must appear in the low bucket.
     assert s["low"] >= 1
 
@@ -193,12 +194,12 @@ def test_deprecated_symbol_hidden_under_default_floor():
     deprecated_in_findings = [
         f for f in report.findings if f.symbol_name == "process_data_DEPRECATED"
     ]
-    assert deprecated_in_findings == [], (
-        "Deprecated symbol should not appear in findings under the default floor"
-    )
-    assert report.hidden_below_threshold >= 1, (
-        "hidden_below_threshold must be non-zero when a deprecated symbol was dropped"
-    )
+    assert (
+        deprecated_in_findings == []
+    ), "Deprecated symbol should not appear in findings under the default floor"
+    assert (
+        report.hidden_below_threshold >= 1
+    ), "hidden_below_threshold must be non-zero when a deprecated symbol was dropped"
 
 
 def test_deprecated_symbol_visible_with_low_floor():
@@ -222,9 +223,7 @@ def test_deprecated_symbol_visible_with_low_floor():
     git_meta = {**_stale_git_meta("pkg/utils.py"), **_stale_git_meta("pkg/caller.py")}
 
     analyzer = DeadCodeAnalyzer(g, git_meta_map=git_meta)
-    report = analyzer.analyze(
-        {"detect_zombie_packages": False, "min_confidence": 0.0}
-    )
+    report = analyzer.analyze({"detect_zombie_packages": False, "min_confidence": 0.0})
 
     deprecated_in_findings = [
         f for f in report.findings if f.symbol_name == "process_data_DEPRECATED"

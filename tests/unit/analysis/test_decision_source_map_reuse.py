@@ -99,9 +99,7 @@ async def test_restrict_prefers_source_map_bytes_then_disk(tmp_path):
     sm = {"src/app.py": (tmp_path / "src" / "app.py").read_bytes()}
     ex = DecisionExtractor(repo_path=tmp_path, source_map=sm)
 
-    decisions = await ex.scan_inline_markers(
-        restrict_to_files=["src/app.py", "src/util.go"]
-    )
+    decisions = await ex.scan_inline_markers(restrict_to_files=["src/app.py", "src/util.go"])
     files = {d.evidence_file for d in decisions}
     assert "src/app.py" in files  # from in-memory bytes
     assert "src/util.go" in files  # from disk fallback
@@ -111,7 +109,5 @@ async def test_restrict_skips_missing_files(tmp_path):
     _write_fixture(tmp_path)
     ex = DecisionExtractor(repo_path=tmp_path, source_map=None)
     # A deleted/renamed path in the change set must not raise or fabricate.
-    decisions = await ex.scan_inline_markers(
-        restrict_to_files=["src/app.py", "src/gone.py"]
-    )
+    decisions = await ex.scan_inline_markers(restrict_to_files=["src/app.py", "src/gone.py"])
     assert {d.evidence_file for d in decisions} == {"src/app.py"}

@@ -65,7 +65,7 @@ def _ext_kind(cat: str, io_kind: str | None = None) -> str:
 
 
 def to_mermaid_l1(view: C4L1) -> str:
-    lines: list[str] = ["C4Context", f'    title System Context — {_q(view.system.name)}', ""]
+    lines: list[str] = ["C4Context", f"    title System Context — {_q(view.system.name)}", ""]
 
     for person in view.people:
         lines.append(
@@ -88,7 +88,7 @@ def to_mermaid_l1(view: C4L1) -> str:
 
 
 def to_mermaid_l2(view: C4L2, system_name: str) -> str:
-    lines: list[str] = ["C4Container", f'    title Containers — {_q(system_name)}', ""]
+    lines: list[str] = ["C4Container", f"    title Containers — {_q(system_name)}", ""]
     lines.append(f'    System_Boundary(sys, "{_q(system_name)}") {{')
     for c in view.containers:
         lines.append(_container_line(c, indent="        "))
@@ -107,10 +107,12 @@ def to_mermaid_l2(view: C4L2, system_name: str) -> str:
 def to_mermaid_l3(view: C4L3, system_name: str) -> str:
     lines: list[str] = [
         "C4Component",
-        f'    title Components — {_q(view.container.name)} ({_q(system_name)})',
+        f"    title Components — {_q(view.container.name)} ({_q(system_name)})",
         "",
     ]
-    lines.append(f'    Container_Boundary({_sid(view.container.id)}, "{_q(view.container.name)}") {{')
+    lines.append(
+        f'    Container_Boundary({_sid(view.container.id)}, "{_q(view.container.name)}") {{'
+    )
     for cmp in view.components:
         lines.append(
             f'        Component({_sid(cmp.id)}, "{_q(cmp.name)}", '
@@ -131,10 +133,7 @@ def to_mermaid_l3(view: C4L3, system_name: str) -> str:
 
 def _container_line(c: Container, indent: str = "    ") -> str:
     desc = f"{c.file_count} files · {c.symbol_count} symbols"
-    return (
-        f'{indent}Container({_sid(c.id)}, "{_q(c.name)}", '
-        f'"{_q(c.language)}", "{_q(desc)}")'
-    )
+    return f'{indent}Container({_sid(c.id)}, "{_q(c.name)}", ' f'"{_q(c.language)}", "{_q(desc)}")'
 
 
 def _emit_externals(externals: list[ExternalSystemView]) -> list[str]:
@@ -168,8 +167,7 @@ def _external_line(ext: ExternalSystemView) -> str:
     kind = _ext_kind(ext.category, ext.io_kind)
     version = f" {ext.version}" if ext.version else ""
     return (
-        f'    {kind}({_sid(ext.id)}, "{_q(ext.display_name)}", '
-        f'"{_q(ext.ecosystem + version)}")'
+        f'    {kind}({_sid(ext.id)}, "{_q(ext.display_name)}", ' f'"{_q(ext.ecosystem + version)}")'
     )
 
 
