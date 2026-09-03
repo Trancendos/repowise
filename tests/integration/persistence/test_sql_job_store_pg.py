@@ -50,14 +50,10 @@ async def pg_session(postgres_container):
 async def test_sql_job_store_roundtrip_postgres(pg_session: AsyncSession):
     """Same contract as the SQLite unit test, but against Postgres."""
     idx = SqlIndexStore(pg_session)
-    repo = await idx.upsert_repository(
-        name="pg-test", local_path="/tmp/pg-test"
-    )
+    repo = await idx.upsert_repository(name="pg-test", local_path="/tmp/pg-test")
     store = SqlJobStore(pg_session)
 
-    job = await store.create_job(
-        repository_id=repo.id, phase="graph", metadata={"k": 1}
-    )
+    job = await store.create_job(repository_id=repo.id, phase="graph", metadata={"k": 1})
     assert job.state is JobState.PENDING
 
     running = await store.update_state(job.id, JobState.RUNNING)

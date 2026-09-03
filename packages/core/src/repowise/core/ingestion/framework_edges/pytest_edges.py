@@ -54,9 +54,7 @@ _TEST_FILE_RE = re.compile(r"(?:^|/)(?:test_[^/]*|[^/]*_test)\.py$")
 # rather than assumed: celery configures `test_*`, and assuming the default
 # refused 346 of its 359 bindings.
 _DEFAULT_TEST_CLASS_GLOBS = ("Test*",)
-_PYTHON_CLASSES_RE = re.compile(
-    r"^\s*python_classes\s*=\s*(.+?)\s*$", re.MULTILINE
-)
+_PYTHON_CLASSES_RE = re.compile(r"^\s*python_classes\s*=\s*(.+?)\s*$", re.MULTILINE)
 
 
 def _test_class_globs(repo_path: Path | None) -> tuple[str, ...]:
@@ -181,9 +179,7 @@ def _fixture_scopes(parsed: Any, class_name: str | None) -> list[str | None]:
         return [None]
     parents: dict[str, list[str]] = {}
     for rel in parsed.heritage:
-        parents.setdefault(rel.child_name, []).append(
-            strip_type_arguments(rel.parent_name).strip()
-        )
+        parents.setdefault(rel.child_name, []).append(strip_type_arguments(rel.parent_name).strip())
 
     scopes: list[str | None] = []
     seen: set[str] = set()
@@ -308,8 +304,7 @@ def _add_fixture_injection_edges(
         if Path(path).name != "conftest.py":
             continue
         declared = {
-            name: sid for (owner, name), sid in _declared_fixtures(parsed).items()
-            if owner is None
+            name: sid for (owner, name), sid in _declared_fixtures(parsed).items() if owner is None
         }
         if declared:
             conftests[Path(path).parent.as_posix()] = declared
@@ -333,15 +328,11 @@ def _add_fixture_injection_edges(
         for sym in parsed.symbols:
             if sym.kind not in ("function", "method") or not sym.name.startswith("test_"):
                 continue
-            if sym.parent_name and not any(
-                fnmatch(sym.parent_name, g) for g in class_globs
-            ):
+            if sym.parent_name and not any(fnmatch(sym.parent_name, g) for g in class_globs):
                 continue
             scopes = _fixture_scopes(parsed, sym.parent_name)
             for name in _requested_fixtures(sym):
-                target = next(
-                    (own[(s, name)] for s in scopes if (s, name) in own), None
-                ) or next(
+                target = next((own[(s, name)] for s in scopes if (s, name) in own), None) or next(
                     (conftests[d][name] for d in chain if name in conftests[d]), None
                 )
                 if target and add_symbol_edge(graph, sym.id, target):

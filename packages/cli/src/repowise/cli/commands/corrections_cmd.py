@@ -141,9 +141,7 @@ def corrections_command(
     console.print()
 
 
-def _write_managed_blocks(
-    repo_root: Path, rules: list[dict], min_count: int, out=None
-) -> None:
+def _write_managed_blocks(repo_root: Path, rules: list[dict], min_count: int, out=None) -> None:
     """Upsert the managed block into CLAUDE.md/AGENTS.md (or prune it).
 
     *out* is where the confirmations go; it is stderr under ``--format json``

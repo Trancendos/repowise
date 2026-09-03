@@ -52,7 +52,9 @@ def _stale_meta(*paths: str) -> dict[str, dict]:
 
 def _unreachable(report, path: str):
     hits = [
-        f for f in report.findings if f.file_path == path and f.kind == DeadCodeKind.UNREACHABLE_FILE
+        f
+        for f in report.findings
+        if f.file_path == path and f.kind == DeadCodeKind.UNREACHABLE_FILE
     ]
     assert len(hits) == 1, f"expected exactly one unreachable finding for {path}, got {hits}"
     return hits[0]
@@ -112,9 +114,7 @@ def test_repo_root_dynamic_import_clamps_other_root_files():
         },
         edges=[("loader.py", "main.py", {"edge_type": "dynamic_uses"})],
     )
-    analyzer = DeadCodeAnalyzer(
-        graph, git_meta_map=_stale_meta("orphan.py", "pkg_c/orphan.py")
-    )
+    analyzer = DeadCodeAnalyzer(graph, git_meta_map=_stale_meta("orphan.py", "pkg_c/orphan.py"))
     assert analyzer._dynamic_import_dirs == {"."}
 
     report = analyzer.analyze(dict(_DETECT_UNREACHABLE_ONLY))

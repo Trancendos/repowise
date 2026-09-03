@@ -487,9 +487,7 @@ async def test_first_resolvable_id_falls_through_to_the_second(tmp_path):
     (tmp_path / "m.py").write_text("def real_one():\n    pass\n", encoding="utf-8")
     ctx = SimpleNamespace(path=str(tmp_path), session_factory=None)
 
-    picked = await _first_resolvable_id(
-        ["m.py::Fabricated", "m.py::real_one"], ctx, None, None
-    )
+    picked = await _first_resolvable_id(["m.py::Fabricated", "m.py::real_one"], ctx, None, None)
 
     assert picked == "m.py::real_one"
 

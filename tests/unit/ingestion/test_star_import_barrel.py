@@ -31,11 +31,7 @@ def _build_calls(tmp_path: Path, files: dict[str, str]):
         data = Path(fi.abs_path).read_bytes()
         gb.add_file(parser.parse_file(fi, data))
     graph = gb.build()
-    return {
-        (src, dst)
-        for src, dst, d in graph.edges(data=True)
-        if d.get("edge_type") == "calls"
-    }
+    return {(src, dst) for src, dst, d in graph.edges(data=True) if d.get("edge_type") == "calls"}
 
 
 def test_call_through_star_import_barrel_resolves(tmp_path: Path) -> None:
@@ -99,9 +95,7 @@ def test_a_nested_namespace_reexport_is_not_flattened(tmp_path: Path) -> None:
     files = {
         "coerce.ts": "export function string(x: unknown) {\n  return String(x);\n}\n",
         "schemas.ts": "export function string(y: number) {\n  return y;\n}\n",
-        "external.ts": (
-            'export * as coerce from "./coerce.js";\nexport * from "./schemas.js";\n'
-        ),
+        "external.ts": ('export * as coerce from "./coerce.js";\nexport * from "./schemas.js";\n'),
         "caller.ts": (
             'import * as z from "./external.js";\n\nexport function run() {\n  return z.string(1);\n}\n'
         ),

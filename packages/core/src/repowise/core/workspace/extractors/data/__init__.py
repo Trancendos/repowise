@@ -64,9 +64,7 @@ class DataExtractor:
     @classmethod
     def source_extensions(cls) -> frozenset[str]:
         """Every extension this extractor's dialects claim."""
-        return _union_extensions(cls.provider_dialects) | _union_extensions(
-            cls.consumer_dialects
-        )
+        return _union_extensions(cls.provider_dialects) | _union_extensions(cls.consumer_dialects)
 
     def extract(
         self,

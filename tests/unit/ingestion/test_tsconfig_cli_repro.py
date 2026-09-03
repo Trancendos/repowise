@@ -15,12 +15,14 @@ def test_tsconfig_alias_cli_rebuild(tmp_path: Path) -> None:
     # 1. Setup mock tsconfig.json
     tsconfig_file = tmp_path / "tsconfig.json"
     tsconfig_file.write_text(
-        json.dumps({
-            "compilerOptions": {
-                "baseUrl": ".",
-                "paths": {"@/*": ["./src/*"]},
+        json.dumps(
+            {
+                "compilerOptions": {
+                    "baseUrl": ".",
+                    "paths": {"@/*": ["./src/*"]},
+                }
             }
-        }),
+        ),
         encoding="utf-8",
     )
 

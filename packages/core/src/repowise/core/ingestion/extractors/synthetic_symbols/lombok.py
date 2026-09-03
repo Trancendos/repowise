@@ -49,13 +49,24 @@ if TYPE_CHECKING:
 # Annotations recognised on a class (or record / enum) declaration.
 _TYPE_ANNOTATIONS_OF_INTEREST = frozenset(
     {
-        "Data", "Value",
-        "Getter", "Setter",
-        "ToString", "EqualsAndHashCode",
-        "NoArgsConstructor", "RequiredArgsConstructor", "AllArgsConstructor",
-        "Builder", "SuperBuilder",
-        "Slf4j", "Log4j2", "Log", "JBossLog",
-        "XSlf4j", "CommonsLog", "Flogger",
+        "Data",
+        "Value",
+        "Getter",
+        "Setter",
+        "ToString",
+        "EqualsAndHashCode",
+        "NoArgsConstructor",
+        "RequiredArgsConstructor",
+        "AllArgsConstructor",
+        "Builder",
+        "SuperBuilder",
+        "Slf4j",
+        "Log4j2",
+        "Log",
+        "JBossLog",
+        "XSlf4j",
+        "CommonsLog",
+        "Flogger",
         "UtilityClass",
         "With",
     }
@@ -115,9 +126,7 @@ def _field_info(field_node: Node, src: str) -> tuple[str, str, bool, set[str]] |
                 elif sub.type in ("marker_annotation", "annotation"):
                     for leaf in sub.children:
                         if leaf.type in ("identifier", "scoped_identifier"):
-                            field_annotations.add(
-                                node_text(leaf, src).strip().split(".")[-1]
-                            )
+                            field_annotations.add(node_text(leaf, src).strip().split(".")[-1])
                             break
         elif child.type == "variable_declarator":
             for leaf in child.children:
@@ -185,24 +194,32 @@ def _with_name(field_name: str) -> str:
     return f"with{_pascal_case(field_name)}"
 
 
-def _add(out: list[Symbol], file_info: FileInfo, *, name: str, kind: str,
-         parent: str, line: int, signature: str) -> None:
+def _add(
+    out: list[Symbol],
+    file_info: FileInfo,
+    *,
+    name: str,
+    kind: str,
+    parent: str,
+    line: int,
+    signature: str,
+) -> None:
     if not name:
         return
-    out.append(build_synthetic_symbol(
-        name=name,
-        kind=kind,
-        signature=signature,
-        start_line=line,
-        end_line=line,
-        file_info=file_info,
-        parent_name=parent,
-    ))
+    out.append(
+        build_synthetic_symbol(
+            name=name,
+            kind=kind,
+            signature=signature,
+            start_line=line,
+            end_line=line,
+            file_info=file_info,
+            parent_name=parent,
+        )
+    )
 
 
-def _emit_for_class(
-    class_node: Node, src: str, file_info: FileInfo, out: list[Symbol]
-) -> None:
+def _emit_for_class(class_node: Node, src: str, file_info: FileInfo, out: list[Symbol]) -> None:
     name_node = class_node.child_by_field_name("name")
     if name_node is None:
         return
@@ -241,98 +258,195 @@ def _emit_for_class(
         field_set = "Setter" in field_annotations or has_setter
         field_with = "With" in field_annotations or has_with
         if field_get:
-            _add(out, file_info, name=_getter_name(field_name, field_type),
-                 kind="method", parent=class_name, line=line,
-                 signature=f"public {field_type or 'Object'} {_getter_name(field_name, field_type)}()")
+            _add(
+                out,
+                file_info,
+                name=_getter_name(field_name, field_type),
+                kind="method",
+                parent=class_name,
+                line=line,
+                signature=f"public {field_type or 'Object'} {_getter_name(field_name, field_type)}()",
+            )
         if field_set and not is_value:
-            _add(out, file_info, name=_setter_name(field_name),
-                 kind="method", parent=class_name, line=line,
-                 signature=f"public void {_setter_name(field_name)}({field_type or 'Object'})")
+            _add(
+                out,
+                file_info,
+                name=_setter_name(field_name),
+                kind="method",
+                parent=class_name,
+                line=line,
+                signature=f"public void {_setter_name(field_name)}({field_type or 'Object'})",
+            )
         if field_with:
-            _add(out, file_info, name=_with_name(field_name),
-                 kind="method", parent=class_name, line=line,
-                 signature=f"public {class_name} {_with_name(field_name)}({field_type or 'Object'})")
+            _add(
+                out,
+                file_info,
+                name=_with_name(field_name),
+                kind="method",
+                parent=class_name,
+                line=line,
+                signature=f"public {class_name} {_with_name(field_name)}({field_type or 'Object'})",
+            )
 
     if has_to_string:
-        _add(out, file_info, name="toString", kind="method",
-             parent=class_name, line=line,
-             signature="public String toString()")
+        _add(
+            out,
+            file_info,
+            name="toString",
+            kind="method",
+            parent=class_name,
+            line=line,
+            signature="public String toString()",
+        )
     if has_eq:
-        _add(out, file_info, name="equals", kind="method",
-             parent=class_name, line=line,
-             signature="public boolean equals(Object)")
-        _add(out, file_info, name="hashCode", kind="method",
-             parent=class_name, line=line,
-             signature="public int hashCode()")
-        _add(out, file_info, name="canEqual", kind="method",
-             parent=class_name, line=line,
-             signature="protected boolean canEqual(Object)")
+        _add(
+            out,
+            file_info,
+            name="equals",
+            kind="method",
+            parent=class_name,
+            line=line,
+            signature="public boolean equals(Object)",
+        )
+        _add(
+            out,
+            file_info,
+            name="hashCode",
+            kind="method",
+            parent=class_name,
+            line=line,
+            signature="public int hashCode()",
+        )
+        _add(
+            out,
+            file_info,
+            name="canEqual",
+            kind="method",
+            parent=class_name,
+            line=line,
+            signature="protected boolean canEqual(Object)",
+        )
 
     if has_rac:
         # @RequiredArgsConstructor: final + @NonNull fields. We don't know
         # @NonNull from the source without parsing all annotations, so use
         # `is_final` as the proxy — covers the dominant Spring DI case
         # of ``private final Service service``.
-        required = [
-            (n, t) for (n, t, fin, _) in fields if fin
-        ]
-        _add(out, file_info, name=class_name, kind="function",
-             parent=class_name, line=line,
-             signature=f"public {class_name}({', '.join(f'{t} {n}' for n, t in required)})")
+        required = [(n, t) for (n, t, fin, _) in fields if fin]
+        _add(
+            out,
+            file_info,
+            name=class_name,
+            kind="function",
+            parent=class_name,
+            line=line,
+            signature=f"public {class_name}({', '.join(f'{t} {n}' for n, t in required)})",
+        )
     if has_aac:
         all_params = [(n, t) for (n, t, _, _) in fields]
-        _add(out, file_info, name=class_name, kind="function",
-             parent=class_name, line=line,
-             signature=f"public {class_name}({', '.join(f'{t} {n}' for n, t in all_params)})")
+        _add(
+            out,
+            file_info,
+            name=class_name,
+            kind="function",
+            parent=class_name,
+            line=line,
+            signature=f"public {class_name}({', '.join(f'{t} {n}' for n, t in all_params)})",
+        )
     if has_noac:
-        _add(out, file_info, name=class_name, kind="function",
-             parent=class_name, line=line,
-             signature=f"public {class_name}()")
+        _add(
+            out,
+            file_info,
+            name=class_name,
+            kind="function",
+            parent=class_name,
+            line=line,
+            signature=f"public {class_name}()",
+        )
 
     if has_builder:
         builder_class = f"{class_name}Builder"
         # The builder class itself
-        out.append(build_synthetic_symbol(
-            name=builder_class, kind="class",
-            signature=f"public static class {builder_class}",
-            start_line=line, end_line=line,
-            file_info=file_info, parent_name=class_name,
-        ))
+        out.append(
+            build_synthetic_symbol(
+                name=builder_class,
+                kind="class",
+                signature=f"public static class {builder_class}",
+                start_line=line,
+                end_line=line,
+                file_info=file_info,
+                parent_name=class_name,
+            )
+        )
         # Static factory on the host class
-        _add(out, file_info, name="builder", kind="method",
-             parent=class_name, line=line,
-             signature=f"public static {builder_class} builder()")
+        _add(
+            out,
+            file_info,
+            name="builder",
+            kind="method",
+            parent=class_name,
+            line=line,
+            signature=f"public static {builder_class} builder()",
+        )
         # Builder-per-field methods + build()
         for field_name, field_type, _is_final, _ann in fields:
-            _add(out, file_info, name=field_name, kind="method",
-                 parent=builder_class, line=line,
-                 signature=f"public {builder_class} {field_name}({field_type or 'Object'})")
-        _add(out, file_info, name="build", kind="method",
-             parent=builder_class, line=line,
-             signature=f"public {class_name} build()")
-        _add(out, file_info, name="toString", kind="method",
-             parent=builder_class, line=line,
-             signature="public String toString()")
+            _add(
+                out,
+                file_info,
+                name=field_name,
+                kind="method",
+                parent=builder_class,
+                line=line,
+                signature=f"public {builder_class} {field_name}({field_type or 'Object'})",
+            )
+        _add(
+            out,
+            file_info,
+            name="build",
+            kind="method",
+            parent=builder_class,
+            line=line,
+            signature=f"public {class_name} build()",
+        )
+        _add(
+            out,
+            file_info,
+            name="toString",
+            kind="method",
+            parent=builder_class,
+            line=line,
+            signature="public String toString()",
+        )
 
     if is_utility:
         # Lombok turns the class into a final utility — emit a private
         # default constructor so the class is "constructed" somewhere.
-        _add(out, file_info, name=class_name, kind="function",
-             parent=class_name, line=line,
-             signature=f"private {class_name}()")
+        _add(
+            out,
+            file_info,
+            name=class_name,
+            kind="function",
+            parent=class_name,
+            line=line,
+            signature=f"private {class_name}()",
+        )
 
     # Logger field — only one logger annotation per class is valid.
     for ann, logger_type in _TYPE_LOGGER_ANNOTATIONS.items():
         if ann in annotations:
-            _add(out, file_info, name="log", kind="variable",
-                 parent=class_name, line=line,
-                 signature=f"private static final {logger_type} log")
+            _add(
+                out,
+                file_info,
+                name="log",
+                kind="variable",
+                parent=class_name,
+                line=line,
+                signature=f"private static final {logger_type} log",
+            )
             break
 
 
-def lombok_synthetic_symbols(
-    root: Node, src: str, file_info: FileInfo
-) -> list[Symbol]:
+def lombok_synthetic_symbols(root: Node, src: str, file_info: FileInfo) -> list[Symbol]:
     """Emit synthetic symbols for Lombok-annotated Java classes."""
     # Cheap reject path: if the source doesn't even mention `@`, there
     # can't be any annotations.

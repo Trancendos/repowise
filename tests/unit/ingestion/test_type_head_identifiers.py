@@ -37,7 +37,13 @@ CASES: list[tuple[str, str, str, str, list[tuple[str, str]]]] = [
     # =========================================================================
     # C# — _head_type_identifier (the TYPE_HEAD_EXTRACTORS default)
     # =========================================================================
-    ("csharp", "cs", "plain", "class Probe {\n    void M(Basket a) {}\n}\n", [("Basket", "method_param")]),
+    (
+        "csharp",
+        "cs",
+        "plain",
+        "class Probe {\n    void M(Basket a) {}\n}\n",
+        [("Basket", "method_param")],
+    ),
     (
         "csharp",
         "cs",
@@ -61,8 +67,20 @@ CASES: list[tuple[str, str, str, str, list[tuple[str, str]]]] = [
         "class Probe {\n    void M(ref readonly Span<byte> a) {}\n}\n",
         [("Span", "method_param")],
     ),
-    ("csharp", "cs", "nullable-wrapper", "class Probe {\n    void M(Foo? a) {}\n}\n", [("Foo", "method_param")]),
-    ("csharp", "cs", "array-wrapper", "class Probe {\n    void M(Foo[] a) {}\n}\n", [("Foo", "method_param")]),
+    (
+        "csharp",
+        "cs",
+        "nullable-wrapper",
+        "class Probe {\n    void M(Foo? a) {}\n}\n",
+        [("Foo", "method_param")],
+    ),
+    (
+        "csharp",
+        "cs",
+        "array-wrapper",
+        "class Probe {\n    void M(Foo[] a) {}\n}\n",
+        [("Foo", "method_param")],
+    ),
     ("csharp", "cs", "builtin-string", "class Probe {\n    void M(string a) {}\n}\n", []),
     ("csharp", "cs", "builtin-int", "class Probe {\n    void M(int a) {}\n}\n", []),
     ("csharp", "cs", "single-upper-generic-param", "class Probe {\n    void M(T a) {}\n}\n", []),
@@ -87,8 +105,20 @@ CASES: list[tuple[str, str, str, str, list[tuple[str, str]]]] = [
         "package main\n\nfunc F(a dynacache.Cache) {}\n",
         [("Cache", "param_type")],
     ),
-    ("go", "go", "pointer-wrapper", "package main\n\nfunc F(a *Cache) {}\n", [("Cache", "param_type")]),
-    ("go", "go", "slice-wrapper", "package main\n\nfunc F(a []Partition) {}\n", [("Partition", "param_type")]),
+    (
+        "go",
+        "go",
+        "pointer-wrapper",
+        "package main\n\nfunc F(a *Cache) {}\n",
+        [("Cache", "param_type")],
+    ),
+    (
+        "go",
+        "go",
+        "slice-wrapper",
+        "package main\n\nfunc F(a []Partition) {}\n",
+        [("Partition", "param_type")],
+    ),
     (
         "go",
         "go",
@@ -103,7 +133,13 @@ CASES: list[tuple[str, str, str, str, list[tuple[str, str]]]] = [
     # C — _c_head_type_identifier (shared with C++)
     # =========================================================================
     ("c", "c", "plain", "void f(JSON_Value *v) {}\n", [("JSON_Value", "param_type")]),
-    ("c", "c", "named-struct-ref", "void f(struct JSON_Object *o) {}\n", [("JSON_Object", "param_type")]),
+    (
+        "c",
+        "c",
+        "named-struct-ref",
+        "void f(struct JSON_Object *o) {}\n",
+        [("JSON_Object", "param_type")],
+    ),
     ("c", "c", "builtin-int", "void f(int x) {}\n", []),
     ("c", "c", "builtin-unsigned-long", "void f(unsigned long x) {}\n", []),
     ("c", "c", "stdlib-typedef-size_t", "void f(size_t x) {}\n", []),
@@ -192,7 +228,13 @@ CASES: list[tuple[str, str, str, str, list[tuple[str, str]]]] = [
         "class Probe {\n    void m(com.x.y.Z a) {}\n}\n",
         [],
     ),
-    ("java", "java", "array-wrapper", "class Probe {\n    void m(Foo[] a) {}\n}\n", [("Foo", "param_type")]),
+    (
+        "java",
+        "java",
+        "array-wrapper",
+        "class Probe {\n    void m(Foo[] a) {}\n}\n",
+        [("Foo", "param_type")],
+    ),
     ("java", "java", "builtin-int", "class Probe {\n    void m(int a) {}\n}\n", []),
     ("java", "java", "builtin-String", "class Probe {\n    void m(String a) {}\n}\n", []),
     ("java", "java", "single-upper-generic-param", "class Probe {\n    void m(T a) {}\n}\n", []),

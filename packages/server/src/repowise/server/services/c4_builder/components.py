@@ -164,9 +164,7 @@ async def detect_components_for_all(
 
 def _matching_roots(node_id: str, roots: list[str]) -> list[str]:
     """Every container path that prefixes *node_id*."""
-    return [
-        root for root in roots if node_id == root or node_id.startswith(root + "/")
-    ]
+    return [root for root in roots if node_id == root or node_id.startswith(root + "/")]
 
 
 def _owned_by(node_id: str, container_path: str, sibling_prefixes: tuple[str, ...]) -> bool:
@@ -237,9 +235,7 @@ async def _files_in(
     # must not capture "packages/core-extras/foo.py"). Final exact filter.
     if container_path:
         prefix = container_path + "/"
-        nodes = [
-            n for n in nodes if n.node_id == container_path or n.node_id.startswith(prefix)
-        ]
+        nodes = [n for n in nodes if n.node_id == container_path or n.node_id.startswith(prefix)]
 
     # Drop files owned by a sibling container so a root/catch-all container does
     # not absorb another container's tree.

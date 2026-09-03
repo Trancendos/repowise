@@ -256,7 +256,6 @@ def _has_unqualified_exclusivity_over_truncated(
     return any(tok in low for tok in _EXCLUSIVITY_TOKENS)
 
 
-
 # A backticked span ending in a source-file extension is a PATH, so its dotted
 # components are not symbol references: ``store.py`` says nothing about a symbol
 # named ``py`` (or one named ``store``).
@@ -281,7 +280,7 @@ def _code_reference(text: str, name: str) -> bool:
     """
     n = re.escape(name)
     patterns = [
-        rf"\b{n}\(",         # called
+        rf"\b{n}\(",  # called
         rf"\b{n}\s*=(?!=)",  # assigned (never a comparison)
     ]
     # Attribute access, unless the name IS a file extension: ``store.py`` is a
@@ -309,11 +308,7 @@ def _is_distinctive_name(name: str) -> bool:
     ``write``, ``main``, ``line`` and ``on`` do not, and those are exactly the
     names that collapse confidence on an ordinary English question.
     """
-    return (
-        any(ch.isupper() for ch in name[1:])
-        or "_" in name
-        or any(ch.isdigit() for ch in name)
-    )
+    return any(ch.isupper() for ch in name[1:]) or "_" in name or any(ch.isdigit() for ch in name)
 
 
 # Nothing but whitespace since the start of the string or the last sentence
@@ -503,9 +498,7 @@ def _agreement_dominant(hits: list[dict], *, vector_leg_keyless: bool = False) -
     # Runner-up found by both: the top must rank at least as high in BOTH
     # sources (no source disagrees) and strictly ahead in at least one.
     if top_a <= sec_a and top_b <= sec_b:
-        return (sec_a - top_a) >= _AGREEMENT_RANK_GAP or (
-            sec_b - top_b
-        ) >= _AGREEMENT_RANK_GAP
+        return (sec_a - top_a) >= _AGREEMENT_RANK_GAP or (sec_b - top_b) >= _AGREEMENT_RANK_GAP
     return False
 
 

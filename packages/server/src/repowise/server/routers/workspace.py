@@ -148,7 +148,7 @@ def _query_repo_stats(db_path: Path) -> dict:
         if row:
             result["repo_id"] = row[0]
 
-        # file count (graph_nodes) 
+        # file count (graph_nodes)
         row = c.execute("SELECT COUNT(*) FROM graph_nodes WHERE node_type = 'file'").fetchone()
         result["file_count"] = row[0] if row else 0
 
@@ -254,7 +254,9 @@ async def get_workspace(
 async def get_contracts(
     ws_config=Depends(get_workspace_config),
     enricher=Depends(get_cross_repo_enricher),
-    contract_type: str | None = Query(None, description="Filter: http, grpc, socket, topic, or data"),
+    contract_type: str | None = Query(
+        None, description="Filter: http, grpc, socket, topic, or data"
+    ),
     repo: str | None = Query(None, description="Filter by repo alias"),
     role: str | None = Query(None, description="Filter: provider or consumer"),
     limit: int = Query(200, ge=1, le=1000),

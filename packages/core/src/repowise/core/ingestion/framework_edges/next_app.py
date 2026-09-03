@@ -33,11 +33,23 @@ if TYPE_CHECKING:
     import networkx as nx
 
 
-_APP_ROUTER_BASENAMES: frozenset[str] = frozenset({
-    "page", "layout", "route", "middleware", "template", "default",
-    "error", "loading", "not-found", "global-error", "forbidden",
-    "unauthorized", "instrumentation",
-})
+_APP_ROUTER_BASENAMES: frozenset[str] = frozenset(
+    {
+        "page",
+        "layout",
+        "route",
+        "middleware",
+        "template",
+        "default",
+        "error",
+        "loading",
+        "not-found",
+        "global-error",
+        "forbidden",
+        "unauthorized",
+        "instrumentation",
+    }
+)
 _APP_ROUTER_EXTS: tuple[str, ...] = (".ts", ".tsx", ".js", ".jsx", ".mjs")
 _APP_DIR_RE = re.compile(r"(?:^|/)app/")
 

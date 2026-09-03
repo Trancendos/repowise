@@ -98,8 +98,7 @@ _BOT_NAME_RE = re.compile(
     re.IGNORECASE,
 )
 _BOT_EMAIL_RE = re.compile(
-    r"(\[bot\]@|@bots\.noreply\.github\.com|^(actions@github\.com|"
-    r"noreply@github\.com)$)",
+    r"(\[bot\]@|@bots\.noreply\.github\.com|^(actions@github\.com|" r"noreply@github\.com)$)",
     re.IGNORECASE,
 )
 

@@ -336,10 +336,10 @@ class TestGitignoreGlobSemantics:
 
     def test_unaffected_patterns_are_not_flagged(self) -> None:
         safe = (
-            "src/legacy/**",   # already the broad form
+            "src/legacy/**",  # already the broad form
             "*.generated.ts",  # no separator: any depth under both engines
-            "vendor/",         # a directory prefix
-            "**/*.spec.ts",    # the ** ahead of it has already covered depth
+            "vendor/",  # a directory prefix
+            "**/*.spec.ts",  # the ** ahead of it has already covered depth
             "src/**/*.py",
         )
         for pattern in safe:
@@ -347,11 +347,7 @@ class TestGitignoreGlobSemantics:
 
     def test_severity_overrides_use_the_same_matching(self) -> None:
         config = HealthConfig.from_dict(
-            {
-                "rules": [
-                    {"path": "src/legacy/**", "severity_overrides": {"complex_method": "low"}}
-                ]
-            }
+            {"rules": [{"path": "src/legacy/**", "severity_overrides": {"complex_method": "low"}}]}
         )
         overrides = config.per_file_severity_overrides(["src/legacy/deep/a.py", "src/new.py"])
         assert "src/legacy/deep/a.py" in overrides
@@ -375,9 +371,7 @@ class TestAMalformedFieldNeverRaises:
         assert HealthConfig.from_dict({"disabled_biomarkers": {"a": 1}}).disabled_biomarkers == []
 
     def test_a_rules_disabled_biomarkers_field_that_is_not_a_list(self) -> None:
-        config = HealthConfig.from_dict(
-            {"rules": [{"path": "src/**", "disabled_biomarkers": 3}]}
-        )
+        config = HealthConfig.from_dict({"rules": [{"path": "src/**", "disabled_biomarkers": 3}]})
         assert len(config.rules) == 1
         assert config.rules[0].disabled_biomarkers == []
 
@@ -403,13 +397,19 @@ class TestAMalformedFieldNeverRaises:
 
     def test_a_refactoring_detectors_field_that_is_not_a_list(self) -> None:
         """Same shape as the rules fields, one block over in config.yaml."""
-        assert HealthConfig._from_refactoring_block(
-            {"detectors": {"disabled": 4}}
-        ).disabled_refactorings == []
+        assert (
+            HealthConfig._from_refactoring_block(
+                {"detectors": {"disabled": 4}}
+            ).disabled_refactorings
+            == []
+        )
         # A bare string must not be read as its characters either.
-        assert HealthConfig._from_refactoring_block(
-            {"detectors": {"disabled": "extract_class"}}
-        ).disabled_refactorings == []
+        assert (
+            HealthConfig._from_refactoring_block(
+                {"detectors": {"disabled": "extract_class"}}
+            ).disabled_refactorings
+            == []
+        )
 
     def test_a_negated_glob_is_flagged_rather_than_silently_dead(self) -> None:
         """A leading '!' has nothing to negate when each rule is its own spec.

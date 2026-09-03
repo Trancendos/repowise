@@ -193,8 +193,8 @@ export function Card() {
         result = parser.parse_file(fi, src)
         assert result.parse_errors == []
         targets = {c.target_name for c in result.calls}
-        assert "StatRow" in targets   # self-closing JSX captured as call
-        assert "Section" in targets   # paired JSX captured as call
+        assert "StatRow" in targets  # self-closing JSX captured as call
+        assert "Section" in targets  # paired JSX captured as call
 
     def test_ts_file_unrelated_syntax_error_with_html_in_string_preserves_original_parse(
         self, parser: ASTParser
@@ -219,7 +219,6 @@ export function f() {
         result = parser.parse_file(fi, src)
         # The real TypeScript error must still be reported — fallback did not clear it.
         assert result.parse_errors != []
-
 
     def test_jsx_element_registers_as_call_target(self, parser: ASTParser) -> None:
         # Regression: ``<StatRow ... />`` inside the same file as the
@@ -305,9 +304,7 @@ export function MyForm() {
         assert "form" not in targets
         assert "input" not in targets
 
-    def test_jsx_motion_and_styled_components_filtered(
-        self, parser: ASTParser
-    ) -> None:
+    def test_jsx_motion_and_styled_components_filtered(self, parser: ASTParser) -> None:
         # Regression: framer-motion / styled-components bring lowercase member
         # expressions like <motion.div>, <motion.span>, <styled.button> which
         # are HTML wrappers and must NOT be emitted as call targets.
@@ -337,11 +334,10 @@ export function AnimatedCard() {
         assert "Item" in targets
         assert "Form" in receivers
         # Lowercase member properties are HTML wrappers — must be filtered
-        assert "div" not in targets    # motion.div
-        assert "span" not in targets   # motion.span
-        assert "button" not in targets # styled.button
+        assert "div" not in targets  # motion.div
+        assert "span" not in targets  # motion.span
+        assert "button" not in targets  # styled.button
         assert "input" not in targets  # motion.input
-
 
     def test_class_methods_still_extracted(self, parser: ASTParser) -> None:
         # Negative for D5: methods inside class bodies must still be
@@ -378,9 +374,7 @@ const priv = x => x;
         assert fn_symbols["double"].visibility == "public"
         assert fn_symbols["priv"].visibility == "private"
 
-    def test_unparenthesized_arrow_functions_extracted_javascript(
-        self, parser: ASTParser
-    ) -> None:
+    def test_unparenthesized_arrow_functions_extracted_javascript(self, parser: ASTParser) -> None:
         # javascript.scm was also patched — verify the same fix works for .js files.
         src = b"""
 export const double = x => x * 2;

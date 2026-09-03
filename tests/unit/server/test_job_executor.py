@@ -696,4 +696,3 @@ async def test_execute_job_dispatches_generate_mode(session_factory, tmp_path):
         await execute_job(job_id, app_state)
 
     run_generate_mock.assert_awaited_once()
-

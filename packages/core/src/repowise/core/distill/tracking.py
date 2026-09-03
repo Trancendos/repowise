@@ -33,9 +33,7 @@ def record_saving(
     conn.commit()
 
 
-def savings_summary(
-    conn: sqlite3.Connection, *, since: float | None = None
-) -> dict[str, Any]:
+def savings_summary(conn: sqlite3.Connection, *, since: float | None = None) -> dict[str, Any]:
     """Aggregate ledger totals, overall and per filter.
 
     *since* is a Unix timestamp; only events at or after it are counted.
@@ -69,9 +67,7 @@ def savings_summary(
     }
 
 
-def distill_summary(
-    conn: sqlite3.Connection, *, since: float | None = None
-) -> dict[str, Any]:
+def distill_summary(conn: sqlite3.Connection, *, since: float | None = None) -> dict[str, Any]:
     """Ledger totals for the **distill** surface only (excludes ``mcp:*``).
 
     Identical in shape to :func:`savings_summary` but scoped to non-MCP
@@ -113,9 +109,7 @@ def distill_summary(
     }
 
 
-def mcp_savings_summary(
-    conn: sqlite3.Connection, *, since: float | None = None
-) -> dict[str, Any]:
+def mcp_savings_summary(conn: sqlite3.Connection, *, since: float | None = None) -> dict[str, Any]:
     """Unified MCP savings view — counterfactual ledger, truncation as fallback.
 
     Two MCP signals live in the sidecar:
@@ -177,9 +171,7 @@ def mcp_savings_summary(
     }
 
 
-def mcp_drops_summary(
-    conn: sqlite3.Connection, *, since: float | None = None
-) -> dict[str, Any]:
+def mcp_drops_summary(conn: sqlite3.Connection, *, since: float | None = None) -> dict[str, Any]:
     """Truncation savings the MCP server already wrote to the omissions store.
 
     MCP tools drop content past their response budget into the ``omissions``
@@ -215,7 +207,7 @@ def mcp_drops_summary(
 def _strip_mcp_prefix(source: str) -> str:
     """``mcp:get_risk`` → ``get_risk`` (passthrough for anything else)."""
     prefix = "mcp:"
-    return source[len(prefix):] if source.startswith(prefix) else source
+    return source[len(prefix) :] if source.startswith(prefix) else source
 
 
 #: Grouping dimensions accepted by :func:`savings_rollup`. ``day`` buckets by

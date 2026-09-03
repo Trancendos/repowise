@@ -254,9 +254,7 @@ def test_concurrent_acquire_has_exactly_one_winner(tmp_path: Path) -> None:
     from repowise.core.update_lock import try_acquire_update_lock
 
     with ThreadPoolExecutor(max_workers=8) as pool:
-        results = list(
-            pool.map(lambda i: try_acquire_update_lock(tmp_path, f"c{i}"), range(8))
-        )
+        results = list(pool.map(lambda i: try_acquire_update_lock(tmp_path, f"c{i}"), range(8)))
 
     winners = [r for r in results if r is None]
     losers = [r for r in results if r is not None]

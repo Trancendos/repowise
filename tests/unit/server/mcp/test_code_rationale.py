@@ -316,9 +316,7 @@ async def test_concept_anchor_injects_winner_as_dominant(tmp_path):
         {"target_path": "pager.py", "page_type": "file_page", "score": 2.0},
         {"target_path": "other.py", "page_type": "file_page", "score": 1.0},
     ]
-    out = await _concept_anchor_hits(
-        Path(str(repo)), "why is the caller list capped at 50", hits
-    )
+    out = await _concept_anchor_hits(Path(str(repo)), "why is the caller list capped at 50", hits)
     assert out[0]["target_path"] == "enrichment.py"
     assert out[0]["_concept_anchored"] is True
     # Dominates the prior top so the dominance gate passes.
@@ -333,9 +331,7 @@ async def test_concept_anchor_skips_without_a_number(tmp_path):
 
     repo = _git_repo(tmp_path, _CALLER_CAP_FILES)
     hits = [{"target_path": "pager.py", "page_type": "file_page", "score": 2.0}]
-    out = await _concept_anchor_hits(
-        Path(str(repo)), "why is the caller list capped", hits
-    )
+    out = await _concept_anchor_hits(Path(str(repo)), "why is the caller list capped", hits)
     assert all(not h.get("_concept_anchored") for h in out)
 
 
@@ -349,7 +345,5 @@ async def test_concept_anchor_skips_when_retrieval_already_led_with_winner(tmp_p
         {"target_path": "enrichment.py", "page_type": "file_page", "score": 2.0},
         {"target_path": "other.py", "page_type": "file_page", "score": 1.95},
     ]
-    out = await _concept_anchor_hits(
-        Path(str(repo)), "why is the caller list capped at 50", hits
-    )
+    out = await _concept_anchor_hits(Path(str(repo)), "why is the caller list capped at 50", hits)
     assert all(not h.get("_concept_anchored") for h in out)

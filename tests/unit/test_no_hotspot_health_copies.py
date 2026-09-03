@@ -124,8 +124,7 @@ def test_the_plumbing_allowlist_has_no_dead_entries(rel: str) -> None:
     """
     known = {_relative(p) for p in _modules_mentioning_hotspot_health()}
     assert rel in known, (
-        f"_PLUMBING lists {rel!r}, which no longer mentions hotspot_health. "
-        "Remove the entry."
+        f"_PLUMBING lists {rel!r}, which no longer mentions hotspot_health. " "Remove the entry."
     )
 
 

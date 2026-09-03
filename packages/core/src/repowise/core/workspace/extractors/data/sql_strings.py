@@ -188,9 +188,7 @@ class SqlStringsDialect:
             # reads. sqlglot models a reference to one as exp.Table all the
             # same, so ``WITH ranked AS (...) ... FROM ranked`` reported a
             # table named ``ranked``. Only unqualified references shadow.
-            cte_names = {
-                cte.alias.lower() for cte in stmt.find_all(exp.CTE) if cte.alias
-            }
+            cte_names = {cte.alias.lower() for cte in stmt.find_all(exp.CTE) if cte.alias}
             for table in stmt.find_all(exp.Table):
                 name = table.name
                 if not name:

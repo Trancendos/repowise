@@ -23,12 +23,27 @@ from .conftest import create_test_repo
 # Three files in three directories, so a truncated or subset-derived module
 # list is distinguishable from a complete one at any limit under three.
 _FILES = [
-    {"file_path": "src/a.py", "line_coverage_pct": 10.0, "covered_lines": [1],
-     "total_coverable_lines": 10, "branch_coverage_pct": 5.0},
-    {"file_path": "lib/b.py", "line_coverage_pct": 50.0, "covered_lines": [1, 2],
-     "total_coverable_lines": 20, "branch_coverage_pct": 40.0},
-    {"file_path": "tools/c.py", "line_coverage_pct": 90.0, "covered_lines": [1, 2, 3],
-     "total_coverable_lines": 30, "branch_coverage_pct": 80.0},
+    {
+        "file_path": "src/a.py",
+        "line_coverage_pct": 10.0,
+        "covered_lines": [1],
+        "total_coverable_lines": 10,
+        "branch_coverage_pct": 5.0,
+    },
+    {
+        "file_path": "lib/b.py",
+        "line_coverage_pct": 50.0,
+        "covered_lines": [1, 2],
+        "total_coverable_lines": 20,
+        "branch_coverage_pct": 40.0,
+    },
+    {
+        "file_path": "tools/c.py",
+        "line_coverage_pct": 90.0,
+        "covered_lines": [1, 2, 3],
+        "total_coverable_lines": 30,
+        "branch_coverage_pct": 80.0,
+    },
 ]
 
 
@@ -71,9 +86,7 @@ async def _get(client, repo_id: str, **params) -> dict:
 
 
 @pytest.mark.parametrize("limit", [1, 2])
-async def test_the_file_limit_does_not_cap_the_module_rollup(
-    client, seeded, limit
-) -> None:
+async def test_the_file_limit_does_not_cap_the_module_rollup(client, seeded, limit) -> None:
     """``limit`` caps ``files``; ``module_limit`` caps ``modules``.
 
     Only limits below the module count can show this, hence 1 and 2 against
@@ -87,9 +100,7 @@ async def test_the_file_limit_does_not_cap_the_module_rollup(
     assert body["modules_total"] == 3
 
 
-async def test_module_limit_caps_modules_without_touching_files(
-    client, seeded
-) -> None:
+async def test_module_limit_caps_modules_without_touching_files(client, seeded) -> None:
     body = await _get(client, seeded["id"], limit=3, module_limit=1)
 
     assert len(body["files"]) == 3
@@ -98,9 +109,7 @@ async def test_module_limit_caps_modules_without_touching_files(
     assert body["modules_total"] == 3
 
 
-async def test_module_limit_zero_declines_the_rollup_but_still_counts_it(
-    client, seeded
-) -> None:
+async def test_module_limit_zero_declines_the_rollup_but_still_counts_it(client, seeded) -> None:
     """What the tab badge sends: the summary, and none of the rest."""
     body = await _get(client, seeded["id"], limit=1, module_limit=0)
 
@@ -110,9 +119,7 @@ async def test_module_limit_zero_declines_the_rollup_but_still_counts_it(
 
 
 @pytest.mark.parametrize("limit", [1, 3, 500])
-async def test_modules_cover_the_repo_when_one_file_is_requested(
-    client, seeded, limit
-) -> None:
+async def test_modules_cover_the_repo_when_one_file_is_requested(client, seeded, limit) -> None:
     """``?file_path=`` scopes ``files``, and nothing else.
 
     The module aggregation used to run over the single-row read, so this
@@ -126,9 +133,7 @@ async def test_modules_cover_the_repo_when_one_file_is_requested(
     assert {m["module"] for m in body["modules"]} == {"src", "lib", "tools"}
 
 
-async def test_summary_stays_repo_wide_for_a_single_file_request(
-    client, seeded
-) -> None:
+async def test_summary_stays_repo_wide_for_a_single_file_request(client, seeded) -> None:
     """Guards the shared read, not a past bug.
 
     ``summary`` is now computed from rows the route loaded rather than from a
@@ -144,9 +149,7 @@ async def test_summary_stays_repo_wide_for_a_single_file_request(
     assert one_file["summary"]["covered_lines"] == 38
 
 
-async def test_module_rollup_counts_every_file_not_just_the_returned_page(
-    client, seeded
-) -> None:
+async def test_module_rollup_counts_every_file_not_just_the_returned_page(client, seeded) -> None:
     body = await _get(client, seeded["id"], limit=1)
 
     by_name = {m["module"]: m for m in body["modules"]}
@@ -187,9 +190,7 @@ async def test_a_file_with_no_health_metric_still_returns_its_coverage(
     assert body["files"][1]["health_score"] == 6.0
 
 
-async def test_covered_lines_are_withheld_from_the_list_response(
-    client, seeded
-) -> None:
+async def test_covered_lines_are_withheld_from_the_list_response(client, seeded) -> None:
     """The list response carries no covered-line arrays; the detail one does."""
     listed = await _get(client, seeded["id"], limit=500)
     detail = await _get(client, seeded["id"], file_path="tools/c.py")

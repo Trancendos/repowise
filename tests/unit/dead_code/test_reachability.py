@@ -197,9 +197,9 @@ def test_framework_anchor_counts_as_cross_package_importer():
     )
 
     zombie_pkgs = [f.file_path for f in report.findings if f.kind == DeadCodeKind.ZOMBIE_PACKAGE]
-    assert "Configuration" not in zombie_pkgs, (
-        "framework: predecessors should count as cross-package importers"
-    )
+    assert (
+        "Configuration" not in zombie_pkgs
+    ), "framework: predecessors should count as cross-package importers"
 
 
 def test_framework_anchor_node_not_flagged_as_unreachable():

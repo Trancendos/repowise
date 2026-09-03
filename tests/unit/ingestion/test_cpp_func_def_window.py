@@ -44,9 +44,7 @@ CORPUS = {
     "paren_but_no_match": "int x = (1 + 2);\nint y = 3;\n",
     "initializer_run_small": (
         "static inline const std::vector<LetterKey> letters = { LetterKey::VK_0,\n"
-        + "\n".join(
-            f"    LetterKey::VK_{c}," for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        )
+        + "\n".join(f"    LetterKey::VK_{c}," for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
         + "\n    LetterKey::VK_BACKSLASH, };\n"
         "void after_the_array() {\n    run();\n}\n"
     ),
@@ -124,9 +122,11 @@ def test_pathological_run_is_fast_and_equivalent() -> None:
     # The KeyboardListener.h shape: a multi-KB run of prefix-class chars
     # (identifiers, ::, commas, whitespace) with no parens. The full-text
     # scan blows up combinatorially; windowed must stay instant and equal.
-    run = "static inline const std::vector<LetterKey> letters = {\n" + "".join(
-        f"    LetterKey::VK_{i},\n" for i in range(250)
-    ) + "};\n"
+    run = (
+        "static inline const std::vector<LetterKey> letters = {\n"
+        + "".join(f"    LetterKey::VK_{i},\n" for i in range(250))
+        + "};\n"
+    )
     text = run + "void after(int x) {\n    run();\n}\n"
     import time
 

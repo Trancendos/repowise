@@ -247,6 +247,7 @@ def _is_symbol_deprecated(sym_name: str, decorators: list[str]) -> bool:
                 return True
     return False
 
+
 # Symbol kinds that cannot be independently imported by name in any
 # supported language. Flagging them as "unused exports" is a guaranteed
 # false-positive — they're always accessed through an enclosing class /
@@ -334,7 +335,6 @@ def _non_importable_kinds(language: str) -> frozenset[str]:
             return _UNIVERSAL_NON_IMPORTABLE - _TS_JS_IMPORTABLE_KINDS
         return _UNIVERSAL_NON_IMPORTABLE
     return _UNIVERSAL_NON_IMPORTABLE | extra
-
 
 
 # Preserved for tests / external callers that imported the old name.
@@ -802,9 +802,7 @@ class DeadCodeAnalyzer:
 
         high = sum(1 for f in findings if f.confidence >= SAFE_CONFIDENCE_THRESHOLD)
         medium = sum(
-            1
-            for f in findings
-            if RISK_CAP_CONFIDENCE <= f.confidence < SAFE_CONFIDENCE_THRESHOLD
+            1 for f in findings if RISK_CAP_CONFIDENCE <= f.confidence < SAFE_CONFIDENCE_THRESHOLD
         )
         low = sum(1 for f in findings if f.confidence < RISK_CAP_CONFIDENCE)
 
@@ -903,7 +901,9 @@ class DeadCodeAnalyzer:
             budget -= len(blob)
             # ``finditer`` rather than ``findall``: the latter materialises
             # every match at once, roughly 500k bytes objects for a 4 MB blob.
-            tokens.update(m.group().decode("ascii", "ignore") for m in _IDENTIFIER_RE.finditer(blob))
+            tokens.update(
+                m.group().decode("ascii", "ignore") for m in _IDENTIFIER_RE.finditer(blob)
+            )
         self._unindexed_tokens = frozenset(tokens)
         return self._unindexed_tokens
 
@@ -1321,9 +1321,7 @@ class DeadCodeAnalyzer:
                 if local_refs and sym_name in local_refs:
                     continue
 
-                is_deprecated = _is_symbol_deprecated(
-                    sym_name, sym.get("decorators") or []
-                )
+                is_deprecated = _is_symbol_deprecated(sym_name, sym.get("decorators") or [])
 
                 # ``export { local as alias }`` publishes the symbol under the
                 # alias; importers carry the alias in ``imported_names``.
@@ -1784,4 +1782,3 @@ class DeadCodeAnalyzer:
                 dt = dt.replace(tzinfo=UTC)
             return (now - dt).days > days
         return False
-

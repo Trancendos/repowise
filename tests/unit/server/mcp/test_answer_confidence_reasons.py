@@ -110,9 +110,9 @@ async def test_ambiguous_retrieval_never_reads_as_dominant(setup_mcp, monkeypatc
     note = result.get("note") or ""
     assert result["confidence"] == "high", "the opt-in must actually reach the high branch"
     assert result["retrieval_quality"] == "weak", "a tied top pair is ambiguous retrieval"
-    assert not ("dominates" in note and "ambiguous" in note), (
-        f"note asserts dominance and ambiguity together: {note!r}"
-    )
+    assert not (
+        "dominates" in note and "ambiguous" in note
+    ), f"note asserts dominance and ambiguity together: {note!r}"
     assert "dominance ratio 1.00x" not in note, "a 1.00x ratio is a tie, not dominance"
     assert "do not re-read the source" not in note
 
@@ -133,9 +133,9 @@ async def test_grounded_prose_does_not_earn_high_on_weak_retrieval(setup_mcp, mo
 
     result = await get_answer(_QUESTION)
     assert result["retrieval_quality"] == "weak"
-    assert result["confidence"] == "medium", (
-        "answer-grounding alone must not out-vote an ambiguous retrieval"
-    )
+    assert (
+        result["confidence"] == "medium"
+    ), "answer-grounding alone must not out-vote an ambiguous retrieval"
     assert "do not re-read the source" not in (result.get("note") or "")
 
 
@@ -281,6 +281,6 @@ async def test_a_served_named_body_still_earns_high_on_weak_retrieval(
     assert "symbol_bodies" in note, "the note must name the evidence it actually used"
     assert "clearly dominates" not in note
     assert "verify against best_guesses" not in note
-    assert "next_action_hint" not in result, (
-        "do not send the agent to the candidates the confidence does not rest on"
-    )
+    assert (
+        "next_action_hint" not in result
+    ), "do not send the agent to the candidates the confidence does not rest on"

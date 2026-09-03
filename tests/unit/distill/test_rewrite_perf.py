@@ -149,9 +149,9 @@ def test_a_ledgered_invocation_stays_under_budget(tmp_path: Path) -> None:
     # Guard the guard: a budget met by not writing the row would pass forever.
     db = tmp_path / ".repowise" / "sessions" / "sessions.db"
     assert db.exists(), "the probe never reached the ledger write it is timing"
-    assert p95 < _LEDGERED_BUDGET_MS, (
-        f"a ledgered rewrite p95 {p95:.1f} ms >= {_LEDGERED_BUDGET_MS} ms"
-    )
+    assert (
+        p95 < _LEDGERED_BUDGET_MS
+    ), f"a ledgered rewrite p95 {p95:.1f} ms >= {_LEDGERED_BUDGET_MS} ms"
 
 
 @pytest.mark.parametrize("command", _PERF_COMMANDS)

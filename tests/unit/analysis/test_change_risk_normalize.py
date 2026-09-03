@@ -81,9 +81,7 @@ def test_cuts_agree_with_priority_banding(scores: list[float]) -> None:
     assert n.moderate_cut is not None and n.high_cut is not None
     assert n.moderate_cut <= n.high_cut
     for s in scores:
-        expected = (
-            "high" if s >= n.high_cut else "moderate" if s >= n.moderate_cut else "low"
-        )
+        expected = "high" if s >= n.high_cut else "moderate" if s >= n.moderate_cut else "low"
         assert n.priority(s) == expected, s
 
 

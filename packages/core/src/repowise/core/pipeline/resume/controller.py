@@ -177,8 +177,7 @@ class ResumeController:
             # only by paying for the whole index a second time.
             emit_warning(
                 progress,
-                f"Index checkpoint not saved ({exc}); "
-                "a resumed run will have to recompute it.",
+                f"Index checkpoint not saved ({exc}); " "a resumed run will have to recompute it.",
             )
             return
         self._index_persisted = True

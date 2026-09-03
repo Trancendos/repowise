@@ -202,8 +202,6 @@ class TestThePassNeverMakesADiagramWorse:
         assert "src_main_py[Existing]" in out
 
 
-
-
 def test_strip_leading_preamble_removes_narration():
     md = (
         "I'll examine the actual source file.\n\n"

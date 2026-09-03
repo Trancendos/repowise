@@ -531,9 +531,7 @@ def detect_cross_repo_co_changes(
             continue
         last_ts = pair_last_ts.get((src_repo, src_file, tgt_repo, tgt_file), 0)
         last_date = (
-            datetime.fromtimestamp(last_ts, tz=UTC).strftime("%Y-%m-%d")
-            if last_ts > 0
-            else ""
+            datetime.fromtimestamp(last_ts, tz=UTC).strftime("%Y-%m-%d") if last_ts > 0 else ""
         )
         results.append(
             CrossRepoCoChange(
@@ -1023,9 +1021,7 @@ def save_overlay(overlay: CrossRepoOverlay, workspace_root: Path) -> Path:
     out_path = data_dir / CROSS_REPO_EDGES_FILENAME
     # Atomic: the MCP enricher reads these artifacts from a separate
     # process and must never observe a half-written file.
-    atomic_write_text(
-        out_path, json.dumps(overlay.to_dict(), indent=2, ensure_ascii=False)
-    )
+    atomic_write_text(out_path, json.dumps(overlay.to_dict(), indent=2, ensure_ascii=False))
     return out_path
 
 
@@ -1099,9 +1095,7 @@ async def run_cross_repo_analysis(
     # Co-change detection (CPU-bound git subprocess calls)
     import asyncio
 
-    co_changes, total_co_changes = await asyncio.to_thread(
-        detect_cross_repo_co_changes, repo_paths
-    )
+    co_changes, total_co_changes = await asyncio.to_thread(detect_cross_repo_co_changes, repo_paths)
 
     # Package dependency detection (file I/O)
     package_deps = await asyncio.to_thread(detect_package_dependencies, repo_paths)

@@ -97,7 +97,6 @@ async def test_discover_adrs_maps_superseded_status_from_frontmatter(tmp_path):
     assert "Adopt gRPC" in d.decision
 
 
-
 class TestAdrDiscoveryHonorsIgnoreFiles:
     """A path git cannot see must not become a decision record.
 

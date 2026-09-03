@@ -243,9 +243,7 @@ class TestLinksDoNotShadowTheirTarget:
     wrong in all of them at once.
     """
 
-    def test_a_symlink_sorted_ahead_of_its_target_keeps_the_target(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_symlink_sorted_ahead_of_its_target_keeps_the_target(self, tmp_path: Path) -> None:
         _seed_tree(tmp_path)
         # "linked" sorts before "svc", so os.walk reaches the link first.
         _symlink(tmp_path / "linked", tmp_path / "svc")
@@ -306,9 +304,7 @@ class TestALinkedWalkRootStillSeesItsOwnTree:
     passed on the broken version.
     """
 
-    def test_a_symlinked_root_walks_the_same_tree_as_the_real_one(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_symlinked_root_walks_the_same_tree_as_the_real_one(self, tmp_path: Path) -> None:
         real = tmp_path / "real"
         real.mkdir()
         _seed_tree(real)
@@ -317,9 +313,7 @@ class TestALinkedWalkRootStillSeesItsOwnTree:
         assert _walked(tmp_path / "via_link") == _walked(real)
         assert _walked(real) == (_EXPECTED_DIRS, _EXPECTED_FILES)
 
-    def test_a_junctioned_root_walks_the_same_tree_as_the_real_one(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_junctioned_root_walks_the_same_tree_as_the_real_one(self, tmp_path: Path) -> None:
         real = tmp_path / "real"
         real.mkdir()
         _seed_tree(real)
@@ -327,9 +321,7 @@ class TestALinkedWalkRootStillSeesItsOwnTree:
 
         assert _walked(tmp_path / "via_junction") == _walked(real)
 
-    def test_an_in_tree_link_is_still_caught_under_a_linked_root(
-        self, tmp_path: Path
-    ) -> None:
+    def test_an_in_tree_link_is_still_caught_under_a_linked_root(self, tmp_path: Path) -> None:
         """Both halves at once — the prefix must not mask a real reparse point."""
         real = tmp_path / "real"
         real.mkdir()
@@ -381,9 +373,7 @@ class TestLinkCyclesStillTerminate:
         assert "vendored/pkg/ext.py" in files
         assert set(_EXPECTED_FILES) <= set(files)
 
-    def test_a_cycle_inside_an_out_of_tree_target_is_still_caught(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_cycle_inside_an_out_of_tree_target_is_still_caught(self, tmp_path: Path) -> None:
         """``visited_real`` is still load-bearing, and only here.
 
         In-tree links never reach it now — they are pruned first — so it would

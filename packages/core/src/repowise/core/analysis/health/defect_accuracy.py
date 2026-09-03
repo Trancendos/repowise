@@ -23,8 +23,8 @@ from __future__ import annotations
 from typing import Any
 
 _DEFAULT_K = 20
-_MIN_FILES = 25          # below this a precision@K headline is noise
-_MIN_DEFECT_FILES = 5    # need a real positive class to divide by
+_MIN_FILES = 25  # below this a precision@K headline is noise
+_MIN_DEFECT_FILES = 5  # need a real positive class to divide by
 _DEFAULT_WINDOW_DAYS = 180
 
 
@@ -61,9 +61,7 @@ def compute_defect_accuracy(
     scored = [m for m in metrics if _get(m, "file_path")]
     n = len(scored)
     fix_counts, window_days = _recent_fix_counts(findings)
-    total_defect_files = sum(
-        1 for m in scored if fix_counts.get(_get(m, "file_path"), 0) > 0
-    )
+    total_defect_files = sum(1 for m in scored if fix_counts.get(_get(m, "file_path"), 0) > 0)
 
     if n < _MIN_FILES or total_defect_files < _MIN_DEFECT_FILES:
         return None
@@ -84,11 +82,7 @@ def compute_defect_accuracy(
     conc_share = hits_in(ranked[:k_conc]) / total_defect_files
 
     # Per-K table for the dig-deeper breakdown.
-    table = [
-        {"k": kx, "hits": hits_in(ranked[:kx])}
-        for kx in (10, 20, 30)
-        if kx <= n
-    ]
+    table = [{"k": kx, "hits": hits_in(ranked[:kx])} for kx in (10, 20, 30) if kx <= n]
 
     # The flagged files themselves, for a bulletproof drill-down.
     sample = [

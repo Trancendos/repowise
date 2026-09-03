@@ -138,8 +138,7 @@ _COMMON_TLDS = frozenset({"ai", "app", "com", "dev", "io", "net", "org"})
 _COMMAND_PREFIXES = frozenset({"cargo", "make", "npm", "pnpm", "poe", "uv", "yarn"})
 _HTTP_METHODS = frozenset({"CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"})
 _IDENT = re.compile(
-    rf"^[A-Za-z_][A-Za-z0-9_]*(?:{_QUALIFIER}[A-Za-z_][A-Za-z0-9_]*)+$"
-    r"|^[A-Za-z_][A-Za-z0-9_]*$"
+    rf"^[A-Za-z_][A-Za-z0-9_]*(?:{_QUALIFIER}[A-Za-z_][A-Za-z0-9_]*)+$" r"|^[A-Za-z_][A-Za-z0-9_]*$"
 )
 
 

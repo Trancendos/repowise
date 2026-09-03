@@ -126,9 +126,7 @@ class TestFileBasedRequires:
 
     def test_psr4_use_unaffected(self, tmp_path: Path) -> None:
         # Namespace imports don't end in .php and keep the PSR-4 path.
-        (tmp_path / "composer.json").write_text(
-            '{"autoload": {"psr-4": {"App\\\\": "src/"}}}'
-        )
+        (tmp_path / "composer.json").write_text('{"autoload": {"psr-4": {"App\\\\": "src/"}}}')
         src = tmp_path / "src" / "Service"
         src.mkdir(parents=True)
         (src / "Mailer.php").write_text("<?php namespace App\\Service; class Mailer {}\n")
@@ -145,20 +143,29 @@ class TestRequireExtraction:
         from repowise.core.ingestion.parser import ASTParser
 
         fi = FileInfo(
-            path="index.php", abs_path="/tmp/index.php", language="php",
-            size_bytes=1, git_hash="", last_modified=datetime.now(),
-            is_test=False, is_config=False, is_api_contract=False,
+            path="index.php",
+            abs_path="/tmp/index.php",
+            language="php",
+            size_bytes=1,
+            git_hash="",
+            last_modified=datetime.now(),
+            is_test=False,
+            is_config=False,
+            is_api_contract=False,
             is_entry_point=False,
         )
         src = (
             b"<?php\n"
-            b"require 'lib/helpers.php';\n"           # single-quoted (string node)
-            b'require_once "config/app.php";\n'       # double-quoted (encapsed)
-            b"include __DIR__ . '/inc/db.php';\n"     # __DIR__ concatenation
+            b"require 'lib/helpers.php';\n"  # single-quoted (string node)
+            b'require_once "config/app.php";\n'  # double-quoted (encapsed)
+            b"include __DIR__ . '/inc/db.php';\n"  # __DIR__ concatenation
             b'require __DIR__ . "/inc/auth.php";\n'
         )
         pf = ASTParser().parse_file(fi, src)
         modules = sorted(i.module_path for i in pf.imports)
         assert modules == [
-            "/inc/auth.php", "/inc/db.php", "config/app.php", "lib/helpers.php",
+            "/inc/auth.php",
+            "/inc/db.php",
+            "config/app.php",
+            "lib/helpers.php",
         ]

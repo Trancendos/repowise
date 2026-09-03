@@ -50,9 +50,7 @@ _STORED_DRIFT_LINE = 3  # points at "from collections import defaultdict"
 async def _hydrate_one(session, repo_id, tmp_path, *, session_factory=None):
     hits = [{"target_path": "mod.py", "page_type": "file_page"}]
     ctx = SimpleNamespace(path=tmp_path, session_factory=session_factory)
-    await _hydrate_symbols_for_hits(
-        session, repo_id, hits, ctx, question_ids={"target_func"}
-    )
+    await _hydrate_symbols_for_hits(session, repo_id, hits, ctx, question_ids={"target_func"})
     return hits[0].get("symbols") or []
 
 
@@ -112,9 +110,7 @@ async def test_corrected_row_is_healed(session, factory, repo_id, tmp_path):
     assert healed.start_line == _REAL_DEF_LINE
 
 
-async def test_unrelocatable_symbol_falls_back_to_stored_signature(
-    session, repo_id, tmp_path
-):
+async def test_unrelocatable_symbol_falls_back_to_stored_signature(session, repo_id, tmp_path):
     """A symbol the live file no longer defines: serve the stored signature, no body."""
     # The file defines target_func, but the index row is for a symbol that was
     # renamed away — relocation cannot find it, so bounds are approximate.
@@ -129,9 +125,7 @@ async def test_unrelocatable_symbol_falls_back_to_stored_signature(
 
     hits = [{"target_path": "mod.py", "page_type": "file_page"}]
     ctx = SimpleNamespace(path=tmp_path, session_factory=None)
-    await _hydrate_symbols_for_hits(
-        session, repo_id, hits, ctx, question_ids={"renamed_away"}
-    )
+    await _hydrate_symbols_for_hits(session, repo_id, hits, ctx, question_ids={"renamed_away"})
     matched = next(s for s in hits[0]["symbols"] if s["name"] == "renamed_away")
 
     # Stored signature is served verbatim (self-consistent); no garbled live slice.
@@ -139,9 +133,7 @@ async def test_unrelocatable_symbol_falls_back_to_stored_signature(
     assert "source_excerpt" not in matched
 
 
-async def test_anchor_stashes_verified_bounds_and_heals(
-    session, factory, repo_id, tmp_path
-):
+async def test_anchor_stashes_verified_bounds_and_heals(session, factory, repo_id, tmp_path):
     """Tier-0 symbol anchoring must stash verified bounds, not the drifted ones."""
     from repowise.server.mcp_server.tool_answer.symbols import _anchor_symbol_hits
 

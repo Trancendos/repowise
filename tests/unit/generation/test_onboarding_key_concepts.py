@@ -111,9 +111,7 @@ def _graph_builder(files: list[ParsedFile], edges: list[tuple[str, str, str]]):
         g.add_edge(src, dst, edge_type=et)
 
     concept_edges = [
-        (u, v)
-        for u, v, d in g.edges(data=True)
-        if d.get("edge_type") in SYMBOL_USE_EDGE_TYPES
+        (u, v) for u, v, d in g.edges(data=True) if d.get("edge_type") in SYMBOL_USE_EDGE_TYPES
     ]
     sub = nx.DiGraph()
     sub.add_nodes_from(n for n, d in g.nodes(data=True) if d.get("node_type") == "symbol")

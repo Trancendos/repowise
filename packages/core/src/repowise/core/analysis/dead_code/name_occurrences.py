@@ -93,9 +93,7 @@ _SPAN_UNKNOWN = _Verdict(_Answer.SPAN_UNKNOWN)
 _ABSENT = _Verdict(_Answer.ABSENT)
 
 
-def occurrence_files(
-    source_map: dict[str, bytes], names: set[bytes]
-) -> dict[bytes, set[str]]:
+def occurrence_files(source_map: dict[str, bytes], names: set[bytes]) -> dict[bytes, set[str]]:
     """For each name in *names*, the indexed files whose source writes it.
 
     One pass over the whole indexed source. The candidate names are known
@@ -141,9 +139,7 @@ def _uses_in_own_file(
       site, and excluding the body would drop that use and leave a live symbol
       claiming the top tier.
     """
-    spanned = [
-        f for f in findings if f.start_line is not None and f.end_line is not None
-    ]
+    spanned = [f for f in findings if f.start_line is not None and f.end_line is not None]
     out: dict[int, _Verdict] = {
         id(f): (_ABSENT if f in spanned else _SPAN_UNKNOWN) for f in findings
     }
@@ -238,9 +234,7 @@ def _verdicts(
             continue
         files = occurrences.get(token, set())
         elsewhere = sorted(
-            f
-            for f in files - {finding.file_path}
-            if not _is_own_type_sibling(f, finding.file_path)
+            f for f in files - {finding.file_path} if not _is_own_type_sibling(f, finding.file_path)
         )
         if elsewhere:
             out[id(finding)] = _Verdict(_Answer.USED, elsewhere[0])

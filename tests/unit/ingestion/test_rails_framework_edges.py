@@ -44,9 +44,7 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 def _make_rails_app(repo: Path) -> None:
@@ -110,9 +108,7 @@ class TestRailsRoutes:
             graph.add_node(p)
         ctx = _ctx(tmp_path, parsed)
         add_framework_edges(graph, parsed, ctx, tech_stack=["rails"])
-        assert graph.has_edge(
-            "config/routes.rb", "app/controllers/admin/reports_controller.rb"
-        )
+        assert graph.has_edge("config/routes.rb", "app/controllers/admin/reports_controller.rb")
 
 
 class TestRailsActiveRecord:
@@ -154,9 +150,7 @@ class TestRailsActiveRecord:
 class TestRailsGate:
     def test_non_rails_repo_unaffected(self, tmp_path: Path) -> None:
         # Plain Ruby with similar-looking code but no config/application.rb
-        (tmp_path / "models.rb").write_text(
-            "class Order; belongs_to :user; end\nclass User; end\n"
-        )
+        (tmp_path / "models.rb").write_text("class Order; belongs_to :user; end\nclass User; end\n")
         parsed = _build_parsed(tmp_path)
         graph = nx.DiGraph()
         for p in parsed:

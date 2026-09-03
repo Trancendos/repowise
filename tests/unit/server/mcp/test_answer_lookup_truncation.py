@@ -183,9 +183,9 @@ async def test_a_bare_lookup_whose_body_was_cut_is_not_high(setup_mcp, monkeypat
     result = await get_answer("min_count_policy")
 
     bodies = result.get("symbol_bodies") or []
-    assert any(b.get("truncated") for b in bodies), (
-        "fixture is vacuous: nothing was truncated, so the gate had nothing to fire on"
-    )
+    assert any(
+        b.get("truncated") for b in bodies
+    ), "fixture is vacuous: nothing was truncated, so the gate had nothing to fire on"
     assert bodies[0]["lines"][1] - bodies[0]["lines"][0] + 1 >= 120, (
         "fixture is vacuous: the body did not reach the inline cap, so the cut "
         "was not ours and the gate is right to ignore it"
@@ -201,8 +201,8 @@ async def test_a_bare_lookup_whose_body_was_cut_is_not_high(setup_mcp, monkeypat
     # point at the continuation rather than at the whole body.
     cont = bodies[0]["continuation"]
     assert cont in result.get("note", ""), result.get("note")
-    assert f"get_symbol id='{cont}'" in (result.get("next_action_hint") or ""), (
-        result.get("next_action_hint")
+    assert f"get_symbol id='{cont}'" in (result.get("next_action_hint") or ""), result.get(
+        "next_action_hint"
     )
 
 

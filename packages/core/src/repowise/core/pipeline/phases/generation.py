@@ -101,9 +101,7 @@ async def run_generation(
     # separate phase (init's generate_docs=False flow) — the flag's documented
     # purpose is to cap the *generation* work, and this is where that happens.
     if test_run:
-        parsed_files = limit_to_top_pagerank(
-            parsed_files, graph_builder, n=TEST_RUN_FILE_LIMIT
-        )
+        parsed_files = limit_to_top_pagerank(parsed_files, graph_builder, n=TEST_RUN_FILE_LIMIT)
         if progress:
             progress.on_message("warning", f"Test run: limiting to {len(parsed_files)} files")
 

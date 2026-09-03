@@ -29,8 +29,7 @@ def _python_is_fastapi_router(parsed: ParsedFile) -> bool:
     # module_path = "fastapi" and imported_names = ["APIRouter"], and
     # sometimes with module_path = "fastapi.APIRouter". Cover both.
     imports_fastapi = any(
-        imp.module_path == "fastapi"
-        or imp.module_path.startswith("fastapi.")
+        imp.module_path == "fastapi" or imp.module_path.startswith("fastapi.")
         for imp in parsed.imports
     )
     if not imports_fastapi:
@@ -44,14 +43,22 @@ def _python_is_fastapi_router(parsed: ParsedFile) -> bool:
         for dec in sym.decorators:
             head = dec.lstrip("@").split("(", 1)[0]
             if "." in head and head.rsplit(".", 1)[1] in {
-                "get", "post", "put", "patch", "delete", "head", "options",
+                "get",
+                "post",
+                "put",
+                "patch",
+                "delete",
+                "head",
+                "options",
             }:
                 return True
     return False
 
 
 _ASPNET_CONTROLLER_BASES = frozenset({"ControllerBase", "Controller", "ApiController"})
-_ASPNET_ATTRIBUTES = frozenset({"ApiController", "Route", "HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch"})
+_ASPNET_ATTRIBUTES = frozenset(
+    {"ApiController", "Route", "HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch"}
+)
 
 
 def _csharp_is_aspnet_controller(parsed: ParsedFile) -> bool:

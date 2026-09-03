@@ -38,9 +38,7 @@ def _build_workspace(root: Path) -> None:
     )
 
 
-def test_update_from_workspace_root_does_not_create_stray_repowise(
-    tmp_path: Path, monkeypatch
-):
+def test_update_from_workspace_root_does_not_create_stray_repowise(tmp_path: Path, monkeypatch):
     """Regression: running ``repowise update`` from a workspace root used
     to leave a stray ``<workspace>/.repowise/`` behind before erroring."""
     _build_workspace(tmp_path)
@@ -100,9 +98,7 @@ def test_update_from_child_repo_stays_single(tmp_path: Path, monkeypatch):
     assert "Already up to date" in result.output or "single-repo" in result.output
 
 
-def test_update_with_no_workspace_flag_overrides_autodetect(
-    tmp_path: Path, monkeypatch
-):
+def test_update_with_no_workspace_flag_overrides_autodetect(tmp_path: Path, monkeypatch):
     """``--no-workspace`` from a workspace root should run the single-repo
     code path on the workspace root and emit the helpful workspace hint."""
     _build_workspace(tmp_path)

@@ -50,9 +50,7 @@ def _to_repo_relative(abs_path: Path, repo_root_resolved: Path) -> str | None:
         return None
 
 
-def _legacy_stem_resolve(
-    module_path: str, ctx: ResolverContext
-) -> str | None:
+def _legacy_stem_resolve(module_path: str, ctx: ResolverContext) -> str | None:
     """Original 26-line resolver — used when no project index is available."""
     parts = module_path.split(".")
     local = parts[-1]
@@ -110,9 +108,7 @@ def _matches_package_prefix(module_path: str, packages: set[str]) -> bool:
     return any(module_path == pkg or module_path.startswith(pkg + ".") for pkg in packages)
 
 
-def resolve_csharp_import(
-    module_path: str, importer_path: str, ctx: ResolverContext
-) -> str | None:
+def resolve_csharp_import(module_path: str, importer_path: str, ctx: ResolverContext) -> str | None:
     """Resolve a C# using directive to a repo-relative file path or external key."""
     index = get_or_build_index(ctx)
     if index is None or not ctx.repo_path:

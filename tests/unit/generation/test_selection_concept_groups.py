@@ -416,9 +416,7 @@ def _leaf(members: list[str]) -> ConceptGroup:
 def _synthesised(leaves: list[ConceptGroup], files: list[str]):
     """The chapters that need a page of their own, as the selector builds them."""
     chapters = _chapter_members(leaves, files)
-    return chapters, _build_rollup_groups(
-        chapters, leaves, files, {f: "python" for f in files}, {}
-    )
+    return chapters, _build_rollup_groups(chapters, leaves, files, {f: "python" for f in files}, {})
 
 
 def test_chapter_emitted_for_parent_of_two_leaf_pages():
@@ -498,12 +496,16 @@ def test_chapter_titles_are_disambiguated_against_the_leaves():
         _module_group("a/web/components", files=(), chapter=True, display=""),
         _module_group("a/ext/components", files=(), chapter=True, display=""),
         _module_group(
-            "a/web/components/x", files=("a/web/components/x/1.py",),
-            chapter=False, display="Components Overview",
+            "a/web/components/x",
+            files=("a/web/components/x/1.py",),
+            chapter=False,
+            display="Components Overview",
         ),
         _module_group(
-            "a/ext/components/y", files=("a/ext/components/y/5.py",),
-            chapter=False, display="Entity Cards",
+            "a/ext/components/y",
+            files=("a/ext/components/y/5.py",),
+            chapter=False,
+            display="Entity Cards",
         ),
     ]
 
@@ -525,12 +527,16 @@ def test_a_chapter_is_named_for_the_directory_it_heads():
     """
     groups = [
         _module_group(
-            "p/ingestion", files=("p/ingestion/loose.py",),
-            chapter=True, display="Pipeline Bootstrap Helpers",
+            "p/ingestion",
+            files=("p/ingestion/loose.py",),
+            chapter=True,
+            display="Pipeline Bootstrap Helpers",
         ),
         _module_group(
-            "p/ingestion/languages", files=("p/ingestion/languages/a.py",),
-            chapter=False, display="Language Catalog",
+            "p/ingestion/languages",
+            files=("p/ingestion/languages/a.py",),
+            chapter=False,
+            display="Language Catalog",
         ),
     ]
 
@@ -546,13 +552,17 @@ def test_a_chapter_skips_container_and_route_segments():
     groups = [
         _module_group("packages/ui/src", files=(), chapter=True, display=""),
         _module_group(
-            "packages/ui/src/zoom", files=("packages/ui/src/zoom/a.ts",),
-            chapter=False, display="Zoom Canvas",
+            "packages/ui/src/zoom",
+            files=("packages/ui/src/zoom/a.ts",),
+            chapter=False,
+            display="Zoom Canvas",
         ),
         _module_group("app/repos/[id]", files=(), chapter=True, display=""),
         _module_group(
-            "app/repos/[id]/docs", files=("app/repos/[id]/docs/p.tsx",),
-            chapter=False, display="Docs Routes",
+            "app/repos/[id]/docs",
+            files=("app/repos/[id]/docs/p.tsx",),
+            chapter=False,
+            display="Docs Routes",
         ),
     ]
 
@@ -571,12 +581,16 @@ def test_a_chapter_spells_its_subject_the_way_the_repository_does():
     groups = [
         _module_group("packages/ui/src", files=(), chapter=True, display=""),
         _module_group(
-            "packages/ui/src/zoom", files=("packages/ui/src/zoom/a.ts",),
-            chapter=False, display="Zoom UI Canvas",
+            "packages/ui/src/zoom",
+            files=("packages/ui/src/zoom/a.ts",),
+            chapter=False,
+            display="Zoom UI Canvas",
         ),
         _module_group(
-            "packages/ui/src/wiki", files=("packages/ui/src/wiki/b.ts",),
-            chapter=False, display="Wiki UI Panels",
+            "packages/ui/src/wiki",
+            files=("packages/ui/src/wiki/b.ts",),
+            chapter=False,
+            display="Wiki UI Panels",
         ),
     ]
 
@@ -592,8 +606,10 @@ def test_a_chapter_takes_its_casing_only_from_a_deliberate_spelling():
     groups = [
         _module_group("p/core", files=(), chapter=True, display=""),
         _module_group(
-            "p/core/a", files=("p/core/a/x.py",),
-            chapter=False, display="Helpers for core and friends",
+            "p/core/a",
+            files=("p/core/a/x.py",),
+            chapter=False,
+            display="Helpers for core and friends",
         ),
     ]
 
@@ -601,7 +617,7 @@ def test_a_chapter_takes_its_casing_only_from_a_deliberate_spelling():
 
 
 def test_a_chapter_does_not_become_a_case_variant_of_a_leaf():
-    """"UI Overview" over "Ui Overview" is one thing written twice.
+    """ "UI Overview" over "Ui Overview" is one thing written twice.
 
     The chapter borrows its casing from its children and the leaf derives its
     own from a path, so the two arrive spelled differently and an exact-match
@@ -610,12 +626,16 @@ def test_a_chapter_does_not_become_a_case_variant_of_a_leaf():
     groups = [
         _module_group("packages/ui/src", files=(), chapter=True, display=""),
         _module_group(
-            "packages/ui/src/overview", files=("packages/ui/src/overview/a.ts",),
-            chapter=False, display="Ui Overview",
+            "packages/ui/src/overview",
+            files=("packages/ui/src/overview/a.ts",),
+            chapter=False,
+            display="Ui Overview",
         ),
         _module_group(
-            "packages/ui/src/zoom", files=("packages/ui/src/zoom/b.ts",),
-            chapter=False, display="Zoom UI Canvas",
+            "packages/ui/src/zoom",
+            files=("packages/ui/src/zoom/b.ts",),
+            chapter=False,
+            display="Zoom UI Canvas",
         ),
     ]
 
@@ -637,9 +657,7 @@ def test_a_chapter_is_named_from_the_children_the_tree_puts_under_it():
         _module_group(
             "p/svc/api/v2", files=("p/svc/api/v2/a.py",), chapter=False, display="V2 API Routes"
         ),
-        _module_group(
-            "p/svc/db", files=("p/svc/db/b.py",), chapter=False, display="Storage Layer"
-        ),
+        _module_group("p/svc/db", files=("p/svc/db/b.py",), chapter=False, display="Storage Layer"),
     ]
 
     out = {g.key: g.display for g in retitle_chapters(groups)}

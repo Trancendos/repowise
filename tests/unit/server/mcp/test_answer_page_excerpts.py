@@ -159,9 +159,9 @@ async def test_hit_with_no_page_content_is_counted_and_logged(
 
     assert result["answer"], "a missing page body degrades the prompt, never the response"
     assert prompts and "One-line summary of the page." in prompts[0]
-    assert any("no page content" in r.getMessage() for r in caplog.records), (
-        "hits served to synthesis without page content must be reported"
-    )
+    assert any(
+        "no page content" in r.getMessage() for r in caplog.records
+    ), "hits served to synthesis without page content must be reported"
 
 
 @pytest.mark.asyncio

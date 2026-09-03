@@ -54,9 +54,7 @@ def graph_and_report(tmp_path_factory):
 
 
 def _calls_to(graph, target: str) -> bool:
-    return any(
-        graph[u][target].get("edge_type") == "calls" for u in graph.predecessors(target)
-    )
+    return any(graph[u][target].get("edge_type") == "calls" for u in graph.predecessors(target))
 
 
 def test_property_access_call_resolves_to_required_export(graph_and_report):

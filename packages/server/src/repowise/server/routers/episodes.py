@@ -200,9 +200,7 @@ async def episode_counts(
     if got is None:
         return EpisodeCountsResponse(available=False)
     by_tier, by_kind = got
-    return EpisodeCountsResponse(
-        total=sum(by_tier.values()), by_tier=by_tier, by_kind=by_kind
-    )
+    return EpisodeCountsResponse(total=sum(by_tier.values()), by_tier=by_tier, by_kind=by_kind)
 
 
 @router.get("/{repo_id}/episodes/by-file", response_model=EpisodeListResponse)

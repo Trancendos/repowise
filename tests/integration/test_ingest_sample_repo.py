@@ -123,9 +123,9 @@ class TestIngestSampleRepo:
         """Python files in the sample repo should parse cleanly."""
         for p in ingestion_result["parsed"]:
             if p.file_info.language == "python":
-                assert p.parse_errors == [], (
-                    f"{p.file_info.path} has parse errors: {p.parse_errors}"
-                )
+                assert (
+                    p.parse_errors == []
+                ), f"{p.file_info.path} has parse errors: {p.parse_errors}"
 
     def test_calculator_class_found(self, ingestion_result) -> None:
         """The Calculator class must be extracted from python_pkg/calculator.py."""
@@ -152,9 +152,9 @@ class TestIngestSampleRepo:
             pairs = [(s.name, s.kind) for s in p.symbols]
             dups = [pair for pair in set(pairs) if pairs.count(pair) > 1]
             for name, kind in dups:
-                assert kind in allowed_dup_kinds, (
-                    f"{p.file_info.path}: unexpected duplicate (name={name!r}, kind={kind!r})"
-                )
+                assert (
+                    kind in allowed_dup_kinds
+                ), f"{p.file_info.path}: unexpected duplicate (name={name!r}, kind={kind!r})"
 
     # ------------------------------------------------------------------
     # Import extraction
@@ -241,17 +241,13 @@ class TestIngestSampleRepo:
     def test_symbol_nodes_exist(self, ingestion_result) -> None:
         """Verify that the graph contains symbol-level nodes."""
         graph = ingestion_result["graph"]
-        symbol_nodes = [
-            n for n, d in graph.nodes(data=True) if d.get("node_type") == "symbol"
-        ]
+        symbol_nodes = [n for n, d in graph.nodes(data=True) if d.get("node_type") == "symbol"]
         assert len(symbol_nodes) > 0, "Graph should contain symbol nodes"
 
     def test_calls_edges_exist(self, ingestion_result) -> None:
         """Verify that CALLS edges were resolved between symbol nodes."""
         graph = ingestion_result["graph"]
-        call_edges = [
-            (u, v) for u, v, d in graph.edges(data=True) if d.get("edge_type") == "calls"
-        ]
+        call_edges = [(u, v) for u, v, d in graph.edges(data=True) if d.get("edge_type") == "calls"]
         # The sample repo has functions calling other functions
         assert len(call_edges) >= 0  # may be 0 for small sample repos
 
@@ -303,11 +299,7 @@ class TestIngestSampleRepo:
     def test_rust_trait_impl_heritage_extracted(self, ingestion_result) -> None:
         """Rust std trait impls (Default, Debug, etc.) are filtered as builtins."""
         calc_file = next(
-            (
-                p
-                for p in ingestion_result["parsed"]
-                if p.file_info.path.endswith("calculator.rs")
-            ),
+            (p for p in ingestion_result["parsed"] if p.file_info.path.endswith("calculator.rs")),
             None,
         )
         assert calc_file is not None
@@ -320,9 +312,9 @@ class TestIngestSampleRepo:
         valid_kinds = {"extends", "implements", "trait_impl", "mixin", "derive"}
         for p in ingestion_result["parsed"]:
             for h in p.heritage:
-                assert h.kind in valid_kinds, (
-                    f"{p.file_info.path}: invalid heritage kind {h.kind!r}"
-                )
+                assert (
+                    h.kind in valid_kinds
+                ), f"{p.file_info.path}: invalid heritage kind {h.kind!r}"
 
     # ------------------------------------------------------------------
     # Graph edge types

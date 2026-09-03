@@ -83,8 +83,9 @@ def ensure_clone(name: str, spec: dict) -> Path:
             ["git", "-C", str(dest), "checkout", "--quiet", spec["sha"]], capture_output=True
         )
         if fetched.returncode != 0:
-            subprocess.run(["git", "-C", str(dest), "fetch", "--quiet", "origin", spec["sha"]],
-                           check=False)
+            subprocess.run(
+                ["git", "-C", str(dest), "fetch", "--quiet", "origin", spec["sha"]], check=False
+            )
             subprocess.run(["git", "-C", str(dest), "checkout", "--quiet", spec["sha"]], check=True)
         print(f"  {name}: checked out pinned {spec['sha'][:10]}")
     return dest
@@ -100,7 +101,9 @@ def index_repo(dest: Path) -> None:
     )
     res = subprocess.run([PY, "-c", code], env=env, capture_output=True, text=True)
     if res.returncode != 0:
-        raise RuntimeError(f"index failed for {dest.name}:\n{res.stdout[-2000:]}\n{res.stderr[-2000:]}")
+        raise RuntimeError(
+            f"index failed for {dest.name}:\n{res.stdout[-2000:]}\n{res.stderr[-2000:]}"
+        )
 
 
 def check_repo(name: str, support: dict[str, str], *, skip_index: bool) -> RepoReport:
@@ -179,9 +182,7 @@ def main() -> int:
             print(f"  !! {s.severity} {s.code}: {s.message}")
         if not report.smells:
             print("  OK — no smells")
-        if args.update_baselines and not any(
-            s.code == "harness_error" for s in report.smells
-        ):
+        if args.update_baselines and not any(s.code == "harness_error" for s in report.smells):
             BASELINE_DIR.mkdir(exist_ok=True)
             (BASELINE_DIR / f"{name}.json").write_text(
                 json.dumps(report.as_dict(), indent=1, sort_keys=True) + "\n", encoding="utf-8"
@@ -208,7 +209,10 @@ def main() -> int:
         print(f"modules report written to {args.modules_report}")
 
     failed = [r.repo for r in reports if r.failed]
-    print(f"\n{len(reports) - len(failed)}/{len(reports)} clean" + (f"; FAILED: {failed}" if failed else ""))
+    print(
+        f"\n{len(reports) - len(failed)}/{len(reports)} clean"
+        + (f"; FAILED: {failed}" if failed else "")
+    )
     return 1 if failed else 0
 
 

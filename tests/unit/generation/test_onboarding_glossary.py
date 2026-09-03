@@ -259,9 +259,7 @@ def render():
     env.filters["table_cell"] = cell
 
     def _render(ctx):
-        return env.get_template("stub/onboarding/glossary.j2").render(
-            ctx=ctx, slot=SLOT_GLOSSARY
-        )
+        return env.get_template("stub/onboarding/glossary.j2").render(ctx=ctx, slot=SLOT_GLOSSARY)
 
     return _render
 
@@ -382,14 +380,61 @@ def test_a_deterministic_subkind_reaches_the_no_provider_path():
 #: matches — a digit in the name matches no module group and corroborates
 #: nothing.
 _STEMS = [
-    "alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel",
-    "india", "juliet", "kilo", "lima", "mike", "november", "oscar", "papa",
-    "quebec", "romeo", "sierra", "tango", "uniform", "victor", "whiskey",
-    "xray", "yankee", "zulu", "amber", "bronze", "copper", "diamond",
-    "emerald", "flint", "garnet", "ivory", "jade", "kevlar", "lapis",
-    "marble", "nickel", "onyx", "pearl", "quartz", "ruby", "slate", "topaz",
-    "umber", "violet", "willow", "xenon", "yarrow", "zircon", "almond",
-    "birch", "cedar", "dogwood",
+    "alpha",
+    "bravo",
+    "charlie",
+    "delta",
+    "echo",
+    "foxtrot",
+    "golf",
+    "hotel",
+    "india",
+    "juliet",
+    "kilo",
+    "lima",
+    "mike",
+    "november",
+    "oscar",
+    "papa",
+    "quebec",
+    "romeo",
+    "sierra",
+    "tango",
+    "uniform",
+    "victor",
+    "whiskey",
+    "xray",
+    "yankee",
+    "zulu",
+    "amber",
+    "bronze",
+    "copper",
+    "diamond",
+    "emerald",
+    "flint",
+    "garnet",
+    "ivory",
+    "jade",
+    "kevlar",
+    "lapis",
+    "marble",
+    "nickel",
+    "onyx",
+    "pearl",
+    "quartz",
+    "ruby",
+    "slate",
+    "topaz",
+    "umber",
+    "violet",
+    "willow",
+    "xenon",
+    "yarrow",
+    "zircon",
+    "almond",
+    "birch",
+    "cedar",
+    "dogwood",
 ]
 
 
@@ -426,7 +471,7 @@ def test_a_page_listing_everything_claims_no_truncation(render):
 
 
 def test_a_row_says_when_its_subsystem_list_is_cut(render):
-    """"Where it is used" is the column a reader acts on, and a truncated list
+    """ "Where it is used" is the column a reader acts on, and a truncated list
     reads as the whole list."""
     modules = [
         *MODULES,

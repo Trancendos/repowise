@@ -48,8 +48,7 @@ depends_on: str | Sequence[str] | None = None
 def _has_column() -> bool:
     inspector = sa.inspect(op.get_bind())
     return any(
-        c["name"] == "per_file_deductions_json"
-        for c in inspector.get_columns("health_snapshots")
+        c["name"] == "per_file_deductions_json" for c in inspector.get_columns("health_snapshots")
     )
 
 

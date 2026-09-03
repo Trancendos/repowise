@@ -103,9 +103,7 @@ async def test_update_graph_converges_with_init_graph(tmp_path: Path) -> None:
 
     # The exact property the centrality cache keys on: identical file and
     # symbol subgraph signatures, so a first post-init update can hit.
-    assert subgraph_signature(init_gb.file_subgraph()) == subgraph_signature(
-        upd_gb.file_subgraph()
-    )
+    assert subgraph_signature(init_gb.file_subgraph()) == subgraph_signature(upd_gb.file_subgraph())
     assert subgraph_signature(init_gb.symbol_subgraph()) == subgraph_signature(
         upd_gb.symbol_subgraph()
     )

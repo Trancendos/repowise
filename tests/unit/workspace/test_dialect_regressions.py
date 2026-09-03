@@ -32,9 +32,7 @@ from repowise.core.workspace.extractors.http.fastapi import FastApiDialect
 
 
 def _ctx(content: str, rel_path: str = "app/routers/chat.py") -> ScanContext:
-    return ScanContext(
-        repo_alias="backend", rel_path=rel_path, suffix=".py", content=content
-    )
+    return ScanContext(repo_alias="backend", rel_path=rel_path, suffix=".py", content=content)
 
 
 def _ids(contracts) -> set[str]:
@@ -45,7 +43,7 @@ class TestFastApiEmptyPath:
     """Regression 1: ``@router.post("")`` mounted at a router prefix."""
 
     # Mirrors backend/app/routers/workspace_chat.py:34,162 and chat.py:49,352.
-    SOURCE = '''
+    SOURCE = """
 router = APIRouter(prefix="/snapshots/{snapshot_id}/chat", tags=["chat"])
 
 
@@ -57,7 +55,7 @@ async def chat_message(request: Request) -> None:
 @router.get("/conversations")
 async def list_conversations() -> None:
     ...
-'''
+"""
 
     def test_empty_path_route_is_extracted_at_the_router_prefix(self) -> None:
         ids = _ids(FastApiDialect().extract(_ctx(self.SOURCE)))
@@ -70,26 +68,26 @@ async def list_conversations() -> None:
     def test_empty_path_without_a_prefix_contributes_nothing(self) -> None:
         # No prefix to stitch onto, so there is no path to record. Dropped by
         # build_provider_contract rather than silently becoming bare "/".
-        src = '''
+        src = """
 app = FastAPI()
 
 
 @app.post("")
 async def nothing() -> None:
     ...
-'''
+"""
         assert FastApiDialect().extract(_ctx(src)) == []
 
     def test_non_router_decorator_is_not_a_route(self) -> None:
         # The empty-path relaxation must not turn every @x.get() into a route.
-        src = '''
+        src = """
 router = APIRouter(prefix="/api")
 
 
 @cache.get("/not-a-route")
 def cached() -> None:
     ...
-'''
+"""
         assert FastApiDialect().extract(_ctx(src)) == []
 
 
@@ -149,9 +147,7 @@ SET churn_percentile = (SELECT prank FROM ranked WHERE ranked.id = git_metadata.
 
     def test_a_real_table_sharing_a_cte_name_elsewhere_is_unaffected(self) -> None:
         # Shadowing is per-statement: no CTE here, so ``ranked`` is a table.
-        tables = {
-            t for t, _verb in SqlStringsDialect()._tables_in("SELECT id FROM ranked")
-        }
+        tables = {t for t, _verb in SqlStringsDialect()._tables_in("SELECT id FROM ranked")}
         assert "ranked" in tables
 
 
@@ -182,9 +178,12 @@ def batch_upsert_symbols(file_paths, symbols):
         assert "data::would" not in ids
 
     def test_real_sql_in_the_same_file_is_still_extracted(self) -> None:
-        src = self.DOCSTRING_SOURCE + '''
+        src = (
+            self.DOCSTRING_SOURCE
+            + """
     rows = conn.execute("SELECT id, name FROM wiki_symbols WHERE repo_id = :r")
-'''
+"""
+        )
         ids = _ids(SqlStringsDialect().extract(_ctx(src, "crud/external_systems.py")))
         assert "data::wiki_symbols" in ids
 

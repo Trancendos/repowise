@@ -148,9 +148,7 @@ def _load_session_state(repo_path: Path, session_id: str) -> dict:
         "served": {},
     }
     try:
-        state = json.loads(
-            _session_state_path(repo_path, session_id).read_text(encoding="utf-8")
-        )
+        state = json.loads(_session_state_path(repo_path, session_id).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return fresh
     if not isinstance(state, dict) or state.get("session_id") != session_id:
@@ -462,9 +460,9 @@ def _same_range(tool_input: dict, prior: dict) -> bool:
     """Whether this Read asked for the same window as the recorded one."""
     if not isinstance(tool_input, dict):
         return False
-    return tool_input.get("offset") == prior.get("off") and tool_input.get(
-        "limit"
-    ) == prior.get("lim")
+    return tool_input.get("offset") == prior.get("off") and tool_input.get("limit") == prior.get(
+        "lim"
+    )
 
 
 def _collapse_replacement(
@@ -516,10 +514,9 @@ def _collapse_replacement(
         touched = False
         try:
             stat = (repo_path / rel).stat()
-            touched = (
-                prior_meta.get("sz") not in (-1, stat.st_size)
-                or prior_meta.get("mt") not in (-1, int(stat.st_mtime_ns))
-            )
+            touched = prior_meta.get("sz") not in (-1, stat.st_size) or prior_meta.get(
+                "mt"
+            ) not in (-1, int(stat.st_mtime_ns))
         except OSError:
             pass
 
@@ -676,9 +673,7 @@ def _log_skeleton_recovery(
     fired.append(("skeleton_ranged", f"skeleton_ranged:{rel}:{offset}:{limit}"))
 
 
-def _log_read_firing(
-    repo_path: Path, session_id: str, category: str, rel: str, text: str
-) -> None:
+def _log_read_firing(repo_path: Path, session_id: str, category: str, rel: str, text: str) -> None:
     """Record one Read-surface firing in the shared efficacy ledger.
 
     Measurement only — never changes what the agent sees, and the once-per-

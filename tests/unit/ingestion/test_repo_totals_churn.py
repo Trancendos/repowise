@@ -222,7 +222,15 @@ def test_deepening_a_shallow_clone_falls_back_to_the_full_walk(tmp_path) -> None
 
     clone = tmp_path / "clone"
     subprocess.run(
-        ["git", "clone", "-q", "--depth", "1", "file://" + str(origin).replace("\\", "/"), str(clone)],
+        [
+            "git",
+            "clone",
+            "-q",
+            "--depth",
+            "1",
+            "file://" + str(origin).replace("\\", "/"),
+            str(clone),
+        ],
         capture_output=True,
         text=True,
         check=True,
@@ -258,9 +266,7 @@ def test_a_skipped_churn_walk_stores_no_anchor(tmp_path, monkeypatch) -> None:
     quietly wrong: the next capture would add a range onto a base that never
     covered its start.
     """
-    monkeypatch.setattr(
-        "repowise.core.ingestion.git_indexer.records._CHURN_COMMIT_CEILING", 0
-    )
+    monkeypatch.setattr("repowise.core.ingestion.git_indexer.records._CHURN_COMMIT_CEILING", 0)
     repo = _init(tmp_path)
     _commit(repo, tmp_path, "a.py", "x = 1\n")
 
@@ -277,8 +283,12 @@ def test_a_prior_without_churn_totals_is_not_folded(tmp_path) -> None:
 
     for broken in (
         RepoTotals(total_commit_count=1, total_lines_added=None, churn_anchor_sha=head),
-        RepoTotals(total_commit_count=None, total_lines_added=99, total_lines_deleted=0,
-                   churn_anchor_sha=head),
+        RepoTotals(
+            total_commit_count=None,
+            total_lines_added=99,
+            total_lines_deleted=0,
+            churn_anchor_sha=head,
+        ),
         RepoTotals(total_commit_count=1, total_lines_added=99, total_lines_deleted=0),
     ):
         assert capture_repo_totals(repo, broken) == _fresh(repo)
@@ -312,9 +322,10 @@ def test_a_retroactive_gitattributes_change_is_corrected_by_the_stride(tmp_path)
     assert _churn(drifted) == (7, 0), "documents the drift the stride exists to bound"
 
     # Crossing the stride boundary re-walks and lands on the truth again.
-    assert capture_repo_totals(
-        repo, dataclasses.replace(drifted, total_commit_count=_STRIDE - 1)
-    ) == truth
+    assert (
+        capture_repo_totals(repo, dataclasses.replace(drifted, total_commit_count=_STRIDE - 1))
+        == truth
+    )
 
 
 def test_the_stride_is_the_only_thing_that_re_anchors_a_clean_history(tmp_path) -> None:
@@ -388,8 +399,10 @@ def test_a_utc_commit_captures_an_offset(tmp_path) -> None:
     from repowise.core.ingestion.git_indexer import GitIndexer
 
     repo = _init(tmp_path)
-    env = {"GIT_AUTHOR_DATE": "2026-01-02T03:04:05+0000",
-           "GIT_COMMITTER_DATE": "2026-01-02T03:04:05+0000"}
+    env = {
+        "GIT_AUTHOR_DATE": "2026-01-02T03:04:05+0000",
+        "GIT_COMMITTER_DATE": "2026-01-02T03:04:05+0000",
+    }
     (tmp_path / "a.py").write_text("x = 1\n", encoding="utf-8")
     repo.index.add(["a.py"])
     subprocess.run(

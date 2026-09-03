@@ -124,8 +124,7 @@ def _analyze(tmp_path, *, module_map):
     (tmp_path / "packages" / "ui" / "widget.py").write_text("b = 2\n", encoding="utf-8")
 
     parsed = [
-        parse_file(f, (tmp_path / f.path).read_bytes())
-        for f in FileTraverser(tmp_path).traverse()
+        parse_file(f, (tmp_path / f.path).read_bytes()) for f in FileTraverser(tmp_path).traverse()
     ]
     report = HealthAnalyzer(None, parsed_files=parsed, module_map=module_map).analyze()
     return {m.file_path: m.module for m in report.metrics}

@@ -145,11 +145,7 @@ def test_non_submodule_binding_keeps_package_init() -> None:
     imp = _imp(
         "sensors",
         ["some_function"],
-        bindings=[
-            NamedBinding(
-                local_name="some_function", exported_name=None, source_file=None
-            )
-        ],
+        bindings=[NamedBinding(local_name="some_function", exported_name=None, source_file=None)],
     )
     targets = resolve_python_import_all(imp, "caller.py", _ctx(paths))
     assert targets == ("sensors/__init__.py",)
@@ -187,11 +183,7 @@ def test_non_submodule_aliased_binding_keeps_package_init() -> None:
     imp = _imp(
         "sensors",
         ["some_function"],
-        bindings=[
-            NamedBinding(
-                local_name="sf", exported_name="some_function", source_file=None
-            )
-        ],
+        bindings=[NamedBinding(local_name="sf", exported_name="some_function", source_file=None)],
     )
     targets = resolve_python_import_all(imp, "caller.py", _ctx(paths))
     assert targets == ("sensors/__init__.py",)

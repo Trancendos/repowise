@@ -547,7 +547,9 @@ def test_python_os_and_shutil_verbs_gated_on_the_module_root():
     # Non-I/O members of the same module never fire.
     assert not any(
         k == "io_in_loop"
-        for k, _ in _hits("python", "import os\ndef f(ps):\n    for p in ps:\n        os.getpid()\n")
+        for k, _ in _hits(
+            "python", "import os\ndef f(ps):\n    for p in ps:\n        os.getpid()\n"
+        )
     )
     # ``remove`` / ``move`` / ``replace`` are ordinary collection verbs off the
     # module root, so an unrelated receiver must stay silent.
@@ -581,7 +583,10 @@ def test_python_chained_os_call_is_not_a_filesystem_sink():
     # Other chained-root shapes off the same ceiling.
     for expr in ("os.environ.get(k).replace('a', 'b')", "os.path.relpath(p).replace('a', 'b')"):
         assert not any(
-            k == "io_in_loop" for k, _ in _hits("python", f"import os\ndef f(xs):\n    for x in xs:\n        {expr}\n")
+            k == "io_in_loop"
+            for k, _ in _hits(
+                "python", f"import os\ndef f(xs):\n    for x in xs:\n        {expr}\n"
+            )
         ), expr
     # The genuine two-segment call is unaffected.
     assert ("io_in_loop", "filesystem") in _hits(

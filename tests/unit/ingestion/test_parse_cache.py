@@ -22,7 +22,6 @@ from repowise.core.ingestion.parse_cache import ParseCache, parser_fingerprint
 _CACHE_DOMAIN = "parse_cache.pkl"
 
 
-
 def _write_fixture(repo) -> None:
     (repo / "util.py").write_text(
         "def helper(x):\n    return x + 1\n",
@@ -177,9 +176,7 @@ def test_dataclass_schema_change_invalidates_cache(repo, monkeypatch):
     try:
         assert (
             parser_fingerprint()
-            != pickle.loads(unseal(cache_file.read_bytes(), domain=_CACHE_DOMAIN))[
-                "fingerprint"
-            ]
+            != pickle.loads(unseal(cache_file.read_bytes(), domain=_CACHE_DOMAIN))["fingerprint"]
         )
 
         cache = ParseCache(repo / ".repowise")

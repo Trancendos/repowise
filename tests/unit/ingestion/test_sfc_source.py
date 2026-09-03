@@ -196,7 +196,9 @@ class TestVueOffsetInvariants:
     def test_non_ascii_markup_keeps_offsets(self) -> None:
         # A multi-byte character in the markup must not shift the script that
         # follows it — the blanking works in bytes, not code points.
-        src = "<template><p>日本語のテキスト</p></template>\n<script>const a = 1;</script>\n".encode()
+        src = (
+            "<template><p>日本語のテキスト</p></template>\n<script>const a = 1;</script>\n".encode()
+        )
         prepared = prepare_source("vue", src)
         assert len(prepared) == len(src)
         assert prepared.index(b"const a = 1;") == src.index(b"const a = 1;")

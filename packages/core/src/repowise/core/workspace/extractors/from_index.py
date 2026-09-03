@@ -232,6 +232,7 @@ def parsed_for(
 # Provider extraction
 # ---------------------------------------------------------------------------
 
+
 def extract_http_providers(
     ctx: ScanContext,
     parsed: ParsedFile,

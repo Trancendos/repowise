@@ -84,15 +84,11 @@ def interactive_agent_select(
         # rendered as a box, which reads as the exact inverse of the truth.
         box = r"\[x]" if choice.id in selected else r"\[ ]"
         detail = f"  [dim]{choice.detail}[/dim]" if choice.detail else ""
-        console_obj.print(
-            f"  {box} [{BRAND_STYLE}][{index}][/] {choice.display_name}{detail}"
-        )
+        console_obj.print(f"  {box} [{BRAND_STYLE}][{index}][/] {choice.display_name}{detail}")
     console_obj.print(f"  [dim]{hint or _ADD_HINT}[/dim]")
 
     try:
-        raw = Prompt.ask(
-            prompt or _ADD_PROMPT, default="", show_default=False, console=console_obj
-        )
+        raw = Prompt.ask(prompt or _ADD_PROMPT, default="", show_default=False, console=console_obj)
     except EOFError:
         return None
 

@@ -579,9 +579,7 @@ def save_breaking_change_report(report: BreakingChangeReport, workspace_root: Pa
     out_path = data_dir / BREAKING_CHANGES_FILENAME
     # Atomic: the MCP enricher reads these artifacts from a separate
     # process and must never observe a half-written file.
-    atomic_write_text(
-        out_path, json.dumps(report.to_dict(), indent=2, ensure_ascii=False)
-    )
+    atomic_write_text(out_path, json.dumps(report.to_dict(), indent=2, ensure_ascii=False))
     return out_path
 
 

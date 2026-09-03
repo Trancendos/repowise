@@ -93,7 +93,9 @@ def test_comments_annotating_our_own_keys_go_with_the_table() -> None:
 
 
 def test_a_file_holding_only_our_table_really_does_empty() -> None:
-    assert remove_table('[mcp_servers.repowise]\ncommand = "repowise"\n', "mcp_servers.repowise") == ""
+    assert (
+        remove_table('[mcp_servers.repowise]\ncommand = "repowise"\n', "mcp_servers.repowise") == ""
+    )
 
 
 def test_a_sibling_with_our_name_as_a_prefix_is_untouched() -> None:
@@ -102,7 +104,7 @@ def test_a_sibling_with_our_name_as_a_prefix_is_untouched() -> None:
 
 
 def test_crlf_endings_are_not_mixed_on_the_last_line() -> None:
-    text = '[mcp_servers.repowise]\r\nc = 1\r\n[mcp_servers.b]\r\nc = 2\r\n'
+    text = "[mcp_servers.repowise]\r\nc = 1\r\n[mcp_servers.b]\r\nc = 2\r\n"
     remaining = remove_table(text, "mcp_servers.repowise")
 
     assert "\n" not in remaining.replace("\r\n", "")
@@ -256,8 +258,7 @@ def test_both_refusals_are_named_not_just_the_first(tmp_path: Path) -> None:
     repo.mkdir()
     _write(
         repo,
-        '[mcp_servers]\nrepowise = { command = "repowise" }\n'
-        '[features]\nhooks = [\n  "a",\n]\n',
+        '[mcp_servers]\nrepowise = { command = "repowise" }\n' '[features]\nhooks = [\n  "a",\n]\n',
     )
 
     write = remove_server_config(repo, drop_hooks_feature=True)

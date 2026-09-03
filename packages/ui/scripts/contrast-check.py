@@ -33,6 +33,7 @@ to the base check list and run in both modes.
 
 Exits non-zero if any required pair misses its floor (CI gate).
 """
+
 from __future__ import annotations
 
 import argparse
@@ -134,10 +135,18 @@ LIGHT = {
     # (avg ~#E6E8E9) — what text actually sits on.
     "kg-node-face-textured": "#FAF8F4",
     # Community family hubs (light) — graph clustering palette.
-    "community-1": "#C0641A",  "community-2": "#58436C",  "community-3": "#B23A2E",
-    "community-4": "#6B7A3D",  "community-5": "#B06A86",  "community-6": "#4A5D7A",
-    "community-7": "#A8821F",  "community-8": "#8A7A66",  "community-9": "#7A2F4A",
-    "community-10": "#B85A38", "community-11": "#2F6B66", "community-12": "#5E5360",
+    "community-1": "#C0641A",
+    "community-2": "#58436C",
+    "community-3": "#B23A2E",
+    "community-4": "#6B7A3D",
+    "community-5": "#B06A86",
+    "community-6": "#4A5D7A",
+    "community-7": "#A8821F",
+    "community-8": "#8A7A66",
+    "community-9": "#7A2F4A",
+    "community-10": "#B85A38",
+    "community-11": "#2F6B66",
+    "community-12": "#5E5360",
 }
 
 DARK = {
@@ -175,10 +184,18 @@ DARK = {
     # Textured face composite: 0.85 ink wash (#322A3E) over the paper photo.
     "kg-node-face-textured": "#4D4658",
     # Community family hubs (dark) — lifted to read on the near-black canvas.
-    "community-1": "#F59520",  "community-2": "#A98FC4",  "community-3": "#E06A5A",
-    "community-4": "#A9BB6F",  "community-5": "#D795B1",  "community-6": "#8FA3C0",
-    "community-7": "#D9B04A",  "community-8": "#B8A68E",  "community-9": "#C4708F",
-    "community-10": "#EBA585", "community-11": "#6FB3AB", "community-12": "#A79DB3",
+    "community-1": "#F59520",
+    "community-2": "#A98FC4",
+    "community-3": "#E06A5A",
+    "community-4": "#A9BB6F",
+    "community-5": "#D795B1",
+    "community-6": "#8FA3C0",
+    "community-7": "#D9B04A",
+    "community-8": "#B8A68E",
+    "community-9": "#C4708F",
+    "community-10": "#EBA585",
+    "community-11": "#6FB3AB",
+    "community-12": "#A79DB3",
 }
 
 # (fg, bg, floor, label)  — floor is the WCAG ratio the pair must meet.
@@ -211,10 +228,7 @@ CHECKS = [
     ("kg-node-text", "kg-node-face-textured", 4.5, "KG card text on textured face"),
     ("text-on-accent", "gradient-ember-end", 4.5, "Text on ember gradient end"),
     # Community hubs are non-text node fills on the graph canvas — floor 3.0:1.
-    *[
-        (f"community-{n}", "bg-canvas", 3.0, f"Community {n} hub on canvas")
-        for n in range(1, 13)
-    ],
+    *[(f"community-{n}", "bg-canvas", 3.0, f"Community {n} hub on canvas") for n in range(1, 13)],
 ]
 
 

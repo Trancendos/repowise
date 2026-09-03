@@ -40,12 +40,14 @@ class TestRepoEntry:
         assert d["last_commit_at_index"] == "abc1234"
 
     def test_from_dict_with_timestamps(self) -> None:
-        entry = RepoEntry.from_dict({
-            "path": "be",
-            "alias": "be",
-            "indexed_at": "2026-04-12T10:30:00+00:00",
-            "last_commit_at_index": "abc1234",
-        })
+        entry = RepoEntry.from_dict(
+            {
+                "path": "be",
+                "alias": "be",
+                "indexed_at": "2026-04-12T10:30:00+00:00",
+                "last_commit_at_index": "abc1234",
+            }
+        )
         assert entry.indexed_at == "2026-04-12T10:30:00+00:00"
         assert entry.last_commit_at_index == "abc1234"
 
@@ -316,9 +318,9 @@ class TestFindWorkspaceRoot:
 def test_save_warns_when_it_drops_a_repo(tmp_path, caplog):
     """A config rewrite that shrinks the workspace is exactly what went
     unexplained once, and it left nothing behind to explain it."""
-    WorkspaceConfig(
-        repos=[RepoEntry(path="a", alias="a"), RepoEntry(path="b", alias="b")]
-    ).save(tmp_path)
+    WorkspaceConfig(repos=[RepoEntry(path="a", alias="a"), RepoEntry(path="b", alias="b")]).save(
+        tmp_path
+    )
 
     with caplog.at_level(logging.WARNING, logger="repowise.workspace.config"):
         WorkspaceConfig(repos=[RepoEntry(path="a", alias="a")]).save(tmp_path)

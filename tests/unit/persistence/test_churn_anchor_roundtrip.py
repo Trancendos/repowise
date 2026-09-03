@@ -45,9 +45,7 @@ async def test_a_repo_with_no_anchor_yet_has_no_prior(async_session) -> None:
     """Every index written before the column existed takes this path: it walks
     the whole history once and anchors itself."""
     repo = await insert_repo(async_session)
-    await update_repo_git_totals(
-        async_session, repo.id, total_commit_count=10, total_lines_added=5
-    )
+    await update_repo_git_totals(async_session, repo.id, total_commit_count=10, total_lines_added=5)
 
     assert _churn_prior(await get_repository(async_session, repo.id)) is None
     assert _churn_prior(None) is None

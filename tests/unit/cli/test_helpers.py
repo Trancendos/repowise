@@ -817,9 +817,7 @@ class TestResolveProviderOrPrompt:
         assert called["prompt"] == 0
 
     @pytest.mark.parametrize("exc_name", ["EOFError", "Abort"])
-    def test_unanswerable_prompt_falls_back_to_clean_error(
-        self, tmp_path, monkeypatch, exc_name
-    ):
+    def test_unanswerable_prompt_falls_back_to_clean_error(self, tmp_path, monkeypatch, exc_name):
         """A tty that lies: the prompt hits EOF/Abort, so we surface the clean
         actionable error instead of a bare 'Aborted!' — the agent-safe path."""
         import click
