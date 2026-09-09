@@ -110,10 +110,7 @@ _CASES = [
     ),
     (
         "python",
-        b"import git\n"
-        b"def f(repos):\n"
-        b"    for r in repos:\n"
-        b"        r.commit()\n",
+        b"import git\n" b"def f(repos):\n" b"    for r in repos:\n" b"        r.commit()\n",
         [],
         "git repo.commit() without a db import is gated out",
     ),
@@ -129,9 +126,7 @@ _CASES = [
     ),
     (
         "python",
-        b"import time\n"
-        b"async def f():\n"
-        b"    time.sleep(1)\n",
+        b"import time\n" b"async def f():\n" b"    time.sleep(1)\n",
         [("blocking_sync_in_async", "time.sleep")],
         "blocking sleep in async",
     ),

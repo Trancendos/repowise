@@ -827,9 +827,7 @@ def init_command(
             include_submodules=include_submodules,
         )
         if seeded:
-            console.print(
-                f"[{OK}]Worktree index seeded successfully. Delegating to update...[/]"
-            )
+            console.print(f"[{OK}]Worktree index seeded successfully. Delegating to update...[/]")
             from repowise.cli.commands.update_cmd.command import run_update
 
             is_workspace = len(scan.repos) > 1 and not no_workspace

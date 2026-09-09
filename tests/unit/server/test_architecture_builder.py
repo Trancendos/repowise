@@ -36,39 +36,171 @@ async def _create_repo(client: AsyncClient) -> dict:
 async def _seed_graph(app, repo_id: str) -> None:
     async with app.state.session_factory() as session:
         nodes = [
-            {"node_id": "src/main.py", "node_type": "file", "language": "python", "symbol_count": 3, "is_entry_point": True},
-            {"node_id": "src/utils.py", "node_type": "file", "language": "python", "symbol_count": 8},
-            {"node_id": "src/models.py", "node_type": "file", "language": "python", "symbol_count": 25},
-            {"node_id": "lib/helpers.ts", "node_type": "file", "language": "typescript", "symbol_count": 2},
-            {"node_id": "lib/index.ts", "node_type": "file", "language": "typescript", "symbol_count": 1, "is_entry_point": True},
-            {"node_id": "tests/test_main.py", "node_type": "file", "language": "python", "symbol_count": 4, "is_test": True},
-            {"node_id": "tests/test_utils.py", "node_type": "file", "language": "python", "symbol_count": 6, "is_test": True},
-            {"node_id": "config/settings.py", "node_type": "file", "language": "python", "symbol_count": 2},
-            {"node_id": "src/main.py::main", "node_type": "function", "language": "python", "symbol_count": 0, "file_path": "src/main.py", "name": "main", "start_line": 1, "end_line": 10},
-            {"node_id": "src/models.py::User", "node_type": "class", "language": "python", "symbol_count": 0, "file_path": "src/models.py", "name": "User", "start_line": 5, "end_line": 30},
-            {"node_id": "external:fastapi", "node_type": "file", "language": "python", "symbol_count": 0},
-            {"node_id": "external:react", "node_type": "file", "language": "typescript", "symbol_count": 0},
+            {
+                "node_id": "src/main.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 3,
+                "is_entry_point": True,
+            },
+            {
+                "node_id": "src/utils.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 8,
+            },
+            {
+                "node_id": "src/models.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 25,
+            },
+            {
+                "node_id": "lib/helpers.ts",
+                "node_type": "file",
+                "language": "typescript",
+                "symbol_count": 2,
+            },
+            {
+                "node_id": "lib/index.ts",
+                "node_type": "file",
+                "language": "typescript",
+                "symbol_count": 1,
+                "is_entry_point": True,
+            },
+            {
+                "node_id": "tests/test_main.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 4,
+                "is_test": True,
+            },
+            {
+                "node_id": "tests/test_utils.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 6,
+                "is_test": True,
+            },
+            {
+                "node_id": "config/settings.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 2,
+            },
+            {
+                "node_id": "src/main.py::main",
+                "node_type": "function",
+                "language": "python",
+                "symbol_count": 0,
+                "file_path": "src/main.py",
+                "name": "main",
+                "start_line": 1,
+                "end_line": 10,
+            },
+            {
+                "node_id": "src/models.py::User",
+                "node_type": "class",
+                "language": "python",
+                "symbol_count": 0,
+                "file_path": "src/models.py",
+                "name": "User",
+                "start_line": 5,
+                "end_line": 30,
+            },
+            {
+                "node_id": "external:fastapi",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 0,
+            },
+            {
+                "node_id": "external:react",
+                "node_type": "file",
+                "language": "typescript",
+                "symbol_count": 0,
+            },
         ]
         await batch_upsert_graph_nodes(session, repo_id, nodes)
 
         edges = [
-            {"source_node_id": "src/main.py", "target_node_id": "src/utils.py", "edge_type": "imports"},
-            {"source_node_id": "src/main.py", "target_node_id": "src/models.py", "edge_type": "imports"},
-            {"source_node_id": "src/utils.py", "target_node_id": "src/models.py", "edge_type": "imports"},
-            {"source_node_id": "lib/index.ts", "target_node_id": "lib/helpers.ts", "edge_type": "imports"},
-            {"source_node_id": "tests/test_main.py", "target_node_id": "src/main.py", "edge_type": "imports"},
-            {"source_node_id": "tests/test_utils.py", "target_node_id": "src/utils.py", "edge_type": "imports"},
-            {"source_node_id": "src/main.py", "target_node_id": "config/settings.py", "edge_type": "imports"},
-            {"source_node_id": "src/main.py", "target_node_id": "external:fastapi", "edge_type": "imports"},
-            {"source_node_id": "lib/helpers.ts", "target_node_id": "external:react", "edge_type": "imports"},
-            {"source_node_id": "src/main.py::main", "target_node_id": "src/utils.py", "edge_type": "calls"},
+            {
+                "source_node_id": "src/main.py",
+                "target_node_id": "src/utils.py",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "src/main.py",
+                "target_node_id": "src/models.py",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "src/utils.py",
+                "target_node_id": "src/models.py",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "lib/index.ts",
+                "target_node_id": "lib/helpers.ts",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "tests/test_main.py",
+                "target_node_id": "src/main.py",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "tests/test_utils.py",
+                "target_node_id": "src/utils.py",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "src/main.py",
+                "target_node_id": "config/settings.py",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "src/main.py",
+                "target_node_id": "external:fastapi",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "lib/helpers.ts",
+                "target_node_id": "external:react",
+                "edge_type": "imports",
+            },
+            {
+                "source_node_id": "src/main.py::main",
+                "target_node_id": "src/utils.py",
+                "edge_type": "calls",
+            },
         ]
         await batch_upsert_graph_edges(session, repo_id, edges)
 
-        id_map = await bulk_upsert_external_systems(session, repo_id, [
-            {"name": "fastapi", "display_name": "FastAPI", "ecosystem": "pypi", "category": "framework", "version": "0.110", "declared_in": "pyproject.toml", "is_dev_dep": False},
-            {"name": "react", "display_name": "React", "ecosystem": "npm", "category": "framework", "version": "^18", "declared_in": "package.json", "is_dev_dep": False},
-        ])
+        id_map = await bulk_upsert_external_systems(
+            session,
+            repo_id,
+            [
+                {
+                    "name": "fastapi",
+                    "display_name": "FastAPI",
+                    "ecosystem": "pypi",
+                    "category": "framework",
+                    "version": "0.110",
+                    "declared_in": "pyproject.toml",
+                    "is_dev_dep": False,
+                },
+                {
+                    "name": "react",
+                    "display_name": "React",
+                    "ecosystem": "npm",
+                    "category": "framework",
+                    "version": "^18",
+                    "declared_in": "package.json",
+                    "is_dev_dep": False,
+                },
+            ],
+        )
         name_to_id = {n: sid for (n, _), sid in id_map.items()}
         await link_graph_nodes_to_external_systems(session, repo_id, name_to_id)
         await session.commit()
@@ -79,14 +211,44 @@ def _write_knowledge_graph(tmp_dir: Path) -> str:
         "version": "1.0.0",
         "project": {"name": "test-repo", "description": "A test project"},
         "layers": [
-            {"id": "layer:api", "name": "API", "description": "API layer", "nodeIds": ["file:src/main.py", "file:src/utils.py"]},
-            {"id": "layer:domain", "name": "Domain", "description": "Domain models", "nodeIds": ["file:src/models.py"]},
-            {"id": "layer:frontend", "name": "Frontend", "description": "Frontend code", "nodeIds": ["file:lib/index.ts", "file:lib/helpers.ts"]},
+            {
+                "id": "layer:api",
+                "name": "API",
+                "description": "API layer",
+                "nodeIds": ["file:src/main.py", "file:src/utils.py"],
+            },
+            {
+                "id": "layer:domain",
+                "name": "Domain",
+                "description": "Domain models",
+                "nodeIds": ["file:src/models.py"],
+            },
+            {
+                "id": "layer:frontend",
+                "name": "Frontend",
+                "description": "Frontend code",
+                "nodeIds": ["file:lib/index.ts", "file:lib/helpers.ts"],
+            },
         ],
         "tour": [
-            {"order": 1, "title": "Entry Point", "description": "Start here", "nodeIds": ["file:src/main.py"]},
-            {"order": 2, "title": "Models", "description": "Core models", "nodeIds": ["file:src/models.py"]},
-            {"order": 3, "title": "Frontend", "description": "UI layer", "nodeIds": ["file:lib/index.ts"]},
+            {
+                "order": 1,
+                "title": "Entry Point",
+                "description": "Start here",
+                "nodeIds": ["file:src/main.py"],
+            },
+            {
+                "order": 2,
+                "title": "Models",
+                "description": "Core models",
+                "nodeIds": ["file:src/models.py"],
+            },
+            {
+                "order": 3,
+                "title": "Frontend",
+                "description": "UI layer",
+                "nodeIds": ["file:lib/index.ts"],
+            },
         ],
     }
     kg_path = tmp_dir / "knowledge-graph.json"
@@ -115,11 +277,30 @@ async def test_layer_assignment_from_db_kg(client: AsyncClient, app) -> None:
     await _seed_graph(app, repo["id"])
 
     async with app.state.session_factory() as session:
-        await upsert_kg_layers(session, repo["id"], [
-            {"id": "layer:api", "name": "API", "description": "API layer", "nodeIds": ["file:src/main.py", "file:src/utils.py"]},
-            {"id": "layer:domain", "name": "Domain", "description": "Domain models", "nodeIds": ["file:src/models.py"]},
-            {"id": "layer:frontend", "name": "Frontend", "description": "Frontend code", "nodeIds": ["file:lib/index.ts", "file:lib/helpers.ts"]},
-        ])
+        await upsert_kg_layers(
+            session,
+            repo["id"],
+            [
+                {
+                    "id": "layer:api",
+                    "name": "API",
+                    "description": "API layer",
+                    "nodeIds": ["file:src/main.py", "file:src/utils.py"],
+                },
+                {
+                    "id": "layer:domain",
+                    "name": "Domain",
+                    "description": "Domain models",
+                    "nodeIds": ["file:src/models.py"],
+                },
+                {
+                    "id": "layer:frontend",
+                    "name": "Frontend",
+                    "description": "Frontend code",
+                    "nodeIds": ["file:lib/index.ts", "file:lib/helpers.ts"],
+                },
+            ],
+        )
         await session.commit()
 
     async with app.state.session_factory() as session:
@@ -137,9 +318,29 @@ async def test_layer_assignment_from_communities(client: AsyncClient, app) -> No
 
     async with app.state.session_factory() as session:
         nodes = [
-            {"node_id": "a/foo.py", "node_type": "file", "language": "python", "symbol_count": 1, "community_id": 1, "community_meta_json": json.dumps({"label": "Group A", "cohesion": 0.8})},
-            {"node_id": "a/bar.py", "node_type": "file", "language": "python", "symbol_count": 2, "community_id": 1},
-            {"node_id": "b/baz.py", "node_type": "file", "language": "python", "symbol_count": 3, "community_id": 2, "community_meta_json": json.dumps({"label": "Group B", "cohesion": 0.5})},
+            {
+                "node_id": "a/foo.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 1,
+                "community_id": 1,
+                "community_meta_json": json.dumps({"label": "Group A", "cohesion": 0.8}),
+            },
+            {
+                "node_id": "a/bar.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 2,
+                "community_id": 1,
+            },
+            {
+                "node_id": "b/baz.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 3,
+                "community_id": 2,
+                "community_meta_json": json.dumps({"label": "Group B", "cohesion": 0.5}),
+            },
         ]
         await batch_upsert_graph_nodes(session, repo_id, nodes)
         await session.commit()
@@ -255,10 +456,24 @@ async def test_tour_from_db(client: AsyncClient, app) -> None:
     await _seed_graph(app, repo["id"])
 
     async with app.state.session_factory() as session:
-        await upsert_kg_tour_steps(session, repo["id"], [
-            {"order": 1, "title": "Entry Point", "description": "Start here", "nodeIds": ["file:src/main.py"]},
-            {"order": 2, "title": "Models", "description": "Core models", "nodeIds": ["file:src/models.py"]},
-        ])
+        await upsert_kg_tour_steps(
+            session,
+            repo["id"],
+            [
+                {
+                    "order": 1,
+                    "title": "Entry Point",
+                    "description": "Start here",
+                    "nodeIds": ["file:src/main.py"],
+                },
+                {
+                    "order": 2,
+                    "title": "Models",
+                    "description": "Core models",
+                    "nodeIds": ["file:src/models.py"],
+                },
+            ],
+        )
         await session.commit()
 
     async with app.state.session_factory() as session:
@@ -279,14 +494,42 @@ async def test_db_layers_take_priority_over_communities(client: AsyncClient, app
 
     async with app.state.session_factory() as session:
         nodes = [
-            {"node_id": "a/foo.py", "node_type": "file", "language": "python", "symbol_count": 1, "community_id": 1, "community_meta_json": json.dumps({"name": "Cluster"})},
-            {"node_id": "a/bar.py", "node_type": "file", "language": "python", "symbol_count": 2, "community_id": 1},
-            {"node_id": "b/baz.py", "node_type": "file", "language": "python", "symbol_count": 3, "community_id": 2},
+            {
+                "node_id": "a/foo.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 1,
+                "community_id": 1,
+                "community_meta_json": json.dumps({"name": "Cluster"}),
+            },
+            {
+                "node_id": "a/bar.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 2,
+                "community_id": 1,
+            },
+            {
+                "node_id": "b/baz.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 3,
+                "community_id": 2,
+            },
         ]
         await batch_upsert_graph_nodes(session, repo_id, nodes)
-        await upsert_kg_layers(session, repo_id, [
-            {"id": "layer:custom", "name": "Custom Layer", "description": "From DB", "nodeIds": ["file:a/foo.py", "file:a/bar.py", "file:b/baz.py"]},
-        ])
+        await upsert_kg_layers(
+            session,
+            repo_id,
+            [
+                {
+                    "id": "layer:custom",
+                    "name": "Custom Layer",
+                    "description": "From DB",
+                    "nodeIds": ["file:a/foo.py", "file:a/bar.py", "file:b/baz.py"],
+                },
+            ],
+        )
         await session.commit()
 
     async with app.state.session_factory() as session:
@@ -328,10 +571,20 @@ async def test_auto_migrate_kg_file_to_db(client: AsyncClient, app) -> None:
     rw_dir.mkdir(exist_ok=True)
     kg = {
         "layers": [
-            {"id": "layer:migrated", "name": "Migrated", "description": "From file", "nodeIds": ["file:src/a.py", "file:src/b.py"]},
+            {
+                "id": "layer:migrated",
+                "name": "Migrated",
+                "description": "From file",
+                "nodeIds": ["file:src/a.py", "file:src/b.py"],
+            },
         ],
         "tour": [
-            {"order": 1, "title": "Start", "description": "Begin here", "nodeIds": ["file:src/a.py"]},
+            {
+                "order": 1,
+                "title": "Start",
+                "description": "Begin here",
+                "nodeIds": ["file:src/a.py"],
+            },
         ],
     }
     (rw_dir / "knowledge-graph.json").write_text(json.dumps(kg))
@@ -347,6 +600,7 @@ async def test_auto_migrate_kg_file_to_db(client: AsyncClient, app) -> None:
 
     async with app.state.session_factory() as session:
         from repowise.core.persistence.crud import get_kg_layers as _get_layers
+
         db_layers = await _get_layers(session, repo_id)
         assert len(db_layers) >= 1
         assert db_layers[0].name == "Migrated"

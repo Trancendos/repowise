@@ -83,9 +83,9 @@ class TestJvmSampleNoFalsePositives:
     def test_module_info_and_package_info_never_flagged(self, jvm_report) -> None:
         unreachable = _paths(jvm_report, DeadCodeKind.UNREACHABLE_FILE)
         for never_flag in ("module-info.java", "package-info.java"):
-            assert not any(p.endswith(never_flag) for p in unreachable), (
-                f"{never_flag} should never be flagged unreachable"
-            )
+            assert not any(
+                p.endswith(never_flag) for p in unreachable
+            ), f"{never_flag} should never be flagged unreachable"
 
     def test_spring_boot_entry_point_reachable(self, jvm_report) -> None:
         unreachable = _paths(jvm_report, DeadCodeKind.UNREACHABLE_FILE)
@@ -113,8 +113,7 @@ class TestJvmSampleNoFalsePositives:
     def test_service_loader_and_jpms_provides_rescue_my_plugin(self, jvm_report) -> None:
         unreachable = _paths(jvm_report, DeadCodeKind.UNREACHABLE_FILE)
         assert not any("lib/MyPlugin.java" in p for p in unreachable), (
-            "MyPlugin should be reachable via META-INF/services and "
-            "JPMS provides...with"
+            "MyPlugin should be reachable via META-INF/services and " "JPMS provides...with"
         )
 
     def test_same_package_sibling_reachable(self, jvm_report) -> None:
@@ -127,9 +126,9 @@ class TestJvmSampleNoFalsePositives:
     def test_integration_test_source_set_reachable(self, jvm_report) -> None:
         unreachable = _paths(jvm_report, DeadCodeKind.UNREACHABLE_FILE)
         exports = _names(jvm_report, DeadCodeKind.UNUSED_EXPORT)
-        assert not any("PluginIT.java" in p for p in unreachable), (
-            "integrationTest source-set files must be never-flagged"
-        )
+        assert not any(
+            "PluginIT.java" in p for p in unreachable
+        ), "integrationTest source-set files must be never-flagged"
         assert "loadsPlugin" not in exports
 
     def test_kotlin_cross_language_reachable(self, jvm_report) -> None:

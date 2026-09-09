@@ -92,7 +92,9 @@ def _translate(pattern: str) -> re.Pattern[str] | None:
         return None
 
 
-def matching_paths(repo_path: Path, pattern: str, limit: int = _MAX_LISTED) -> tuple[list[str], int]:
+def matching_paths(
+    repo_path: Path, pattern: str, limit: int = _MAX_LISTED
+) -> tuple[list[str], int]:
     """``(paths, total)`` indexed under *repo_path* matching *pattern*.
 
     ``total`` is the full match count, so the caller can say how many it is

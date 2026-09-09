@@ -153,13 +153,9 @@ def test_migration_0041_upgrades_sqlite() -> None:
                 assert "commit_sha" in cols
                 assert "commit_at" in cols
                 uqs = await conn.run_sync(
-                    lambda sync_conn: inspect(sync_conn).get_unique_constraints(
-                        "security_findings"
-                    )
+                    lambda sync_conn: inspect(sync_conn).get_unique_constraints("security_findings")
                 )
-                assert any(
-                    uq.get("name") == "uq_security_finding_provenance" for uq in uqs
-                )
+                assert any(uq.get("name") == "uq_security_finding_provenance" for uq in uqs)
 
         import asyncio
 
@@ -348,9 +344,7 @@ async def test_history_default_skips_test_fixtures_and_placeholders(
     assert "docs.py" not in paths, "elided placeholder reported as a credential"
 
 
-async def test_all_patterns_lifts_the_noise_gate(
-    session: AsyncSession, secret_repo: Path
-) -> None:
+async def test_all_patterns_lifts_the_noise_gate(session: AsyncSession, secret_repo: Path) -> None:
     """The filtering is the default's promise, not a hard exclusion."""
     (secret_repo / "tests").mkdir(exist_ok=True)
     (secret_repo / "tests" / "test_client.py").write_text('password = "fixture-value"\n')

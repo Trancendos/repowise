@@ -191,6 +191,7 @@ def degraded_legs(legs: dict[str, str]) -> list[str]:
     """
     return sorted(leg for leg, outcome in legs.items() if outcome not in ("ok", "keyless"))
 
+
 # Third retrieval leg: the structural symbol index. FTS and the vector store
 # both read the generated wiki page, which by construction carries an overview
 # sentence, the *public* symbol table and dependency paths, with no function

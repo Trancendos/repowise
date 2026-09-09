@@ -20,9 +20,7 @@ class RewriteRequest:
 
     __slots__ = ("command", "cwd", "session_id", "shell")
 
-    def __init__(
-        self, command: str, cwd: str, shell: str = "posix", session_id: str = ""
-    ) -> None:
+    def __init__(self, command: str, cwd: str, shell: str = "posix", session_id: str = "") -> None:
         self.command = command
         self.cwd = cwd
         #: The agent's session id, carried solely so the rewrite hook can

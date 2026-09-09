@@ -73,8 +73,7 @@ def _type_use_edges(graph: nx.DiGraph) -> list[tuple[str, str, str]]:
     return [
         (u, v, ",".join(d.get("type_uses", [])))
         for u, v, d in graph.edges(data=True)
-        if d.get("edge_type") == "type_use"
-        or "type_uses" in d
+        if d.get("edge_type") == "type_use" or "type_uses" in d
     ]
 
 
@@ -119,8 +118,7 @@ class TestJavaTypeRefs:
         resolve_type_refs(parsed, ctx, ctx.graph)
         edges = _type_use_edges(ctx.graph)
         assert any(
-            u == "src/main/java/com/foo/Svc.java"
-            and v == "src/main/java/com/foo/Repo.java"
+            u == "src/main/java/com/foo/Svc.java" and v == "src/main/java/com/foo/Repo.java"
             for u, v, _ in edges
         ), edges
 
@@ -143,8 +141,7 @@ class TestJavaTypeRefs:
         resolve_type_refs(parsed, ctx, ctx.graph)
         edges = _type_use_edges(ctx.graph)
         assert any(
-            u == "src/main/java/com/foo/Holder.java"
-            and v == "src/main/java/com/foo/UserPref.java"
+            u == "src/main/java/com/foo/Holder.java" and v == "src/main/java/com/foo/UserPref.java"
             for u, v, _ in edges
         ), edges
 
@@ -186,8 +183,7 @@ class TestJavaTypeRefs:
         resolve_type_refs(parsed, ctx, ctx.graph)
         edges = _type_use_edges(ctx.graph)
         assert any(
-            u == "src/main/java/com/foo/Child.java"
-            and v == "src/main/java/com/foo/Parent.java"
+            u == "src/main/java/com/foo/Child.java" and v == "src/main/java/com/foo/Parent.java"
             for u, v, _ in edges
         ), edges
 
@@ -210,8 +206,7 @@ class TestKotlinTypeRefs:
         resolve_type_refs(parsed, ctx, ctx.graph)
         edges = _type_use_edges(ctx.graph)
         assert any(
-            u == "src/main/kotlin/com/foo/Svc.kt"
-            and v == "src/main/kotlin/com/foo/Repo.kt"
+            u == "src/main/kotlin/com/foo/Svc.kt" and v == "src/main/kotlin/com/foo/Repo.kt"
             for u, v, _ in edges
         ), edges
 
@@ -232,8 +227,7 @@ class TestKotlinTypeRefs:
         resolve_type_refs(parsed, ctx, ctx.graph)
         edges = _type_use_edges(ctx.graph)
         assert any(
-            u == "src/main/kotlin/com/foo/Holder.kt"
-            and v == "src/main/kotlin/com/foo/Repo.kt"
+            u == "src/main/kotlin/com/foo/Holder.kt" and v == "src/main/kotlin/com/foo/Repo.kt"
             for u, v, _ in edges
         ), edges
 
@@ -255,7 +249,6 @@ class TestKotlinTypeRefs:
         resolve_type_refs(parsed, ctx, ctx.graph)
         edges = _type_use_edges(ctx.graph)
         assert any(
-            u == "src/main/java/com/foo/Caller.kt"
-            and v == "src/main/java/com/foo/Service.java"
+            u == "src/main/java/com/foo/Caller.kt" and v == "src/main/java/com/foo/Service.java"
             for u, v, _ in edges
         ), edges

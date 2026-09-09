@@ -47,7 +47,9 @@ def _consumer(repo, cid, ctype="http", file="src/client.py") -> Contract:
     )
 
 
-def _link(cid, p_repo, p_file, c_repo, c_file, ctype="http", match="exact", conf=0.9) -> ContractLink:
+def _link(
+    cid, p_repo, p_file, c_repo, c_file, ctype="http", match="exact", conf=0.9
+) -> ContractLink:
     return ContractLink(
         contract_id=cid,
         contract_type=ctype,
@@ -202,7 +204,11 @@ def test_behavioral_edge_scores_lower_than_structural_at_same_distance():
     # one must rank lower purely from BEHAVIORAL_EDGE_WEIGHT.
     contracts = [
         _provider("api", "http::GET::/u", file="api/h.py"),
-        _consumer("web", "http::GET::/u", file="web/c.py", ),
+        _consumer(
+            "web",
+            "http::GET::/u",
+            file="web/c.py",
+        ),
     ]
     links = [_link("http::GET::/u", "api", "api/h.py", "web", "web/c.py", conf=0.7)]
     overlay = CrossRepoOverlay(
@@ -222,9 +228,7 @@ def test_include_behavioral_false_drops_co_change_edges():
         _consumer("web", "http::GET::/u", file="web/c.py"),
     ]
     links = [_link("http::GET::/u", "api", "api/h.py", "web", "web/c.py")]
-    overlay = CrossRepoOverlay(
-        co_changes=[_cochange("api", "api/h.py", "infra", "infra/x.yaml")]
-    )
+    overlay = CrossRepoOverlay(co_changes=[_cochange("api", "api/h.py", "infra", "infra/x.yaml")])
     graph = build_system_graph(contracts, links, overlay, {})
     result = cross_repo_blast_radius(graph, ["api"], include_behavioral=False)
     assert {n.id for n in result.impacted} == {"web"}
@@ -232,9 +236,7 @@ def test_include_behavioral_false_drops_co_change_edges():
 
 
 def test_co_change_propagates_both_directions():
-    overlay = CrossRepoOverlay(
-        co_changes=[_cochange("a", "a/x.py", "b", "b/y.py", strength=0.8)]
-    )
+    overlay = CrossRepoOverlay(co_changes=[_cochange("a", "a/x.py", "b", "b/y.py", strength=0.8)])
     graph = build_system_graph([], [], overlay, {})
     # Changing either side impacts the other (undirected behavioral edge).
     assert {n.id for n in cross_repo_blast_radius(graph, ["a"]).impacted} == {"b"}

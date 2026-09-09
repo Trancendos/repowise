@@ -14,7 +14,7 @@ from datetime import UTC, datetime
 from repowise.core.ingestion import ASTParser
 from repowise.core.ingestion.models import FileInfo
 
-_PY_SOURCE = b'''\
+_PY_SOURCE = b"""\
 import os
 from collections import OrderedDict
 
@@ -31,7 +31,7 @@ class Child(Base):
 
 def helper(arg: str) -> str:
     return arg.upper()
-'''
+"""
 
 
 def _file_info(path: str = "pkg/mod.py") -> FileInfo:

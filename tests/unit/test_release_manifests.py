@@ -78,13 +78,11 @@ def test_a_release_manifest_tracks_the_package_version(
         "packages/server/src/repowise/server/__init__.py",
     ],
 )
-def test_a_package_dunder_version_tracks_pyproject(
-    module_path: str, package_version: str
-) -> None:
+def test_a_package_dunder_version_tracks_pyproject(module_path: str, package_version: str) -> None:
     text = (ROOT / module_path).read_text(encoding="utf-8")
-    assert f'__version__ = "{package_version}"' in text, (
-        f"{module_path} does not carry __version__ = {package_version!r}"
-    )
+    assert (
+        f'__version__ = "{package_version}"' in text
+    ), f"{module_path} does not carry __version__ = {package_version!r}"
 
 
 def test_the_registry_manifest_describes_the_cli_it_ships() -> None:
@@ -100,17 +98,17 @@ def test_the_registry_manifest_describes_the_cli_it_ships() -> None:
     assert isinstance(arguments, list)
 
     subcommand = arguments[0]
-    assert subcommand["value"] == mcp_command.name, (
-        "server.json invokes a different subcommand than the CLI registers"
-    )
+    assert (
+        subcommand["value"] == mcp_command.name
+    ), "server.json invokes a different subcommand than the CLI registers"
 
     repo_path = next(arg for arg in arguments if arg.get("valueHint") == "repo_path")
-    assert repo_path["isRequired"] == params["path"].required, (
-        "server.json and the CLI disagree on whether the repository path is required"
-    )
+    assert (
+        repo_path["isRequired"] == params["path"].required
+    ), "server.json and the CLI disagree on whether the repository path is required"
 
     transport = next(arg for arg in arguments if arg.get("name") == "--transport")
-    assert transport["value"] == params["transport"].default, (
-        "server.json pins a --transport value the CLI does not default to"
-    )
+    assert (
+        transport["value"] == params["transport"].default
+    ), "server.json pins a --transport value the CLI does not default to"
     assert transport["value"] in params["transport"].type.choices

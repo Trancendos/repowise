@@ -108,12 +108,8 @@ class _SqlMetaMixin(MetaIndexStore):
     async def upsert_page(self, **kwargs: Any) -> Page:
         return await crud.upsert_page(self._session, **kwargs)
 
-    async def upsert_page_from_generated(
-        self, generated_page: object, repository_id: str
-    ) -> Page:
-        return await crud.upsert_page_from_generated(
-            self._session, generated_page, repository_id
-        )
+    async def upsert_page_from_generated(self, generated_page: object, repository_id: str) -> Page:
+        return await crud.upsert_page_from_generated(self._session, generated_page, repository_id)
 
     async def get_page(self, page_id: str) -> Page | None:
         return await crud.get_page(self._session, page_id)
@@ -138,9 +134,7 @@ class _SqlMetaMixin(MetaIndexStore):
             order=order,
         )
 
-    async def get_page_versions(
-        self, page_id: str, *, limit: int = 50
-    ) -> list[PageVersion]:
+    async def get_page_versions(self, page_id: str, *, limit: int = 50) -> list[PageVersion]:
         return await crud.get_page_versions(self._session, page_id, limit=limit)
 
     async def get_stale_pages(self, repository_id: str) -> list[Page]:
@@ -167,9 +161,7 @@ class _SqlMetaMixin(MetaIndexStore):
             delivery_id=delivery_id,
         )
 
-    async def mark_webhook_processed(
-        self, event_id: str, *, job_id: str | None = None
-    ) -> None:
+    async def mark_webhook_processed(self, event_id: str, *, job_id: str | None = None) -> None:
         await crud.mark_webhook_processed(self._session, event_id, job_id=job_id)
 
     async def create_conversation(
@@ -190,9 +182,7 @@ class _SqlMetaMixin(MetaIndexStore):
     async def update_conversation_title(
         self, conversation_id: str, title: str
     ) -> Conversation | None:
-        return await crud.update_conversation_title(
-            self._session, conversation_id, title
-        )
+        return await crud.update_conversation_title(self._session, conversation_id, title)
 
     async def delete_conversation(self, conversation_id: str) -> bool:
         return await crud.delete_conversation(self._session, conversation_id)

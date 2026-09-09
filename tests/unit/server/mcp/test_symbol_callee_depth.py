@@ -93,9 +93,7 @@ async def _root(session, rid: str) -> WikiSymbol:
     return res.scalar_one()
 
 
-async def test_depth_two_serves_the_direct_callee_with_its_body(
-    session, repository, chain
-) -> None:
+async def test_depth_two_serves_the_direct_callee_with_its_body(session, repository, chain) -> None:
     """The whole point: the next hop arrives with source, not as a name to re-fetch."""
     root = await _root(session, repository.id)
     block = await _expand_callees(session, repository.id, root, chain, 2, None)
@@ -107,9 +105,7 @@ async def test_depth_two_serves_the_direct_callee_with_its_body(
     assert entry["verified"] is True
 
 
-async def test_depth_three_reaches_two_hops_and_labels_each(
-    session, repository, chain
-) -> None:
+async def test_depth_three_reaches_two_hops_and_labels_each(session, repository, chain) -> None:
     """Transitive, and each body says how far out it is."""
     root = await _root(session, repository.id)
     block = await _expand_callees(session, repository.id, root, chain, 3, None)
@@ -141,9 +137,7 @@ async def test_a_leaf_symbol_returns_no_block(session, repository, chain) -> Non
 # --- the bounds, checked from the side that would blow up ------------------
 
 
-async def test_a_cycle_terminates_and_serves_each_symbol_once(
-    session, repository, chain
-) -> None:
+async def test_a_cycle_terminates_and_serves_each_symbol_once(session, repository, chain) -> None:
     """Recursion is normal code. A walk that re-queues a seen node never ends.
 
     Closing f3 -> f0 makes the chain a cycle; the walk must stop and must not
@@ -248,9 +242,7 @@ async def test_excluded_callees_are_dropped(session, repository, chain) -> None:
     assert block is None
 
 
-async def test_a_base_class_is_not_served_as_a_callee(
-    session, repository, chain
-) -> None:
+async def test_a_base_class_is_not_served_as_a_callee(session, repository, chain) -> None:
     """The walk follows `calls`, not everything that reaches a symbol.
 
     `_expand_callees` imports `_CALL_EDGE_TYPES` from `tool_context.enrichment`,

@@ -124,8 +124,9 @@ def measurement_ref(
 def _ref_exists(repo_path: str, ref: str) -> bool:
     try:
         return bool(
-            _git(["rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"], repo_path, check=False)
-            .strip()
+            _git(
+                ["rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"], repo_path, check=False
+            ).strip()
         )
     except (subprocess.SubprocessError, OSError):
         return False

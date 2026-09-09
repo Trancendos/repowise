@@ -348,9 +348,7 @@ def _workspace_rows(target: CommandTarget) -> list[dict]:
 
         file_count, symbol_count = _query_repo_counts(abs_path)
         page_count = _query_page_count(abs_path)
-        is_stale, current_head, behind = check_repo_staleness(
-            abs_path, entry.last_commit_at_index
-        )
+        is_stale, current_head, behind = check_repo_staleness(abs_path, entry.last_commit_at_index)
         row.update(
             files=file_count,
             symbols=symbol_count,
@@ -527,9 +525,7 @@ def status_command(path: str | None, workspace: bool, no_workspace: bool, fmt: s
     repowise_dir = get_repowise_dir(repo_path)
 
     if not repowise_dir.exists():
-        notices.print(
-            "[yellow]No .repowise/ directory found. Run 'repowise init' first.[/yellow]"
-        )
+        notices.print("[yellow]No .repowise/ directory found. Run 'repowise init' first.[/yellow]")
         if fmt == "json":
             emit_json({"repo": str(repo_path), "indexed": False})
         return
@@ -540,9 +536,7 @@ def status_command(path: str | None, workspace: bool, no_workspace: bool, fmt: s
     has_db = db_path.exists() or db_configured()
 
     if fmt == "json":
-        counts, total_db_tokens = (
-            run_async(_query_pages(repo_path)) if has_db else ({}, 0)
-        )
+        counts, total_db_tokens = run_async(_query_pages(repo_path)) if has_db else ({}, 0)
         emit_json(
             {
                 "repo": str(repo_path),

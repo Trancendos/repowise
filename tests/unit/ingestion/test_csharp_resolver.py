@@ -31,7 +31,9 @@ from repowise.core.ingestion.resolvers.dotnet.namespace_map import declared_name
 # ---------------------------------------------------------------------------
 
 
-def _csproj(deps: list[str] = (), packages: list[tuple[str, str]] = (), implicit: bool = True) -> str:
+def _csproj(
+    deps: list[str] = (), packages: list[tuple[str, str]] = (), implicit: bool = True
+) -> str:
     refs = "\n".join(f'    <ProjectReference Include="{p}" />' for p in deps)
     pkgs = "\n".join(
         f'    <PackageReference Include="{name}" Version="{ver}" />' for name, ver in packages

@@ -63,9 +63,7 @@ def parse_package_swift(path: Path) -> dict[str, str]:
     return result
 
 
-def build_swift_targets(
-    repo_path: Path | None, *, prune_nested_git: bool = True
-) -> dict[str, str]:
+def build_swift_targets(repo_path: Path | None, *, prune_nested_git: bool = True) -> dict[str, str]:
     """Walk the repo for every ``Package.swift``, merge their target maps.
 
     Each target's source dir is prefixed with the package's directory

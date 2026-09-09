@@ -95,10 +95,14 @@ async def test_reconcile_restamps_rows_left_on_the_old_ladder(async_session):
     # Simulate a store written before the swap: session evidence stamped 7, and
     # the headline confidence derived from that stale rank.
     row = (
-        await async_session.execute(
-            select(DecisionEvidence).where(DecisionEvidence.decision_id == rec.id)
+        (
+            await async_session.execute(
+                select(DecisionEvidence).where(DecisionEvidence.decision_id == rec.id)
+            )
         )
-    ).scalars().one()
+        .scalars()
+        .one()
+    )
     row.source_rank = 7
     rec.confidence = compute_confidence(7, 1, "exact")
     await async_session.flush()
@@ -127,10 +131,14 @@ async def test_reconcile_scores_a_headline_the_same_way_the_upsert_does(async_se
     scored_by_upsert = rec.confidence
 
     rows = (
-        await async_session.execute(
-            select(DecisionEvidence).where(DecisionEvidence.decision_id == rec.id)
+        (
+            await async_session.execute(
+                select(DecisionEvidence).where(DecisionEvidence.decision_id == rec.id)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     for row in rows:
         row.source_rank = 7 if row.source == "session" else 8
     rec.confidence = 0.123
@@ -179,10 +187,14 @@ async def test_every_retired_source_is_drained(async_session):
         assert await purge_proposed_decisions_by_source(async_session, repo.id, source) == 1
 
     remaining = (
-        await async_session.execute(
-            select(DecisionRecord).where(DecisionRecord.repository_id == repo.id)
+        (
+            await async_session.execute(
+                select(DecisionRecord).where(DecisionRecord.repository_id == repo.id)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert remaining == []
 
 

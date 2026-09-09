@@ -65,9 +65,7 @@ def connect(repo_path: Path) -> sqlite3.Connection | None:
     if not db_path.exists():
         return None
     try:
-        return sqlite3.connect(
-            f"file:{db_path.as_posix()}?mode=ro", uri=True, timeout=1
-        )
+        return sqlite3.connect(f"file:{db_path.as_posix()}?mode=ro", uri=True, timeout=1)
     except sqlite3.Error:
         return None
 
@@ -84,9 +82,7 @@ def repo_id(conn: sqlite3.Connection, repo_path: Path) -> str | None:
     return row[0] if row else None
 
 
-def pagerank(
-    conn: sqlite3.Connection, repository_id: str, paths: list[str]
-) -> dict[str, float]:
+def pagerank(conn: sqlite3.Connection, repository_id: str, paths: list[str]) -> dict[str, float]:
     """PageRank by node id for the file nodes among *paths*."""
     if not paths:
         return {}

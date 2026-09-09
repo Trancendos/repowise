@@ -129,9 +129,9 @@ async def test_the_window_still_fills_with_real_pages_when_decisions_crowd_it():
     hits = await pipeline.hybrid_retrieve(_QUESTION, ctx)
 
     assert len(hits) == pipeline._RETRIEVAL_FETCH_LIMIT
-    assert store.limits[0] > pipeline._RETRIEVAL_FETCH_LIMIT, (
-        "the fetch must ask for more than it needs, or crowding empties the window"
-    )
+    assert (
+        store.limits[0] > pipeline._RETRIEVAL_FETCH_LIMIT
+    ), "the fetch must ask for more than it needs, or crowding empties the window"
 
 
 async def test_a_window_that_stays_short_is_reported(caplog):

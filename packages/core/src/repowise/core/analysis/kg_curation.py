@@ -143,6 +143,7 @@ def _graph_mode(dominant_lang: str, lang_by_path: dict[str, str], graph_builder:
         return "sparse"
     return "flow"
 
+
 __all__ = [
     "KGValidation",
     "apply_summary_floor",
@@ -465,13 +466,32 @@ _SIZE_SUFFIX_RE = re.compile(r"\(\d+\)\s*$")
 # Universal organizational directory names — containers, not domain labels.
 # Shared with community labeling; the data-driven ``dominant_segments`` set
 # complements this with per-repo namespace noise (the repo's own name).
-GENERIC_ORG_SEGMENTS = frozenset({
-    "src", "lib", "core", "common", "shared", "internal", "pkg",
-    "main", "app", "utils", "helpers", "index", "mod",
-    # Monorepo organisational directories
-    "packages", "modules", "workspace", "workspaces", "libs",
-    "projects", "services", "apps",
-})
+GENERIC_ORG_SEGMENTS = frozenset(
+    {
+        "src",
+        "lib",
+        "core",
+        "common",
+        "shared",
+        "internal",
+        "pkg",
+        "main",
+        "app",
+        "utils",
+        "helpers",
+        "index",
+        "mod",
+        # Monorepo organisational directories
+        "packages",
+        "modules",
+        "workspace",
+        "workspaces",
+        "libs",
+        "projects",
+        "services",
+        "apps",
+    }
+)
 
 
 def dominant_segments(paths: list[str]) -> set[str]:
@@ -753,12 +773,8 @@ def derive_modules(
         if per_layer_count[m["layerId"]] == 1:
             module["wholeLayer"] = True
         if lang_by_id is not None:
-            langs = Counter(
-                lang for nid in m["nodeIds"] if (lang := lang_by_id.get(nid, ""))
-            )
-            module["language"] = (
-                min(langs, key=lambda tag: (-langs[tag], tag)) if langs else ""
-            )
+            langs = Counter(lang for nid in m["nodeIds"] if (lang := lang_by_id.get(nid, "")))
+            module["language"] = min(langs, key=lambda tag: (-langs[tag], tag)) if langs else ""
         out.append(module)
     return out
 
@@ -793,9 +809,7 @@ def _curate_modules(kg: KnowledgeGraphResult) -> list[dict] | None:
     names = [m["name"] for m in modules]
     ids = [m["id"] for m in modules]
     if len(set(names)) != len(names) or len(set(ids)) != len(ids):
-        logger.warning(
-            "kg_curation: derived module names/ids not unique; exporting no modules"
-        )
+        logger.warning("kg_curation: derived module names/ids not unique; exporting no modules")
         return None
     return modules
 
@@ -985,9 +999,7 @@ def _structural_walk(
 
     def conventional(p: str) -> bool:
         pp = PurePosixPath(p)
-        return pp.name in entry_names or (
-            bool(project_stem) and pp.stem.lower() == project_stem
-        )
+        return pp.name in entry_names or (bool(project_stem) and pp.stem.lower() == project_stem)
 
     anchor = min(
         code,
@@ -1105,10 +1117,7 @@ def _anchor_fanout_rank(graph_builder: Any) -> dict[str, int]:
     package import (15 sibling edges) out-ranks a file with a dozen real
     dependencies and the anchor lands alphabetically-by-luck.
     """
-    return {
-        src: len(target_groups)
-        for src, target_groups in _import_groups(graph_builder).items()
-    }
+    return {src: len(target_groups) for src, target_groups in _import_groups(graph_builder).items()}
 
 
 def _drop_extra_barrels(paths: list[str], barrels: set[str], keep: int = 1) -> list[str]:
@@ -1234,9 +1243,7 @@ def _curate_tour(
     # SpecUtil) — are what the suite runs ON, not where tests start. Their
     # heavy in-degree otherwise wins the pagerank tie-break on every repo
     # with shared fixtures.
-    adjacent_paths = {
-        p for layer in ADJACENT_LAYERS for p in by_layer.get(layer, [])
-    }
+    adjacent_paths = {p for layer in ADJACENT_LAYERS for p in by_layer.get(layer, [])}
     # Fan-out groups (one import statement expanded to many sibling targets
     # — Go/JVM package imports) are *not* evidence that a specific file is
     # referenced: a chi root test "imports" every sibling test through the
@@ -1481,9 +1488,7 @@ def _curate_tour(
     lang_counts = Counter(code_langs)
     total_code = sum(lang_counts.values()) or 1
     test_langs = {
-        lang_by_path.get(p, "")
-        for layer in ADJACENT_LAYERS
-        for p in by_layer.get(layer, [])
+        lang_by_path.get(p, "") for layer in ADJACENT_LAYERS for p in by_layer.get(layer, [])
     }
     other_suites = sorted(
         spec.display_name
@@ -1799,18 +1804,14 @@ def validate_kg(kg: KnowledgeGraphResult) -> KGValidation:
         if len(flat) != len(module_covered):
             errors.append("modules: a file appears in more than one module")
         if not module_covered <= file_ids:
-            errors.append(
-                f"modules: {len(module_covered - file_ids)} unknown ids in modules"
-            )
+            errors.append(f"modules: {len(module_covered - file_ids)} unknown ids in modules")
         module_names = [m.get("name", "") for m in modules]
         if len(set(module_names)) != len(module_names):
             errors.append("modules: names not unique")
         size_suffixed = [n for n in module_names if _SIZE_SUFFIX_RE.search(n)]
         if size_suffixed:
             errors.append(f"modules: size-suffixed names: {size_suffixed}")
-        oversized = sum(
-            1 for ids in module_member_lists if len(ids) > _MODULE_TARGET_MAX
-        )
+        oversized = sum(1 for ids in module_member_lists if len(ids) > _MODULE_TARGET_MAX)
         if oversized:
             # Flat dirs may honestly exceed the window — soft signal only.
             warnings.append(f"{oversized} modules above target_max (flat dirs?)")

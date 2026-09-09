@@ -25,7 +25,9 @@ def _node(path: str, *, summary: str = "", ntype: str = "file", tags=None) -> di
 def test_summary_restatement_flags_bare_template_only():
     nodes = [
         _node("pyproject.toml", summary="Configuration file: pyproject.toml.", ntype="config"),
-        _node("a/b.json", summary="Node package manifest: dependencies and scripts.", ntype="config"),
+        _node(
+            "a/b.json", summary="Node package manifest: dependencies and scripts.", ntype="config"
+        ),
         _node("src/walker.py", summary="Service module walker defining Walk, Visit.", ntype="file"),
     ]
     findings = checks.check_summaries_restate_filename(nodes)
@@ -139,11 +141,13 @@ def test_tour_sequential_detects_gap_and_empty_step():
 
 def test_layer_name_category_flags_unbacked_category_word():
     nodes = [_node("plugins/claude/plugin.json"), _node("plugins/readme.md")]
-    layers = [{
-        "id": "layer:p",
-        "name": "Claude Plugin Middleware",
-        "nodeIds": ["file:plugins/claude/plugin.json", "file:plugins/readme.md"],
-    }]
+    layers = [
+        {
+            "id": "layer:p",
+            "name": "Claude Plugin Middleware",
+            "nodeIds": ["file:plugins/claude/plugin.json", "file:plugins/readme.md"],
+        }
+    ]
     findings = checks.check_layer_name_category(layers, nodes)
     assert len(findings) == 1
     assert findings[0].severity is Severity.WARNING
@@ -152,11 +156,13 @@ def test_layer_name_category_flags_unbacked_category_word():
 
 def test_layer_name_category_ok_when_files_back_the_word():
     nodes = [_node("src/middleware/auth.ts")]
-    layers = [{
-        "id": "layer:m",
-        "name": "Auth Middleware",
-        "nodeIds": ["file:src/middleware/auth.ts"],
-    }]
+    layers = [
+        {
+            "id": "layer:m",
+            "name": "Auth Middleware",
+            "nodeIds": ["file:src/middleware/auth.ts"],
+        }
+    ]
     assert checks.check_layer_name_category(layers, nodes) == []
 
 
@@ -164,11 +170,13 @@ def test_layer_name_category_handles_ies_plural_singularization():
     # "Repositories" must match files under a repository/ dir (ies -> y), not
     # produce a false category-error finding.
     nodes = [_node("src/repository/user_repo.py")]
-    layers = [{
-        "id": "layer:r",
-        "name": "Data Repositories",
-        "nodeIds": ["file:src/repository/user_repo.py"],
-    }]
+    layers = [
+        {
+            "id": "layer:r",
+            "name": "Data Repositories",
+            "nodeIds": ["file:src/repository/user_repo.py"],
+        }
+    ]
     assert checks.check_layer_name_category(layers, nodes) == []
 
 
@@ -183,8 +191,11 @@ def _kg(nodes, layers, tour):
 
 def test_run_review_aggregates_and_reports_ok():
     nodes = [_node("a.py", summary="a module.")]
-    kg = _kg(nodes, [{"id": "layer:x", "nodeIds": ["file:a.py"]}],
-             [{"order": 1, "title": "A", "target_path": "a", "reason": "Entry."}])
+    kg = _kg(
+        nodes,
+        [{"id": "layer:x", "nodeIds": ["file:a.py"]}],
+        [{"order": 1, "title": "A", "target_path": "a", "reason": "Entry."}],
+    )
     report = run_review(kg)
     assert report.ok
     assert report.criticals == []

@@ -147,9 +147,7 @@ async def _actors_for(
     client, scheduled job …) rather than a lone hardcoded "User".
     """
     actors = derive_actors(await _curated_entry_points(session, repo_id))
-    people = [
-        Person(id=a.id, name=a.name, description=a.description, kind=a.kind) for a in actors
-    ]
+    people = [Person(id=a.id, name=a.name, description=a.description, kind=a.kind) for a in actors]
     relations = [Relation(source_id=a.id, target_id=system.id, label=a.verb) for a in actors]
     return people, relations
 
@@ -161,9 +159,7 @@ async def build_l1(session: AsyncSession, repo_id: str) -> C4L1:
 
     people, relations = await _actors_for(session, repo_id, system)
     for ext in externals:
-        relations.append(
-            Relation(source_id=system.id, target_id=ext.id, label=ext.category)
-        )
+        relations.append(Relation(source_id=system.id, target_id=ext.id, label=ext.category))
     return C4L1(
         system=system,
         people=people,
@@ -174,17 +170,13 @@ async def build_l1(session: AsyncSession, repo_id: str) -> C4L1:
 
 async def build_l2(session: AsyncSession, repo_id: str) -> C4L2:
     repo = await load_repo(session, repo_id)
-    containers = await detect_containers(
-        session, repo_id, root_name=repo.name if repo else None
-    )
+    containers = await detect_containers(session, repo_id, root_name=repo.name if repo else None)
     externals, _ = await _external_views(session, repo_id)
 
     file_to_container = await _file_to_container_map(session, repo_id, containers)
     file_to_external = await external_node_to_system_id(session, repo_id)
 
-    containers = await _annotate_container_signals(
-        session, repo_id, containers, file_to_container
-    )
+    containers = await _annotate_container_signals(session, repo_id, containers, file_to_container)
 
     relations = await aggregate_relations(
         session,
@@ -202,9 +194,7 @@ async def build_l2(session: AsyncSession, repo_id: str) -> C4L2:
 async def build_l3(session: AsyncSession, repo_id: str, container_id_value: str) -> C4L3 | None:
     """Return L3 view for one container, or ``None`` if it doesn't exist."""
     repo = await load_repo(session, repo_id)
-    containers = await detect_containers(
-        session, repo_id, root_name=repo.name if repo else None
-    )
+    containers = await detect_containers(session, repo_id, root_name=repo.name if repo else None)
     container = next((c for c in containers if c.id == container_id_value), None)
     if container is None:
         return None
@@ -223,9 +213,7 @@ async def build_l3(session: AsyncSession, repo_id: str, container_id_value: str)
     # header card matches what L2 shows.
     full_file_to_container = await _file_to_container_map(session, repo_id, containers)
     container = (
-        await _annotate_container_signals(
-            session, repo_id, [container], full_file_to_container
-        )
+        await _annotate_container_signals(session, repo_id, [container], full_file_to_container)
     )[0]
 
     # Files outside this container map to their owning container so cross-
@@ -248,8 +236,7 @@ async def build_l3(session: AsyncSession, repo_id: str, container_id_value: str)
 
     relevant_box_ids = {c.id for c in components} | {container.id}
     relations = [
-        r for r in relations
-        if r.source_id in relevant_box_ids or r.target_id in relevant_box_ids
+        r for r in relations if r.source_id in relevant_box_ids or r.target_id in relevant_box_ids
     ]
 
     externals_all, _ = await _external_views(session, repo_id)
@@ -287,9 +274,7 @@ async def build_model(
 
     file_to_container = await _file_to_container_map(session, repo_id, containers)
     file_to_external = await external_node_to_system_id(session, repo_id)
-    containers = await _annotate_container_signals(
-        session, repo_id, containers, file_to_container
-    )
+    containers = await _annotate_container_signals(session, repo_id, containers, file_to_container)
 
     edges = await load_edges(session, repo_id)
     container_relations = await aggregate_relations(
@@ -411,9 +396,7 @@ async def _per_file_signals(session: AsyncSession, repo_id: str) -> dict[str, di
 
 async def _tour_steps(session: AsyncSession, repo_id: str) -> list[TourStep]:
     """The curated reading order, if this repo has one."""
-    layer_names = {
-        layer.layer_id: layer.name for layer in await get_kg_layers(session, repo_id)
-    }
+    layer_names = {layer.layer_id: layer.name for layer in await get_kg_layers(session, repo_id)}
     steps = await get_kg_tour_steps(session, repo_id)
     return [
         TourStep(

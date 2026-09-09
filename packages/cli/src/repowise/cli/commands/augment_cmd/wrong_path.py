@@ -229,9 +229,7 @@ def _log_wrong_path_firing(repo_path: Path, session_id: str, text: str) -> None:
     _log_firing(repo_path, session_id, "wrong_path", "rescue", text)
 
 
-def _log_firing(
-    repo_path: Path, session_id: str, surface: str, category: str, text: str
-) -> None:
+def _log_firing(repo_path: Path, session_id: str, surface: str, category: str, text: str) -> None:
     """Record one failure-surface firing; measurement only, never fatal.
 
     Same contract as the search surfaces: keyed on a hash of the emitted text

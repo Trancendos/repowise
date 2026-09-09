@@ -72,9 +72,7 @@ PAGE_FTS_DDL = (
 # ``NOT EXISTS`` rather than ``NOT IN``: the subquery's column is a primary key
 # and can never be NULL today, but ``NOT IN`` returns no rows at all the day one
 # is, which would turn this into a silent no-op instead of a visible failure.
-_ORPHAN_PREDICATE = (
-    "NOT EXISTS (SELECT 1 FROM wiki_pages p WHERE p.id = page_fts.page_id)"
-)
+_ORPHAN_PREDICATE = "NOT EXISTS (SELECT 1 FROM wiki_pages p WHERE p.id = page_fts.page_id)"
 _ORPHAN_COUNT_SQL = f"SELECT count(*) FROM page_fts WHERE {_ORPHAN_PREDICATE}"
 _ORPHAN_DELETE_SQL = f"DELETE FROM page_fts WHERE {_ORPHAN_PREDICATE}"
 

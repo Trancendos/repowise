@@ -102,7 +102,7 @@ class B {
 }
 """
 
-PYTHON_TWO_CLASSES = '''
+PYTHON_TWO_CLASSES = """
 class A:
     def helper(self):
         return 1
@@ -114,7 +114,7 @@ class A:
 class B:
     def helper(self):
         return 2
-'''
+"""
 
 KOTLIN_TOP_LEVEL_FN = """
 class A {
@@ -142,33 +142,33 @@ class TestClassAwareTier:
         parsed = _parse_all(tmp_path, {"src/A.java": ("java", JAVA_TWO_CLASSES)})
         edges = _edges(parsed, tmp_path)
         hits = [e for e in edges if e[0].endswith("::A::run")]
-        assert [e[1].split("::")[-2:] for e in hits] == [["A", "helper"]], (
-            f"helper() inside A.run must reach A::helper, not B's; edges: {edges}"
-        )
+        assert [e[1].split("::")[-2:] for e in hits] == [
+            ["A", "helper"]
+        ], f"helper() inside A.run must reach A::helper, not B's; edges: {edges}"
         assert hits[0][2:] == (0.95, "enclosing_class")
 
     def test_recursion_does_not_reach_another_class(self, tmp_path: Path) -> None:
         """The caller's own class's `helper` IS the caller — that is a self-call."""
         parsed = _parse_all(tmp_path, {"src/A.java": ("java", JAVA_RECURSIVE)})
         edges = _edges(parsed, tmp_path)
-        assert _targets_of(edges, "::A::helper") == [], (
-            f"recursive helper() must not edge to B::helper; edges: {edges}"
-        )
+        assert (
+            _targets_of(edges, "::A::helper") == []
+        ), f"recursive helper() must not edge to B::helper; edges: {edges}"
 
     def test_a_member_shaped_site_is_not_treated_as_bare(self, tmp_path: Path) -> None:
         parsed = _parse_all(tmp_path, {"src/A.java": ("java", JAVA_MEMBER_SHAPED)})
         edges = _edges(parsed, tmp_path)
-        assert not [t for t in _targets_of(edges, "::A::run") if t.endswith("::A::helper")], (
-            f"b.helper() must not resolve to the caller's own helper; edges: {edges}"
-        )
+        assert not [
+            t for t in _targets_of(edges, "::A::run") if t.endswith("::A::helper")
+        ], f"b.helper() must not resolve to the caller's own helper; edges: {edges}"
 
     def test_language_without_an_implicit_receiver_is_untouched(self, tmp_path: Path) -> None:
         """A bare `helper()` in Python is a module-level function, never `self.helper()`."""
         parsed = _parse_all(tmp_path, {"src/a.py": ("python", PYTHON_TWO_CLASSES)})
         edges = _edges(parsed, tmp_path)
-        assert not [t for t in _targets_of(edges, "::A::run") if t.endswith("::A::helper")], (
-            f"Python bare call must not bind to the caller's class; edges: {edges}"
-        )
+        assert not [
+            t for t in _targets_of(edges, "::A::run") if t.endswith("::A::helper")
+        ], f"Python bare call must not bind to the caller's class; edges: {edges}"
 
     def test_a_top_level_function_hit_is_left_alone(self, tmp_path: Path) -> None:
         """Kotlin puts free functions beside classes, so the flat hit may be right.
@@ -180,14 +180,14 @@ class TestClassAwareTier:
         parsed = _parse_all(tmp_path, {"src/A.kt": ("kotlin", KOTLIN_TOP_LEVEL_FN)})
         edges = _edges(parsed, tmp_path)
         targets = _targets_of(edges, "::A::run")
-        assert targets and not any(t.endswith("::A::helper") for t in targets), (
-            f"the top-level helper must keep the edge; edges: {edges}"
-        )
+        assert targets and not any(
+            t.endswith("::A::helper") for t in targets
+        ), f"the top-level helper must keep the edge; edges: {edges}"
 
     def test_a_constructor_hit_is_left_alone(self, tmp_path: Path) -> None:
         """`new Entry()` reaches a constructor; a same-named nested type is not a rival."""
         parsed = _parse_all(tmp_path, {"src/Holder.java": ("java", JAVA_CONSTRUCTOR)})
         edges = _edges(parsed, tmp_path)
-        assert not [t for t in _targets_of(edges, "::make") if t.endswith("::Holder::Entry")], (
-            f"a constructor hit must not be redirected; edges: {edges}"
-        )
+        assert not [
+            t for t in _targets_of(edges, "::make") if t.endswith("::Holder::Entry")
+        ], f"a constructor hit must not be redirected; edges: {edges}"

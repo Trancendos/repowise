@@ -390,8 +390,7 @@ def _reconcile_schema(connection: object) -> None:
             _run(
                 f"{table.name}.{column.name}",
                 lambda table=table, column=column: text(
-                    f'ALTER TABLE "{table.name}" ADD COLUMN '
-                    f"{_add_column_ddl(column, dialect)}"
+                    f'ALTER TABLE "{table.name}" ADD COLUMN ' f"{_add_column_ddl(column, dialect)}"
                 ),
             )
 

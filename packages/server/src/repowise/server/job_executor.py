@@ -358,9 +358,7 @@ async def execute_job(
             mode = str(config.get("mode") or "sync")
             if mode not in VALID_JOB_MODES:
                 valid_str = ", ".join(sorted(VALID_JOB_MODES))
-                raise ValueError(
-                    f"Invalid job mode '{mode}'. Expected one of: {valid_str}"
-                )
+                raise ValueError(f"Invalid job mode '{mode}'. Expected one of: {valid_str}")
 
             is_full_resync = mode == "full_resync"
             is_initial_index = mode == "initial_index"

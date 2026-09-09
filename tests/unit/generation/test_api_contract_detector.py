@@ -23,7 +23,9 @@ def _file(path: str, language: str) -> FileInfo:
     )
 
 
-def _sym(name: str, kind: str = "function", decorators: list[str] | None = None, signature: str = "") -> Symbol:
+def _sym(
+    name: str, kind: str = "function", decorators: list[str] | None = None, signature: str = ""
+) -> Symbol:
     return Symbol(
         id=f"x::{name}",
         name=name,
@@ -82,7 +84,11 @@ def test_detects_aspnet_controller_via_inheritance():
     pf = _parsed(
         "Controllers/UsersController.cs",
         "csharp",
-        symbols=[_sym("UsersController", kind="class", signature="class UsersController : ControllerBase")],
+        symbols=[
+            _sym(
+                "UsersController", kind="class", signature="class UsersController : ControllerBase"
+            )
+        ],
     )
     assert detect_code_api_contracts([pf]) == 1
 

@@ -207,12 +207,21 @@ async def decision_db(session: AsyncSession, repo_id: str) -> str:
             primary_owner_email="alice@example.com",
             primary_owner_commit_pct=0.65,
             top_authors_json=json.dumps([{"name": "Alice", "count": 27}]),
-            significant_commits_json=json.dumps([
-                {"sha": "abc1", "date": "2026-03-15", "message": "Refactor auth", "author": "Alice"},
-            ]),
-            co_change_partners_json=json.dumps([
-                {"file_path": "src/db/models.py", "count": 3},
-            ]),
+            significant_commits_json=json.dumps(
+                [
+                    {
+                        "sha": "abc1",
+                        "date": "2026-03-15",
+                        "message": "Refactor auth",
+                        "author": "Alice",
+                    },
+                ]
+            ),
+            co_change_partners_json=json.dumps(
+                [
+                    {"file_path": "src/db/models.py", "count": 3},
+                ]
+            ),
             is_hotspot=True,
             is_stable=False,
             churn_percentile=0.92,
@@ -573,7 +582,9 @@ async def test_get_risk_pr_mode_governance_risk_summary_mentions_count(setup_mcp
     directive = result["directive"]
     gov_count = len(directive.get("governance_risk", []))
     if gov_count > 0:
-        assert str(gov_count) in directive["summary"] or "governance" in directive["summary"].lower()
+        assert (
+            str(gov_count) in directive["summary"] or "governance" in directive["summary"].lower()
+        )
 
 
 @pytest.mark.asyncio
@@ -665,9 +676,9 @@ async def test_get_overview_key_decisions_sorted_by_confidence(setup_mcp_decisio
     if len(top) > 1:
         confidences = [e["confidence"] for e in top]
         for i in range(len(confidences) - 1):
-            assert confidences[i] >= confidences[i + 1], (
-                f"top_active not sorted by confidence desc at index {i}"
-            )
+            assert (
+                confidences[i] >= confidences[i + 1]
+            ), f"top_active not sorted by confidence desc at index {i}"
 
 
 @pytest.mark.asyncio

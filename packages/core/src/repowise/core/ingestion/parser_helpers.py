@@ -245,9 +245,7 @@ def prepare_pascal_source(source: bytes, path: str | None) -> bytes:
     return source
 
 
-def _dedupe_pascal_interface_symbols(
-    symbols: list[Symbol], node_types: list[str]
-) -> list[Symbol]:
+def _dedupe_pascal_interface_symbols(symbols: list[Symbol], node_types: list[str]) -> list[Symbol]:
     """Drop an interface-section method signature once its implementation
     is also present, so the two don't become two graph nodes for one method.
 
@@ -471,6 +469,7 @@ def _classify_param_origin(type_node: Node) -> str:
 # Go type-reference head extraction
 # ---------------------------------------------------------------------------
 
+
 def _go_head_type_identifier(type_node: Node, src: str) -> str | None:
     """Return the head type name of a Go type expression, or None.
 
@@ -540,6 +539,7 @@ def _go_head_type_identifier(type_node: Node, src: str) -> str | None:
 # C / C++ type-reference head extraction
 # ---------------------------------------------------------------------------
 
+
 def _c_head_type_identifier(type_node: Node, src: str) -> str | None:
     """Return the head type name of a C / C++ type expression, or None.
 
@@ -577,8 +577,10 @@ def _c_head_type_identifier(type_node: Node, src: str) -> str | None:
         if kind == "qualified_identifier":
             # ``NS::Type`` — take the rightmost name component.
             name = node.child_by_field_name("name")
-            node = name if name is not None else (
-                node.named_children[-1] if node.named_children else None
+            node = (
+                name
+                if name is not None
+                else (node.named_children[-1] if node.named_children else None)
             )
             continue
         # type_qualifier (const/volatile) wrappers and anything else:
@@ -594,6 +596,7 @@ def _c_head_type_identifier(type_node: Node, src: str) -> str | None:
 # ---------------------------------------------------------------------------
 # TypeScript / JavaScript type-reference head extraction
 # ---------------------------------------------------------------------------
+
 
 def _ts_head_type_identifier(type_node: Node, src: str) -> str | None:
     """Return the head identifier of a TypeScript/JavaScript type, or None.
@@ -634,11 +637,23 @@ def _ts_head_type_identifier(type_node: Node, src: str) -> str | None:
             break
         if kind == "predefined_type":
             return None
-        if kind in ("union_type", "intersection_type", "function_type",
-                    "constructor_type", "object_type", "literal_type",
-                    "tuple_type", "conditional_type", "mapped_type",
-                    "index_type_query", "type_query", "lookup_type",
-                    "template_literal_type", "infer_type", "readonly_type"):
+        if kind in (
+            "union_type",
+            "intersection_type",
+            "function_type",
+            "constructor_type",
+            "object_type",
+            "literal_type",
+            "tuple_type",
+            "conditional_type",
+            "mapped_type",
+            "index_type_query",
+            "type_query",
+            "lookup_type",
+            "template_literal_type",
+            "infer_type",
+            "readonly_type",
+        ):
             return None
         if kind == "generic_type":
             # ``Foo<T>`` — descend to the bare name; generic args are
@@ -652,8 +667,7 @@ def _ts_head_type_identifier(type_node: Node, src: str) -> str | None:
         if kind == "nested_type_identifier":
             # ``ns.Foo`` — rightmost name component is the type itself.
             name = node.child_by_field_name("name") or next(
-                (c for c in reversed(node.named_children)
-                 if c.type == "type_identifier"),
+                (c for c in reversed(node.named_children) if c.type == "type_identifier"),
                 None,
             )
             node = name
@@ -688,6 +702,7 @@ def _ts_head_type_identifier(type_node: Node, src: str) -> str | None:
 # Java type-reference head extraction
 # ---------------------------------------------------------------------------
 
+
 def _java_head_type_identifier(type_node: Node, src: str) -> str | None:
     """Return the head type identifier of a Java type expression, or None.
 
@@ -710,7 +725,9 @@ def _java_head_type_identifier(type_node: Node, src: str) -> str | None:
             text = _node_text(node, src)
             break
         if kind in (
-            "void_type", "integral_type", "floating_point_type",
+            "void_type",
+            "integral_type",
+            "floating_point_type",
             "boolean_type",
         ):
             return None
@@ -725,8 +742,11 @@ def _java_head_type_identifier(type_node: Node, src: str) -> str | None:
             # ``Foo<T>`` — descend to the bare name; generic args are
             # captured separately by their own type_arguments inner captures.
             inner = next(
-                (c for c in node.named_children
-                 if c.type in ("type_identifier", "scoped_type_identifier")),
+                (
+                    c
+                    for c in node.named_children
+                    if c.type in ("type_identifier", "scoped_type_identifier")
+                ),
                 None,
             )
             node = inner
@@ -739,8 +759,11 @@ def _java_head_type_identifier(type_node: Node, src: str) -> str | None:
         if kind == "annotated_type":
             # ``@NonNull Foo`` — last named child is the type.
             node = next(
-                (c for c in reversed(node.named_children)
-                 if c.type not in ("annotation", "marker_annotation")),
+                (
+                    c
+                    for c in reversed(node.named_children)
+                    if c.type not in ("annotation", "marker_annotation")
+                ),
                 None,
             )
             continue
@@ -755,6 +778,7 @@ def _java_head_type_identifier(type_node: Node, src: str) -> str | None:
 # ---------------------------------------------------------------------------
 # Kotlin type-reference head extraction
 # ---------------------------------------------------------------------------
+
 
 def _kotlin_head_type_identifier(type_node: Node, src: str) -> str | None:
     """Return the head identifier of a Kotlin type expression, or None.
@@ -814,6 +838,7 @@ def _kotlin_head_type_identifier(type_node: Node, src: str) -> str | None:
 # Rust type-reference head extraction
 # ---------------------------------------------------------------------------
 
+
 def _rust_head_type_identifier(type_node: Node, src: str) -> str | None:
     """Return the head identifier of a Rust type expression, or None.
 
@@ -865,12 +890,17 @@ def _rust_head_type_identifier(type_node: Node, src: str) -> str | None:
             continue
         if kind in ("dynamic_type", "abstract_type"):
             # ``dyn Trait`` / ``impl Trait`` — sole named child is the trait.
-            node = node.child_by_field_name("trait") or next(
-                iter(node.named_children), None
-            )
+            node = node.child_by_field_name("trait") or next(iter(node.named_children), None)
             continue
-        if kind in ("primitive_type", "tuple_type", "unit_type", "array_type",
-                    "function_type", "never_type", "empty_type"):
+        if kind in (
+            "primitive_type",
+            "tuple_type",
+            "unit_type",
+            "array_type",
+            "function_type",
+            "never_type",
+            "empty_type",
+        ):
             # Builtin, or no single head name to resolve.
             return None
         # Unknown shape - descend into the first named child and re-classify.

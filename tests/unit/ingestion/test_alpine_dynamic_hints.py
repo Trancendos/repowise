@@ -14,8 +14,7 @@ class TestAlpineDynamicHints:
             "export default function explorer() { return {}; }\n"
         )
         (tmp_path / "index.js").write_text(
-            "import explorer from './data/explorer.js'\n"
-            "Alpine.data('explorer', explorer)\n"
+            "import explorer from './data/explorer.js'\n" "Alpine.data('explorer', explorer)\n"
         )
         edges = AlpineDynamicHints().extract(tmp_path)
         assert any(

@@ -178,9 +178,7 @@ class TestAgainstTheOtherReplacingSurface:
         )
         return repo
 
-    def test_a_skeleton_is_never_followed_by_you_already_have_this(
-        self, both_on: Path
-    ) -> None:
+    def test_a_skeleton_is_never_followed_by_you_already_have_this(self, both_on: Path) -> None:
         """The collapse must not claim bytes a skeleton stood in for.
 
         Otherwise the second Read says "you were served the whole file" to an
@@ -189,13 +187,11 @@ class TestAgainstTheOtherReplacingSurface:
         """
         assert "Skeleton of" in _served(_read(both_on))
         second = _read(both_on)
-        assert second.replacement is None, (
-            "the Read after a skeleton must return the file, not a notice about it"
-        )
+        assert (
+            second.replacement is None
+        ), "the Read after a skeleton must return the file, not a notice about it"
 
-    def test_and_that_read_is_not_reported_as_an_external_change(
-        self, both_on: Path
-    ) -> None:
+    def test_and_that_read_is_not_reported_as_an_external_change(self, both_on: Path) -> None:
         """The other half: the skeleton's digest differs from the file's, and
         treating that as a change would invent one."""
         _read(both_on)
@@ -323,7 +319,9 @@ class TestLedger:
             ).fetchall()
         finally:
             con.close()
-        assert rows == [("read_reread", "hook-read", "a.py", len(_BODY) // 4, pytest.approx(rows[0][4]))]
+        assert rows == [
+            ("read_reread", "hook-read", "a.py", len(_BODY) // 4, pytest.approx(rows[0][4]))
+        ]
         assert rows[0][4] < rows[0][3], "a collapse that saved nothing is not a saving"
 
     def test_the_state_records_what_was_served(self, repo: Path) -> None:

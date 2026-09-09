@@ -393,14 +393,10 @@ async def batch_upsert_graph_node_membership(
         gate=UpsertGate(
             key_column=GraphNodeMembership.node_id,
             columns=_MEMBERSHIP_FIELDS,
-            item_values_fn=lambda kv: {
-                k: v for k, v in kv[1].items() if k in _MEMBERSHIP_FIELDS
-            },
+            item_values_fn=lambda kv: {k: v for k, v in kv[1].items() if k in _MEMBERSHIP_FIELDS},
             # Pruned keys are excluded: their rows are gone by the time the
             # upsert runs, and a snapshot never sends a key it just pruned.
-            prefetched={
-                row[0]: row[1:] for row in existing_rows if row[0] in current
-            },
+            prefetched={row[0]: row[1:] for row in existing_rows if row[0] in current},
         ),
         insert_fn=lambda kv: GraphNodeMembership(
             id=_new_uuid(),
@@ -890,13 +886,21 @@ async def get_node_degree_counts(
     in-degree is rendered as "Dependents (N)" above a dependents list, and
     the two disagreed by the file's own symbol count.
     """
-    in_q = select(func.count()).select_from(GraphEdge).where(
-        GraphEdge.repository_id == repository_id,
-        GraphEdge.target_node_id == node_id,
+    in_q = (
+        select(func.count())
+        .select_from(GraphEdge)
+        .where(
+            GraphEdge.repository_id == repository_id,
+            GraphEdge.target_node_id == node_id,
+        )
     )
-    out_q = select(func.count()).select_from(GraphEdge).where(
-        GraphEdge.repository_id == repository_id,
-        GraphEdge.source_node_id == node_id,
+    out_q = (
+        select(func.count())
+        .select_from(GraphEdge)
+        .where(
+            GraphEdge.repository_id == repository_id,
+            GraphEdge.source_node_id == node_id,
+        )
     )
     if edge_types:
         in_q = in_q.where(GraphEdge.edge_type.in_(edge_types))

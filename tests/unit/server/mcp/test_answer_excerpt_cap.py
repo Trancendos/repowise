@@ -103,9 +103,9 @@ async def test_whole_fetched_excerpt_survives_formatting(setup_mcp, factory, mon
     await get_answer("how does the alpha module handle the write path")
 
     assert prompts, "synthesis must run"
-    assert body[:_GATED_EXCERPT_CHARS] in prompts[0], (
-        f"the whole {_GATED_EXCERPT_CHARS}-char fetched excerpt must reach the prompt"
-    )
+    assert (
+        body[:_GATED_EXCERPT_CHARS] in prompts[0]
+    ), f"the whole {_GATED_EXCERPT_CHARS}-char fetched excerpt must reach the prompt"
 
 
 @pytest.mark.asyncio

@@ -96,9 +96,9 @@ def test_workspace_update_backfills_docs_pointer(tmp_path: Path) -> None:
 
     state = _state(repo)
     assert state[SYNC_POINTER_KEY] == c1, "sync pointer should advance to new commit"
-    assert state.get(DOCS_POINTER_KEY) == c0, (
-        "workspace update must backfill docs pointer from the old sync pointer"
-    )
+    assert (
+        state.get(DOCS_POINTER_KEY) == c0
+    ), "workspace update must backfill docs pointer from the old sync pointer"
 
 
 def test_stale_prose_is_reachable_after_workspace_update(tmp_path: Path) -> None:
@@ -136,9 +136,9 @@ def test_stale_prose_is_reachable_after_workspace_update(tmp_path: Path) -> None
         cli, ["update", str(repo), "--docs", "--provider", "mock", "--no-workspace"]
     )
     assert result.exit_code == 0, result.output
-    assert "No changed files detected" not in result.output, (
-        "docs run used the workspace-advanced pointer as its diff base and saw an empty diff"
-    )
+    assert (
+        "No changed files detected" not in result.output
+    ), "docs run used the workspace-advanced pointer as its diff base and saw an empty diff"
 
     state = _state(repo)
     assert state.get(DOCS_POINTER_KEY) == c2, "docs pointer should now reach HEAD"
@@ -205,9 +205,9 @@ def test_workspace_docs_update_reports_deferral_not_regeneration(tmp_path: Path)
 
     assert result.exit_code == 0, result.output
     assert "deferred to an in-flight update" in result.output, result.output
-    assert "with docs regenerated" not in result.output, (
-        "a lock-bail must not be reported as a regeneration"
-    )
+    assert (
+        "with docs regenerated" not in result.output
+    ), "a lock-bail must not be reported as a regeneration"
     # Nothing regenerated -> the docs pointer stays put (the in-flight update
     # owns advancing it once it finishes).
     assert _state(repo).get(DOCS_POINTER_KEY) == c0

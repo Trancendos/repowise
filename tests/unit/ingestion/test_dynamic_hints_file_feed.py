@@ -56,9 +56,7 @@ def repo(tmp_path: Path) -> Path:
 
 def _walked_files(root: Path) -> list[str]:
     snap = WalkSnapshot(root, prune_dirs=PRUNED_DIRS_DERIVED)
-    return [
-        p.relative_to(root).as_posix() for p in snap.iter_glob(root, "*") if p.is_file()
-    ]
+    return [p.relative_to(root).as_posix() for p in snap.iter_glob(root, "*") if p.is_file()]
 
 
 class TestFileFeedEquivalence:
@@ -92,7 +90,8 @@ class TestFileFeedEquivalence:
         assert "config/settings/local_settings.py" in walked_refs
 
         indexed = [
-            p for p in _walked_files(repo)
+            p
+            for p in _walked_files(repo)
             if p not in ("src/Bar.Designer.cs", "config/settings/local_settings.py")
         ]
         fed = HintRegistry().extract_all(repo, file_paths=indexed)

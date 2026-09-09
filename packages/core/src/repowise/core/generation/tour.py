@@ -303,7 +303,11 @@ def build_tour(
     # entries reach almost nothing and a non-seed file's imports fan out
     # substantially, that file co-anchors the walk (its own steps use
     # anchor wording, never "entry point").
-    if genuine_entries and len(depths) <= _STUB_ENTRY_REACH and len(documented) > _STUB_ENTRY_REACH * 2:
+    if (
+        genuine_entries
+        and len(depths) <= _STUB_ENTRY_REACH
+        and len(documented) > _STUB_ENTRY_REACH * 2
+    ):
         co_anchor = _best_anchor(set(seeds))
         if co_anchor is not None and _fanout(co_anchor) >= 3:
             anchor_seeds.add(co_anchor)
@@ -403,10 +407,7 @@ def build_tour(
             else:
                 # No fan-in evidence: a generated lookup table parked by
                 # PageRank must not claim the repo depends on it.
-                reason = (
-                    "Off the import paths walked above — a standalone or "
-                    "supporting file."
-                )
+                reason = "Off the import paths walked above — a standalone or " "supporting file."
         elif d == 1:
             # Anchor-seeded walks have no entry points — the reason must not
             # invent them. When a co-anchor rescued a wiring-stub entry, the

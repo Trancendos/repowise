@@ -116,9 +116,9 @@ def measure_amplification(
         directory = transcript_dir_for(repo_root, projects_root)
         if not directory.is_dir():
             return Amplification()
-        files = sorted(
-            directory.glob("*.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True
-        )[:limit]
+        files = sorted(directory.glob("*.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True)[
+            :limit
+        ]
     except (OSError, ValueError):
         return Amplification()
 

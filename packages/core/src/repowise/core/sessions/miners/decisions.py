@@ -643,7 +643,6 @@ def _promotion_decisions(row: dict[str, Any], repo_root: Path) -> list[Extracted
 INJECTION_EVAL_MIN_AGE_SECONDS = 3600.0
 
 
-
 async def apply_injection_feedback(
     db_session: Any,
     repository_id: str,

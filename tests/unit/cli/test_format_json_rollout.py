@@ -147,9 +147,7 @@ def test_legacy_alias_actually_selects_json(module: str, attr: str, args, tmp_pa
         json.loads(result.stdout)  # must be one parseable document
     else:
         # A ClickException abort is fine; an unhandled traceback is not.
-        assert not isinstance(result.exception, (TypeError, KeyError, NameError)), (
-            result.exception
-        )
+        assert not isinstance(result.exception, (TypeError, KeyError, NameError)), result.exception
 
 
 def test_resolve_format_lets_the_alias_only_select_json() -> None:
@@ -183,9 +181,7 @@ def test_vector_store_refusal_prints_to_stderr(monkeypatch, tmp_path, capsys) ->
     from repowise.cli import providers
     from repowise.core.providers.embedding.base import MockEmbedder
 
-    monkeypatch.setattr(
-        "repowise.cli.providers.vector_store.existing_vector_dim", lambda _d: 1536
-    )
+    monkeypatch.setattr("repowise.cli.providers.vector_store.existing_vector_dim", lambda _d: 1536)
     assert providers.build_vector_store(tmp_path, MockEmbedder()) is None
 
     captured = capsys.readouterr()
@@ -256,9 +252,7 @@ def test_whats_new_json_carries_every_selected_release() -> None:
     # The cap that matters is the 8-bullet one, so at least one release has to
     # carry more than 8 bullets. Asserting only that the keys exist would pass
     # against a payload whose sections are all empty.
-    assert max(
-        sum(len(s["items"]) for s in r["sections"]) for r in payload["releases"]
-    ) > 8
+    assert max(sum(len(s["items"]) for s in r["sections"]) for r in payload["releases"]) > 8
 
 
 def test_status_json_reports_absence_rather_than_only_a_notice(tmp_path) -> None:
@@ -293,9 +287,7 @@ def test_corrections_json_write_does_not_prune_when_the_scan_found_nothing(
         lambda *_a, **_k: {"rules": []},
     )
     wrote: list = []
-    monkeypatch.setattr(
-        corrections_cmd, "_write_managed_blocks", lambda *a, **k: wrote.append(a)
-    )
+    monkeypatch.setattr(corrections_cmd, "_write_managed_blocks", lambda *a, **k: wrote.append(a))
 
     result = _split_runner().invoke(
         corrections_cmd.corrections_command,
@@ -327,10 +319,12 @@ def test_workspace_rows_give_every_repo_the_same_keys(tmp_path) -> None:
         ws_config=SimpleNamespace(
             default_repo="api",
             repos=[
-                SimpleNamespace(alias="api", path="api", indexed_at=None,
-                                last_commit_at_index=None),
-                SimpleNamespace(alias="web", path="web", indexed_at=None,
-                                last_commit_at_index=None),
+                SimpleNamespace(
+                    alias="api", path="api", indexed_at=None, last_commit_at_index=None
+                ),
+                SimpleNamespace(
+                    alias="web", path="web", indexed_at=None, last_commit_at_index=None
+                ),
             ],
         ),
     )
@@ -350,9 +344,7 @@ def test_workspace_rows_give_every_repo_the_same_keys(tmp_path) -> None:
     assert json.loads(json.dumps(rows, default=str))
 
 
-def test_forgone_rows_keeps_what_it_read_when_a_later_surface_errors(
-    monkeypatch, tmp_path
-) -> None:
+def test_forgone_rows_keeps_what_it_read_when_a_later_surface_errors(monkeypatch, tmp_path) -> None:
     """A mid-loop sqlite error must not retract earlier surfaces.
 
     The printer this was split out of printed each surface as it went, so a

@@ -113,9 +113,9 @@ def test_the_progress_module_does_not_drag_in_the_pipeline_package() -> None:
 
     probe = "import repowise.cli.ui.progress, sys; print('repowise.core.pipeline' in sys.modules)"
     out = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True, check=True)
-    assert out.stdout.strip() == "False", (
-        "importing repowise.cli.ui.progress pulled in repowise.core.pipeline"
-    )
+    assert (
+        out.stdout.strip() == "False"
+    ), "importing repowise.cli.ui.progress pulled in repowise.core.pipeline"
 
 
 def test_the_cli_entry_point_does_not_drag_in_the_pipeline_package() -> None:
@@ -138,9 +138,9 @@ def test_the_cli_entry_point_does_not_drag_in_the_pipeline_package() -> None:
         "print([m for m in sys.modules if m.startswith('repowise.core.pipeline')])"
     )
     out = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True, check=True)
-    assert out.stdout.strip() == "[]", (
-        f"importing repowise.cli.main pulled in the pipeline package: {out.stdout.strip()}"
-    )
+    assert (
+        out.stdout.strip() == "[]"
+    ), f"importing repowise.cli.main pulled in the pipeline package: {out.stdout.strip()}"
 
 
 # --- keyless provider detection --------------------------------------------
@@ -245,9 +245,9 @@ def test_the_keyless_providers_get_setup_help_instead_of_a_key_prompt() -> None:
     for name, lines in provider_selection._LOCAL_PROVIDER_SETUP.items():
         rendered = "\n".join(lines()).lower()
         assert rendered.strip(), f"{name} has no setup help"
-        assert "no api key here" in rendered or "no key needed" in rendered, (
-            f"{name}'s help does not say there is no key to paste"
-        )
+        assert (
+            "no api key here" in rendered or "no key needed" in rendered
+        ), f"{name}'s help does not say there is no key to paste"
 
 
 def test_selecting_an_unreachable_ollama_never_prompts_for_a_key(monkeypatch: Any) -> None:

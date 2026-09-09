@@ -7,6 +7,7 @@ import fnmatch
 
 def _matches(path: str) -> bool:
     from repowise.core.analysis.dead_code.constants import _NEVER_FLAG_PATTERNS
+
     return any(fnmatch.fnmatch(path, p) for p in _NEVER_FLAG_PATTERNS)
 
 

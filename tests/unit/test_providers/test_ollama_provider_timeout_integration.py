@@ -49,9 +49,9 @@ async def test_ollama_retries_on_timeout():
         await p.generate(system_prompt="", user_prompt="", max_tokens=10)
 
     # Tenacity should have retried _MAX_RETRIES times (= 3)
-    assert call_count == 3, (
-        f"Expected 3 retries before ProviderError, got {call_count}. Fix may not be working."
-    )
+    assert (
+        call_count == 3
+    ), f"Expected 3 retries before ProviderError, got {call_count}. Fix may not be working."
     assert "ollama" in str(exc_info.value)
 
 
@@ -77,9 +77,9 @@ async def test_ollama_retries_on_connection_error():
     with pytest.raises(ProviderError) as exc_info:
         await p.generate(system_prompt="", user_prompt="", max_tokens=10)
 
-    assert call_count == 3, (
-        f"Expected 3 retries before ProviderError, got {call_count}. Fix may not be working."
-    )
+    assert (
+        call_count == 3
+    ), f"Expected 3 retries before ProviderError, got {call_count}. Fix may not be working."
     assert "ollama" in str(exc_info.value)
 
 
@@ -166,9 +166,9 @@ async def test_ollama_does_not_retry_invalid_request():
     with pytest.raises(ProviderError) as exc_info:
         await p.generate(system_prompt="", user_prompt="", max_tokens=10)
 
-    assert call_count == 1, (
-        f"Non-retryable 400 must fail immediately, but was called {call_count} times."
-    )
+    assert (
+        call_count == 1
+    ), f"Non-retryable 400 must fail immediately, but was called {call_count} times."
     assert "ollama" in str(exc_info.value)
 
 
@@ -197,7 +197,7 @@ async def test_ollama_does_not_retry_authentication_error():
     with pytest.raises(ProviderError) as exc_info:
         await p.generate(system_prompt="", user_prompt="", max_tokens=10)
 
-    assert call_count == 1, (
-        f"Authentication error must fail immediately, but was called {call_count} times."
-    )
+    assert (
+        call_count == 1
+    ), f"Authentication error must fail immediately, but was called {call_count} times."
     assert "ollama" in str(exc_info.value)

@@ -62,9 +62,7 @@ class RustAxumDialect:
             window = _line_window(content, m.end())
             methods = {mm.group(1).upper() for mm in _AXUM_METHOD_RE.finditer(window)}
             for method in sorted(methods):
-                c = build_provider_contract(
-                    ctx, method=method, path_raw=path_raw, framework="axum"
-                )
+                c = build_provider_contract(ctx, method=method, path_raw=path_raw, framework="axum")
                 if c is not None:
                     out.append(c)
 

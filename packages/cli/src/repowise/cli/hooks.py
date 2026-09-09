@@ -152,9 +152,7 @@ def _strip_legacy_block(content: str) -> tuple[str, bool]:
             start = i
             for j in range(i - 1, -1, -1):
                 stripped = lines[j].strip()
-                if stripped.startswith("# post-commit hook") or stripped.startswith(
-                    "# Auto-syncs"
-                ):
+                if stripped.startswith("# post-commit hook") or stripped.startswith("# Auto-syncs"):
                     start = j
                     break
                 if not stripped or stripped.startswith("#!"):
@@ -171,7 +169,7 @@ def _strip_legacy_block(content: str) -> tuple[str, bool]:
             break
         end = k
 
-    cleaned = "\n".join(lines[:start] + lines[end + 1:]).rstrip() + "\n"
+    cleaned = "\n".join(lines[:start] + lines[end + 1 :]).rstrip() + "\n"
     return cleaned, True
 
 
@@ -234,16 +232,13 @@ def install(repo_path: Path) -> str:
             # Marker block present. Decide whether to leave alone or upgrade.
             current_block = _HOOK_SCRIPT.rstrip() + "\n"
             if current_block in content:
-                return (
-                    "migrated legacy hook" if migrated_legacy else "already installed"
-                )
+                return "migrated legacy hook" if migrated_legacy else "already installed"
             content, replaced = _replace_marker_block(content, _HOOK_SCRIPT)
             if replaced:
                 hook_path.write_text(content, encoding="utf-8")
                 with contextlib.suppress(OSError):
                     hook_path.chmod(
-                        hook_path.stat().st_mode
-                        | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
+                        hook_path.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
                     )
                 return "upgraded"
             return "already installed"

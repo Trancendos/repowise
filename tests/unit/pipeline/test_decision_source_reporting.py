@@ -88,9 +88,7 @@ async def test_failed_source_warns_and_is_kept_out_of_the_empty_list(_patched, m
     assert "provider exploded" in warnings
     # And it is NOT also reported as an honest zero.
     assert "Nothing found in" in info
-    nothing_line = next(
-        t for lvl, t in progress.messages if lvl == "info" and "Nothing found" in t
-    )
+    nothing_line = next(t for lvl, t in progress.messages if lvl == "info" and "Nothing found" in t)
     assert "pull requests" not in nothing_line
     # Sources that genuinely found nothing still appear there.
     assert "git history" in nothing_line

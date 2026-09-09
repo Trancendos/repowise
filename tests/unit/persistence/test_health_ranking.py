@@ -116,9 +116,7 @@ async def test_score_still_outranks_deduction(async_session, tmp_path) -> None:
     ]
 
 
-async def test_scoped_read_ranks_and_sums_only_the_requested_paths(
-    async_session, tmp_path
-) -> None:
+async def test_scoped_read_ranks_and_sums_only_the_requested_paths(async_session, tmp_path) -> None:
     repo = await _seed(
         async_session,
         tmp_path,

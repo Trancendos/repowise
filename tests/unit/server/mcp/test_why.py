@@ -356,9 +356,9 @@ async def test_get_why_semantic_decision_namespace_filtering(session, setup_mcp)
     # The semantic decision hit should appear with the prefix stripped
     assert "dec-vec-1" in decision_ids, f"Expected 'dec-vec-1' in decisions; got {decision_ids}"
     # The noise page must not appear in decisions
-    assert not any(d.get("id", "").startswith("file_page:") for d in result["decisions"]), (
-        "Noise page should not appear in decisions list"
-    )
+    assert not any(
+        d.get("id", "").startswith("file_page:") for d in result["decisions"]
+    ), "Noise page should not appear in decisions list"
 
 
 # ---------------------------------------------------------------------------
@@ -486,9 +486,7 @@ async def test_get_why_asks_git_about_the_top_record_only(session, setup_mcp, mo
 async def test_get_why_stays_silent_when_git_cannot_decide(session, setup_mcp, monkeypatch):
     from repowise.server.mcp_server import get_why, tool_why
 
-    monkeypatch.setattr(
-        tool_why, "describe_decision_currency", lambda root, **kw: None
-    )
+    monkeypatch.setattr(tool_why, "describe_decision_currency", lambda root, **kw: None)
 
     result = await get_why("src/auth/service.py")
 
@@ -524,7 +522,9 @@ async def test_get_why_path_leaves_a_small_response_untouched(session, setup_mcp
 
 
 @pytest.mark.asyncio
-async def test_get_why_path_fits_with_one_enormous_record(session, setup_mcp, monkeypatch, tmp_path):
+async def test_get_why_path_fits_with_one_enormous_record(
+    session, setup_mcp, monkeypatch, tmp_path
+):
     """The last record is droppable too — a cap on the count is not a bound.
 
     One governing record whose free text alone busts the budget is the case a

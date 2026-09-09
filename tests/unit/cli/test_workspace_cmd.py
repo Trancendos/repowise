@@ -476,18 +476,49 @@ class TestWorkspaceDiagnostics:
             default_repo="backend",
         )
         contracts = [
-            Contract(repo="backend", contract_id="http::GET::/users", contract_type="http",
-                     role="provider", file_path="r.py", symbol_name="h", confidence=0.9),
-            Contract(repo="frontend", contract_id="http::GET::/users", contract_type="http",
-                     role="consumer", file_path="c.ts", symbol_name="f", confidence=0.8),
-            Contract(repo="backend", contract_id="http::GET::/orphan", contract_type="http",
-                     role="provider", file_path="r.py", symbol_name="o", confidence=0.9),
+            Contract(
+                repo="backend",
+                contract_id="http::GET::/users",
+                contract_type="http",
+                role="provider",
+                file_path="r.py",
+                symbol_name="h",
+                confidence=0.9,
+            ),
+            Contract(
+                repo="frontend",
+                contract_id="http::GET::/users",
+                contract_type="http",
+                role="consumer",
+                file_path="c.ts",
+                symbol_name="f",
+                confidence=0.8,
+            ),
+            Contract(
+                repo="backend",
+                contract_id="http::GET::/orphan",
+                contract_type="http",
+                role="provider",
+                file_path="r.py",
+                symbol_name="o",
+                confidence=0.9,
+            ),
         ]
         links = [
-            ContractLink(contract_id="http::GET::/users", contract_type="http", match_type="exact",
-                         confidence=0.72, provider_repo="backend", provider_file="r.py",
-                         provider_symbol="h", provider_service=None, consumer_repo="frontend",
-                         consumer_file="c.ts", consumer_symbol="f", consumer_service=None),
+            ContractLink(
+                contract_id="http::GET::/users",
+                contract_type="http",
+                match_type="exact",
+                confidence=0.72,
+                provider_repo="backend",
+                provider_file="r.py",
+                provider_symbol="h",
+                provider_service=None,
+                consumer_repo="frontend",
+                consumer_file="c.ts",
+                consumer_symbol="f",
+                consumer_service=None,
+            ),
         ]
         graph = build_system_graph(contracts, links, CrossRepoOverlay(), {}, generated_at="t")
         save_system_graph(graph, root)

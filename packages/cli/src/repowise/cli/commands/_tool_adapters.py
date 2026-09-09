@@ -105,9 +105,7 @@ def resolve_indexed_repo(
     from repowise.cli.helpers import REPOWISE_DIR
 
     if not (repo_path / REPOWISE_DIR).is_dir():
-        raise click.ClickException(
-            f"{repo_path} is not indexed. Run 'repowise init' there first."
-        )
+        raise click.ClickException(f"{repo_path} is not indexed. Run 'repowise init' there first.")
     return repo_path
 
 

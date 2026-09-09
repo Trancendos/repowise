@@ -140,8 +140,10 @@ def test_unrelated_repowise_text_is_not_a_firing():
 
 def test_skeleton_nudge_acted_only_on_a_structure_call():
     (firing,) = parse_emission(NUDGE)
-    classify(firing, [_use("mcp__repowise__get_context", targets=["pkg/core/thing.py"],
-                           include=["skeleton"])])
+    classify(
+        firing,
+        [_use("mcp__repowise__get_context", targets=["pkg/core/thing.py"], include=["skeleton"])],
+    )
     assert firing.acted is True
     assert firing.evidence == "skeleton_call"
     assert firing.distance == 0
@@ -328,8 +330,10 @@ def _transcript(path, emissions_then_uses):
             # The paired record the harness also writes for the same firing.
             lines.append(
                 json.dumps(
-                    {"type": "attachment", "attachment": {
-                        "type": "hook_additional_context", "content": [value]}}
+                    {
+                        "type": "attachment",
+                        "attachment": {"type": "hook_additional_context", "content": [value]},
+                    }
                 )
             )
         else:
@@ -340,8 +344,12 @@ def _transcript(path, emissions_then_uses):
                         "type": "assistant",
                         "message": {
                             "content": [
-                                {"type": "tool_use", "id": "t1", "name": name,
-                                 "input": json.loads(inp)}
+                                {
+                                    "type": "tool_use",
+                                    "id": "t1",
+                                    "name": name,
+                                    "input": json.loads(inp),
+                                }
                             ]
                         },
                     }
@@ -353,8 +361,10 @@ def _transcript(path, emissions_then_uses):
 def test_replay_counts_each_firing_once_despite_the_paired_record(tmp_path):
     """The harness logs one emission twice; counting both doubles every figure."""
     t = tmp_path / "sess-1.jsonl"
-    _transcript(t, [("hook", TRIAGE), ("echo", TRIAGE),
-                    ("use", _use("Read", file_path="pkg/core/loader.py"))])
+    _transcript(
+        t,
+        [("hook", TRIAGE), ("echo", TRIAGE), ("use", _use("Read", file_path="pkg/core/loader.py"))],
+    )
 
     firings = list(iter_transcript_firings(t))
     assert len(firings) == 1
@@ -378,14 +388,23 @@ def test_ingest_is_idempotent_and_settles_the_live_row(tmp_path):
 
     d = transcript_dir_for(repo.resolve(), projects)
     d.mkdir(parents=True)
-    _transcript(d / "sess-1.jsonl", [("hook", TRIAGE),
-                                     ("use", _use("Read", file_path="pkg/core/loader.py"))])
+    _transcript(
+        d / "sess-1.jsonl",
+        [("hook", TRIAGE), ("use", _use("Read", file_path="pkg/core/loader.py"))],
+    )
 
     # The live hook wrote its own row first, keyed on the same text.
     store = SessionStagingStore.open_default(repo)
-    store.record_firing(session_id="sess-1", key=ledger_key("search", "triage", TRIAGE),
-                        surface="search", category="triage", chars=len(TRIAGE),
-                        shown_at=1.0, duration_ms=50, acted=None)
+    store.record_firing(
+        session_id="sess-1",
+        key=ledger_key("search", "triage", TRIAGE),
+        surface="search",
+        category="triage",
+        chars=len(TRIAGE),
+        shown_at=1.0,
+        duration_ms=50,
+        acted=None,
+    )
     store.commit()
     store.close()
 
@@ -403,11 +422,14 @@ def test_ingest_is_idempotent_and_settles_the_live_row(tmp_path):
     assert rows[0]["duration_ms_total"] == 1200, "harness timing should win over the hook's"
 
 
-@pytest.mark.parametrize("surface,category,text", [
-    ("read", "skeleton_nudge", NUDGE),
-    ("search", "triage", TRIAGE),
-    ("fix_history", "edit_notice", FIXES),
-])
+@pytest.mark.parametrize(
+    "surface,category,text",
+    [
+        ("read", "skeleton_nudge", NUDGE),
+        ("search", "triage", TRIAGE),
+        ("fix_history", "edit_notice", FIXES),
+    ],
+)
 def test_ledger_key_mirrors_the_hook_side_helper(surface, category, text):
     """Drift here silently doubles every count — the hook cannot import core."""
     from repowise.cli.commands.augment_cmd._shared import _ledger_key

@@ -687,9 +687,7 @@ def serve_command(
                 ready = _download_web(__version__)
 
             if ready:
-                frontend_proc = _start_frontend(
-                    node, port, ui_port, local_web=local_web, host=host
-                )
+                frontend_proc = _start_frontend(node, port, ui_port, local_web=local_web, host=host)
                 if frontend_proc:
                     console.print(f"[green]Web UI starting on http://localhost:{ui_port}[/green]")
                 else:

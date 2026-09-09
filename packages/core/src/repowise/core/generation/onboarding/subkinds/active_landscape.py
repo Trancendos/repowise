@@ -75,10 +75,7 @@ def _build(signals: OnboardingSignals) -> ActiveLandscapeContext | None:
             files_touched += 1
             total_commits_90d += commits
 
-    if (
-        total_commits_90d < _GATE_MIN_COMMITS_90D
-        or files_touched < _GATE_MIN_FILES_TOUCHED
-    ):
+    if total_commits_90d < _GATE_MIN_COMMITS_90D or files_touched < _GATE_MIN_FILES_TOUCHED:
         return None
 
     # Build hot files — sorted by 90d churn, then commit recency proxy (age).

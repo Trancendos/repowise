@@ -116,9 +116,7 @@ def _symbol_relevance(entry: dict, terms: set[str]) -> int:
             score += _RELEVANCE_SIG_WEIGHT
         else:
             if doc_tokens is None:
-                doc_tokens = _text_stems(
-                    (entry.get("docstring") or "")[:_RELEVANCE_DOC_CHARS]
-                )
+                doc_tokens = _text_stems((entry.get("docstring") or "")[:_RELEVANCE_DOC_CHARS])
             if _stem_hit(term, doc_tokens):
                 score += _RELEVANCE_DOC_WEIGHT
     return score
@@ -162,9 +160,7 @@ def _extract_question_identifiers(question: str) -> set[str]:
     return ids
 
 
-def union_defers_to_synthesis(
-    question: str, question_ids: set[str], union_groups: dict
-) -> bool:
+def union_defers_to_synthesis(question: str, question_ids: set[str], union_groups: dict) -> bool:
     """True when an answer-by-union should fall through to synthesis.
 
     Answer-by-union is the right reply for a small set of genuine parallel
@@ -314,9 +310,7 @@ def _read_signature_from_source(
         # "ends with a colon" alone leaves a one-line body (``def go(self): pass``)
         # and every brace language (``func f() error {``, ``render() {``) with no
         # terminator at all, so the signature absorbs the lines after it.
-        if paren_depth <= 0 and (
-            stripped.endswith(":") or _SIG_TERMINATOR_RE.search(stripped)
-        ):
+        if paren_depth <= 0 and (stripped.endswith(":") or _SIG_TERMINATOR_RE.search(stripped)):
             break
     if not sig_lines:
         return None
@@ -832,9 +826,7 @@ async def _hydrate_candidate_defines(
         matched = name.lower() in qids
         if not matched and name.startswith("_"):
             continue
-        by_file.setdefault(file_path, []).append(
-            (0 if matched else 1, rank, name, start_line or 0)
-        )
+        by_file.setdefault(file_path, []).append((0 if matched else 1, rank, name, start_line or 0))
 
     for path, rows in by_file.items():
         rows.sort(key=lambda r: (r[0], r[1], r[3]))
@@ -936,9 +928,7 @@ async def _hydrate_symbols_for_hits(
         if row.kind in ("constant", "variable") or not verified:
             rich_sig = None
         else:
-            rich_sig = _read_signature_from_source(
-                repo_root, row.file_path, start_line, text=text
-            )
+            rich_sig = _read_signature_from_source(repo_root, row.file_path, start_line, text=text)
         matched = _question_names_symbol(row, qids_lower)
         entry: dict[str, Any] = {
             "name": row.name,
@@ -954,9 +944,7 @@ async def _hydrate_symbols_for_hits(
         # symbol rather than per comparison.
         entry["_relevance"] = _symbol_relevance(entry, term_stems)
         if matched and verified:
-            src = _read_symbol_source(
-                repo_root, row.file_path, start_line, end_line, text=text
-            )
+            src = _read_symbol_source(repo_root, row.file_path, start_line, end_line, text=text)
             if src:
                 entry["source_excerpt"] = src
         by_file.setdefault(row.file_path, []).append(entry)
@@ -1058,14 +1046,10 @@ _DECL_MODIFIERS = (
 _WITHHELD_DEF_PATTERNS: tuple[re.Pattern[str], ...] = (
     # Python: def / async def / class.
     re.compile(
-        r"^(?P<indent>[ \t]*)(?:async[ \t]+)?(?P<kind>def|class)[ \t]+"
-        r"(?P<name>[A-Za-z_]\w*)"
+        r"^(?P<indent>[ \t]*)(?:async[ \t]+)?(?P<kind>def|class)[ \t]+" r"(?P<name>[A-Za-z_]\w*)"
     ),
     # Go methods, whose name follows the receiver: ``func (s *Store) Write(``.
-    re.compile(
-        r"^(?P<indent>[ \t]*)(?P<kind>func)[ \t]+\([^)]*\)[ \t]*"
-        r"(?P<name>[A-Za-z_]\w*)"
-    ),
+    re.compile(r"^(?P<indent>[ \t]*)(?P<kind>func)[ \t]+\([^)]*\)[ \t]*" r"(?P<name>[A-Za-z_]\w*)"),
     # Declaration keyword + name: Go func/type, Rust fn/struct/trait/impl/enum,
     # Java/C#/Kotlin class/interface/record, TS class/interface/type/enum.
     re.compile(
@@ -1115,12 +1099,51 @@ _BRACE_MEMBER = len(_WITHHELD_DEF_PATTERNS) - 1
 # hides the keyword from a name-only guard.
 _NOT_A_DEFINITION = frozenset(
     {
-        "if", "for", "while", "switch", "catch", "else", "do", "try", "return",
-        "with", "using", "lock", "foreach", "case", "synchronized", "await",
-        "yield", "new", "typeof", "in", "of", "when", "unless", "match",
-        "raise", "throw", "assert", "del", "delete", "print", "elif", "except",
-        "finally", "import", "from", "global", "nonlocal", "pass", "break",
-        "continue", "go", "defer", "select", "range", "constructor",
+        "if",
+        "for",
+        "while",
+        "switch",
+        "catch",
+        "else",
+        "do",
+        "try",
+        "return",
+        "with",
+        "using",
+        "lock",
+        "foreach",
+        "case",
+        "synchronized",
+        "await",
+        "yield",
+        "new",
+        "typeof",
+        "in",
+        "of",
+        "when",
+        "unless",
+        "match",
+        "raise",
+        "throw",
+        "assert",
+        "del",
+        "delete",
+        "print",
+        "elif",
+        "except",
+        "finally",
+        "import",
+        "from",
+        "global",
+        "nonlocal",
+        "pass",
+        "break",
+        "continue",
+        "go",
+        "defer",
+        "select",
+        "range",
+        "constructor",
     }
 )
 
@@ -1132,11 +1155,46 @@ _FIRST_WORD_RE = re.compile(r"[A-Za-z_$][\w$]*")
 # words -- ``match``, ``range`` and ``print`` are all real function names.
 _RESERVED_NAMES = frozenset(
     {
-        "is", "not", "and", "or", "in", "if", "else", "elif", "for", "while",
-        "return", "none", "true", "false", "null", "undefined", "class", "def",
-        "import", "from", "as", "with", "pass", "lambda", "del", "global",
-        "raise", "try", "except", "finally", "yield", "await", "assert",
-        "break", "continue", "nonlocal", "var", "let", "const", "function",
+        "is",
+        "not",
+        "and",
+        "or",
+        "in",
+        "if",
+        "else",
+        "elif",
+        "for",
+        "while",
+        "return",
+        "none",
+        "true",
+        "false",
+        "null",
+        "undefined",
+        "class",
+        "def",
+        "import",
+        "from",
+        "as",
+        "with",
+        "pass",
+        "lambda",
+        "del",
+        "global",
+        "raise",
+        "try",
+        "except",
+        "finally",
+        "yield",
+        "await",
+        "assert",
+        "break",
+        "continue",
+        "nonlocal",
+        "var",
+        "let",
+        "const",
+        "function",
     }
 )
 
@@ -1182,9 +1240,7 @@ def _match_definition(raw: str, next_raw: str = "") -> re.Match[str] | None:
             # a comma, but an argument on its own line inside a multi-line call
             # does -- and when the following argument is a dict literal, the
             # next line really is ``{`` (``bool(matched_nums),`` then ``{``).
-            if not m.group("brace") and (
-                next_raw.strip() != "{" or raw.rstrip().endswith(",")
-            ):
+            if not m.group("brace") and (next_raw.strip() != "{" or raw.rstrip().endswith(",")):
                 continue
         return m
     return None
@@ -1235,8 +1291,20 @@ _REGEX_CAN_START_AFTER = frozenset("(,=:[!&|?{};+-*%~^<>\n")
 # character-class case `_skip_regex` exists for.
 _REGEX_CAN_START_AFTER_WORD = frozenset(
     {
-        "return", "case", "typeof", "yield", "await", "throw", "in", "of",
-        "new", "delete", "instanceof", "do", "else", "void",
+        "return",
+        "case",
+        "typeof",
+        "yield",
+        "await",
+        "throw",
+        "in",
+        "of",
+        "new",
+        "delete",
+        "instanceof",
+        "do",
+        "else",
+        "void",
     }
 )
 
@@ -1494,9 +1562,7 @@ def _string_masked_lines(lines: tuple[str, ...], backticks: bool = True) -> _Mas
     synthetic 1.2 MB file with one stray backtick on line 1. Bounded at two
     walks, and the cache means it is paid once per file.
     """
-    strings, comments, template_left_open = _walk_string_state(
-        lines, backticks=backticks
-    )
+    strings, comments, template_left_open = _walk_string_state(lines, backticks=backticks)
     if template_left_open:
         # The lexer-lite lost track: a template literal opened and never closed,
         # so every line below it is masked to EOF and every definition there is
@@ -1505,9 +1571,7 @@ def _string_masked_lines(lines: tuple[str, ...], backticks: bool = True) -> _Mas
         # pre-backtick walk for this file, which under-masks instead: the cost is
         # a spurious name in a list, not an absent real one.
         strings, comments, _ = _walk_string_state(lines, backticks=False)
-    return _Masked(
-        frozenset(strings), frozenset(comments), frozenset(strings | comments)
-    )
+    return _Masked(frozenset(strings), frozenset(comments), frozenset(strings | comments))
 
 
 def _indent_width(raw: str) -> int:
@@ -1526,9 +1590,7 @@ _UNBOUNDED_INDENT = 1 << 30
 _WITHHELD_MAX_SYMBOLS: int = 8
 
 
-def withheld_definitions(
-    repo_root: Path | None, continuation: str | None
-) -> list[dict]:
+def withheld_definitions(repo_root: Path | None, continuation: str | None) -> list[dict]:
     """Definitions that live in the range a truncated body did NOT serve.
 
     ``continuation`` is the ``path:first-last`` pointer already attached to a
@@ -1608,9 +1670,7 @@ def withheld_definitions(
     _usable = [
         n
         for n in range(lo, _end + 1)
-        if lines[n - 1].strip()
-        and n not in masked
-        and lines[n - 1].strip()[0] not in ")]}{"
+        if lines[n - 1].strip() and n not in masked and lines[n - 1].strip()[0] not in ")]}{"
     ]
     if lo in mask.strings:
         # The cut is INSIDE a multi-line string, so the expression holding that

@@ -269,13 +269,13 @@ def test_integration_writes_match_baseline(baseline_env) -> None:
         }
 
     for scope in ("project", "user"):
-        assert sorted(actual[scope]) == sorted(expected[scope]), (
-            f"{scope} scope wrote a different set of files than the baseline"
-        )
+        assert sorted(actual[scope]) == sorted(
+            expected[scope]
+        ), f"{scope} scope wrote a different set of files than the baseline"
         for rel in sorted(expected[scope]):
-            assert actual[scope][rel]["content"] == expected[scope][rel]["content"], (
-                f"{scope}/{rel} content diverged from the baseline"
-            )
+            assert (
+                actual[scope][rel]["content"] == expected[scope][rel]["content"]
+            ), f"{scope}/{rel} content diverged from the baseline"
             assert actual[scope][rel]["newlines"] == _expected_newlines(
                 expected[scope][rel]["newlines"]
             ), f"{scope}/{rel} changed line-ending discipline"

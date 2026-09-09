@@ -75,9 +75,7 @@ def _write(root, episode: Episode, *, born: float, seen: float | None = None):
     simulated by moving ``last_seen_at`` forward on its own.
     """
     with EpisodeStore(default_store_path(root)) as store:
-        store.replace_kinds(
-            tier=episode.tier, kinds=[episode.kind], episodes=[episode], now=born
-        )
+        store.replace_kinds(tier=episode.tier, kinds=[episode.kind], episodes=[episode], now=born)
         if seen is not None:
             # Reaches past the write API on purpose: `replace_kinds` stamps
             # birth and last-seen from one clock, so a later re-observation
@@ -223,7 +221,9 @@ def test_a_node_scoped_episode_is_suppressed_once_its_scope_changes(repo):
         ),
         born=time.time(),
     )
-    asked = payload(answer="Routers are registered in backend/main.py.", citations=["backend/main.py"])
+    asked = payload(
+        answer="Routers are registered in backend/main.py.", citations=["backend/main.py"]
+    )
 
     # Nothing in scope has changed yet, so it is served.
     served = run(copy.deepcopy(asked), repo, question="where are routers registered")
@@ -288,9 +288,7 @@ def test_without_git_a_repo_wide_fact_is_served_and_a_scoped_one_is_not(tmp_path
 
     scoped = payload(answer="It lives in vendor/lib.py.", citations=["vendor/lib.py"])
     before = copy.deepcopy(scoped)
-    attach_episode_sync(
-        scoped, question="where does lib live", repo_path=root, repo_name="nogit"
-    )
+    attach_episode_sync(scoped, question="where does lib live", repo_path=root, repo_name="nogit")
     assert scoped == before
 
 
@@ -344,9 +342,7 @@ def test_a_rare_launcher_name_is_matched(repo):
 
 def test_a_subject_matches_as_a_phrase_not_a_substring(repo):
     _write(repo, formatter_episode(_head(repo)), born=time.time())
-    before = payload(
-        answer="The `ruff formatter` docs describe its style.", fallback_targets=[]
-    )
+    before = payload(answer="The `ruff formatter` docs describe its style.", fallback_targets=[])
 
     got = run(copy.deepcopy(before), repo, question="what is ruff formatting")
 
@@ -378,7 +374,12 @@ def test_a_git_episode_does_not_take_the_re_observed_shortcut(repo):
     """
     born_at = _head(repo)
     now = time.time()
-    _write(repo, _git_episode(born_at, birth_commit=born_at, nodes=("app.py",)), born=now, seen=now + 60)
+    _write(
+        repo,
+        _git_episode(born_at, birth_commit=born_at, nodes=("app.py",)),
+        born=now,
+        seen=now + 60,
+    )
     (repo / "app.py").write_text("x = 1\n", encoding="utf-8")
     _git(repo, "add", "-A")
     _git(repo, "commit", "-qm", "touch app")

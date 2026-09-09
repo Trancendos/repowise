@@ -342,9 +342,7 @@ class CallResolver:
                 # so x's names are reachable as ``ns.name`` and are NOT this
                 # file's own exports. Flattening them makes a bare ``name``
                 # resolve into a nested namespace it was never in.
-                if any(
-                    b.local_name == "*" and b.exported_name for b in imp.bindings
-                ):
+                if any(b.local_name == "*" and b.exported_name for b in imp.bindings):
                     continue
                 resolved = imp.resolved_file
                 if resolved != path:
@@ -989,9 +987,7 @@ class CallResolver:
         ):
             sym_id = self._inherited_method(caller_id, target_name)
             if sym_id is not None:
-                return ResolvedCall(
-                    caller_id, sym_id, 0.90, call.line, "enclosing_inherited"
-                )
+                return ResolvedCall(caller_id, sym_id, 0.90, call.line, "enclosing_inherited")
 
         return None
 
@@ -1270,9 +1266,7 @@ class CallResolver:
                 exported = (binding.exported_name if binding else None) or type_name
                 declaring = self._barrel_origins.get(bound, {}).get(exported)
                 if declaring is not None and declaring != bound:
-                    sym_id = self._file_methods.get(declaring, {}).get(
-                        (exported, call.target_name)
-                    )
+                    sym_id = self._file_methods.get(declaring, {}).get((exported, call.target_name))
             return None if sym_id is None else (sym_id, "import")
 
         # Bound to something outside the repo and there is no edge to find,
@@ -1337,9 +1331,7 @@ class CallResolver:
         # Third scope: a module-level def a framework decorator turned into an
         # instance. Neither of the two above can see it — it is not in the body
         # and not a field.
-        from_framework = (
-            type_name is None and unbound and language in FRAMEWORK_DECORATOR_LANGUAGES
-        )
+        from_framework = type_name is None and unbound and language in FRAMEWORK_DECORATOR_LANGUAGES
         if from_framework:
             # The type lookup is a dict hit and the shadowing scan reads the
             # whole file, so the cheap half decides first: only a receiver this
@@ -1362,9 +1354,7 @@ class CallResolver:
             return self._field_typed_call(caller_id, sym_id, tier, call.line)
         return self._body_typed_call(caller_id, sym_id, tier, call.line)
 
-    def _body_typed_call(
-        self, caller_id: str, sym_id: str, tier: str, line: int
-    ) -> ResolvedCall:
+    def _body_typed_call(self, caller_id: str, sym_id: str, tier: str, line: int) -> ResolvedCall:
         """Stamp an edge whose receiver was typed from the calling body."""
         if tier == "same_file":
             return ResolvedCall(caller_id, sym_id, 0.93, line, "receiver_typed_same_file")
@@ -1374,9 +1364,7 @@ class CallResolver:
             return ResolvedCall(caller_id, sym_id, 0.88, line, "receiver_typed_import")
         return ResolvedCall(caller_id, sym_id, 0.75, line, "receiver_typed_global")
 
-    def _field_typed_call(
-        self, caller_id: str, sym_id: str, tier: str, line: int
-    ) -> ResolvedCall:
+    def _field_typed_call(self, caller_id: str, sym_id: str, tier: str, line: int) -> ResolvedCall:
         """Stamp an edge whose receiver was typed from the enclosing class."""
         if tier == "same_file":
             return ResolvedCall(caller_id, sym_id, 0.93, line, "receiver_field_same_file")
@@ -1464,9 +1452,7 @@ class CallResolver:
 
         parsed = self._parsed_files.get(file_path)
         symbols = parsed.symbols if parsed else ()
-        class_spans = {
-            s.id: (s.start_line, s.end_line) for s in symbols if s.kind in _TYPE_KINDS
-        }
+        class_spans = {s.id: (s.start_line, s.end_line) for s in symbols if s.kind in _TYPE_KINDS}
         by_class = types_by_class(
             self._declarations_for(file_path, language),
             class_spans,
@@ -1477,9 +1463,7 @@ class CallResolver:
         self._field_types[file_path] = by_class
         return by_class
 
-    def _bound_names_in(
-        self, file_path: str, caller_id: str, language: str
-    ) -> frozenset[str]:
+    def _bound_names_in(self, file_path: str, caller_id: str, language: str) -> frozenset[str]:
         """Every name the calling body binds, however it was bound."""
         key = (file_path, caller_id)
         names = self._bound_names.get(key)
@@ -1538,9 +1522,7 @@ class CallResolver:
             self._framework_types[file_path] = types
         return types
 
-    def _framework_type_of(
-        self, file_path: str, receiver_name: str, language: str
-    ) -> str | None:
+    def _framework_type_of(self, file_path: str, receiver_name: str, language: str) -> str | None:
         """The framework type of *receiver_name*, where this file can see it.
 
         Declared here, or imported here by name. A decorated def in a file the
@@ -1598,9 +1580,7 @@ class CallResolver:
         text = ""
         if parsed is not None:
             try:
-                text = Path(parsed.file_info.abs_path).read_text(
-                    encoding="utf-8", errors="ignore"
-                )
+                text = Path(parsed.file_info.abs_path).read_text(encoding="utf-8", errors="ignore")
             except OSError:
                 text = ""
 

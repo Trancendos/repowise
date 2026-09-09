@@ -40,7 +40,22 @@ _LAYER_HINTS: tuple[tuple[str, frozenset[str]], ...] = (
     ("CLI", frozenset({"cli", "commands", "cmd", "cli_commands"})),
     ("API", frozenset({"routes", "api", "controllers", "endpoints", "handlers", "routers"})),
     ("Service", frozenset({"services", "core", "lib", "domain", "logic", "usecases"})),
-    ("Data", frozenset({"models", "db", "data", "persistence", "repository", "repositories", "store", "stores", "entities"})),
+    (
+        "Data",
+        frozenset(
+            {
+                "models",
+                "db",
+                "data",
+                "persistence",
+                "repository",
+                "repositories",
+                "store",
+                "stores",
+                "entities",
+            }
+        ),
+    ),
     ("UI", frozenset({"components", "views", "pages", "ui", "layouts", "widgets", "screens"})),
     ("Middleware", frozenset({"middleware", "plugins", "interceptors", "guards"})),
     ("Utility", frozenset({"utils", "helpers", "common", "shared", "tools", "util"})),
@@ -105,8 +120,16 @@ for _tag, _hints in _LANG_REGISTRY.layer_dir_hints_by_language().items():
 # chi, …) or benchmarks (cargo's benches/, jason's bench/).
 _EXAMPLE_DIR_TOKENS = frozenset(
     {
-        "examples", "_examples", "example", "samples", "sample", "demo", "demos",
-        "bench", "benches", "benchmarks",
+        "examples",
+        "_examples",
+        "example",
+        "samples",
+        "sample",
+        "demo",
+        "demos",
+        "bench",
+        "benches",
+        "benchmarks",
     }
 )
 

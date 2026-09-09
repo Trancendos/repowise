@@ -98,9 +98,9 @@ def test_every_registered_target_has_a_row() -> None:
 
     text = _on_disk(GEN.OUTPUT)
     for target in registry.all_targets():
-        assert f"| {target.display_name} |" in text or f"[{target.display_name}](" in text, (
-            f"{target.id} is registered but has no row in the matrix"
-        )
+        assert (
+            f"| {target.display_name} |" in text or f"[{target.display_name}](" in text
+        ), f"{target.id} is registered but has no row in the matrix"
         assert f"`{target.id}`" in text, f"{target.id} is missing from the target id list"
 
 
@@ -336,9 +336,9 @@ def test_the_readme_tool_table_lists_exactly_the_flagship_tools() -> None:
         f"flagship count is {COUNTS['flagship']}."
     )
     excluded = sorted(set(listed) & GEN.NON_FLAGSHIP_TOOLS)
-    assert not excluded, (
-        f"{excluded} is excluded from the README's count but has a row in its table."
-    )
+    assert (
+        not excluded
+    ), f"{excluded} is excluded from the README's count but has a row in its table."
 
 
 @pytest.mark.parametrize(
@@ -379,9 +379,7 @@ def _appears(phrase: str, text: str) -> bool:
     COUNT_CLAIMS,
     ids=[f"{rel}:{tmpl}" for rel, _, tmpl in COUNT_CLAIMS],
 )
-def test_a_published_tool_count_matches_the_registry(
-    relpath: str, key: str, template: str
-) -> None:
+def test_a_published_tool_count_matches_the_registry(relpath: str, key: str, template: str) -> None:
     path = ROOT / relpath
     assert path.exists(), f"{relpath} is named in COUNT_CLAIMS but does not exist"
     expected = _phrase(template, COUNTS[key])

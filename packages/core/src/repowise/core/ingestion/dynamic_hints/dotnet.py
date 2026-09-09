@@ -188,9 +188,7 @@ class DotNetDynamicHints(DynamicHintExtractor):
             # ---- eventBus.Subscribe<TEvent, THandler>() ----
             for match in _EVENT_BUS_SUBSCRIBE_RE.finditer(text):
                 event_targets = _files_for(match.group(1))
-                handler_targets = (
-                    _files_for(match.group(2)) if match.group(2) else []
-                )
+                handler_targets = _files_for(match.group(2)) if match.group(2) else []
                 for tgt in event_targets:
                     if tgt != rel:
                         edges.append(

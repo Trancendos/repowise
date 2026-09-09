@@ -104,9 +104,7 @@ def _build_graph(repo: Path) -> nx.DiGraph:
 
 def _method_implements(graph: nx.DiGraph) -> set[tuple[str, str]]:
     return {
-        (u, v)
-        for u, v, d in graph.edges(data=True)
-        if d.get("edge_type") == "method_implements"
+        (u, v) for u, v, d in graph.edges(data=True) if d.get("edge_type") == "method_implements"
     }
 
 
@@ -141,11 +139,7 @@ class TestInterfaceSatisfactionDeadCode:
         return analyzer.analyze().findings
 
     def _unused_exports(self, repo: Path) -> set[str]:
-        return {
-            f.symbol_name
-            for f in self._findings(repo)
-            if f.kind == DeadCodeKind.UNUSED_EXPORT
-        }
+        return {f.symbol_name for f in self._findings(repo) if f.kind == DeadCodeKind.UNUSED_EXPORT}
 
     def test_satisfied_interfaces_not_flagged(self, tmp_path: Path) -> None:
         exports = self._unused_exports(tmp_path)

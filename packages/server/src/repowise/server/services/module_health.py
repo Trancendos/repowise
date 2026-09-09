@@ -81,9 +81,7 @@ def _score(acc: _ModuleAccumulator) -> dict:
     file_count = len(acc.files)
     hotspot_count = sum(1 for m in acc.files if m.is_hotspot)
     dead_pct = (acc.dead_code_count / file_count) if file_count else 0.0
-    doc_pct = (
-        acc.doc_covered_symbols / acc.symbol_count if acc.symbol_count else 0.0
-    )
+    doc_pct = acc.doc_covered_symbols / acc.symbol_count if acc.symbol_count else 0.0
 
     bus_factors = [m.bus_factor or 0 for m in acc.files]
     med_bus = float(median(bus_factors)) if bus_factors else 0.0
@@ -134,20 +132,16 @@ def _score(acc: _ModuleAccumulator) -> dict:
     }
 
 
-async def aggregate_modules(
-    session: AsyncSession, repo_id: str
-) -> dict[str, _ModuleAccumulator]:
+async def aggregate_modules(session: AsyncSession, repo_id: str) -> dict[str, _ModuleAccumulator]:
     """Single-pass aggregator. O(files + symbols + dead + decisions)."""
 
     files = (
-        await session.execute(
-            select(GitMetadata).where(GitMetadata.repository_id == repo_id)
-        )
-    ).scalars().all()
-
-    accs: dict[str, _ModuleAccumulator] = defaultdict(
-        lambda: _ModuleAccumulator(module_path="")
+        (await session.execute(select(GitMetadata).where(GitMetadata.repository_id == repo_id)))
+        .scalars()
+        .all()
     )
+
+    accs: dict[str, _ModuleAccumulator] = defaultdict(lambda: _ModuleAccumulator(module_path=""))
 
     for m in files:
         mod = module_of(m.file_path)
@@ -166,9 +160,7 @@ async def aggregate_modules(
         except json.JSONDecodeError:
             pass
         if m.is_hotspot:
-            acc.top_hotspot_paths.append(
-                ((m.temporal_hotspot_score or 0.0), m.file_path)
-            )
+            acc.top_hotspot_paths.append(((m.temporal_hotspot_score or 0.0), m.file_path))
 
     # Symbols + docs by module.
     sym_rows = (
@@ -207,9 +199,9 @@ async def aggregate_modules(
     # Decisions by affected module.
     decisions = (
         await session.execute(
-            select(
-                DecisionRecord.id, DecisionRecord.affected_modules_json
-            ).where(DecisionRecord.repository_id == repo_id)
+            select(DecisionRecord.id, DecisionRecord.affected_modules_json).where(
+                DecisionRecord.repository_id == repo_id
+            )
         )
     ).all()
     for did, modules_json in decisions:
@@ -334,9 +326,7 @@ async def build_single_file_health(
         await session.execute(
             select(
                 sa_func.count(WikiSymbol.id),
-                sa_func.count(
-                    sa_func.nullif(sa_func.trim(WikiSymbol.docstring), "")
-                ),
+                sa_func.count(sa_func.nullif(sa_func.trim(WikiSymbol.docstring), "")),
             ).where(
                 WikiSymbol.repository_id == repo_id,
                 WikiSymbol.file_path == file_path,
@@ -371,22 +361,26 @@ async def build_single_file_health(
     # Build owners list from top_authors_json
     owners_list: list[dict] = []
     if primary_owner:
-        owners_list.append({
-            "name": primary_owner,
-            "email": git_row.primary_owner_email,
-            "file_count": 1,
-            "pct": primary_owner_pct,
-        })
+        owners_list.append(
+            {
+                "name": primary_owner,
+                "email": git_row.primary_owner_email,
+                "file_count": 1,
+                "pct": primary_owner_pct,
+            }
+        )
     try:
         for a in json.loads(git_row.top_authors_json or "[]"):
             name = a.get("name")
             if name and name != primary_owner:
-                owners_list.append({
-                    "name": name,
-                    "email": a.get("email"),
-                    "file_count": 1,
-                    "pct": a.get("pct", 0.0),
-                })
+                owners_list.append(
+                    {
+                        "name": name,
+                        "email": a.get("email"),
+                        "file_count": 1,
+                        "pct": a.get("pct", 0.0),
+                    }
+                )
     except json.JSONDecodeError:
         pass
 
@@ -421,5 +415,3 @@ async def build_single_file_health(
         "governing_decisions": [],
         "contributor_count": len(contributors),
     }
-
-

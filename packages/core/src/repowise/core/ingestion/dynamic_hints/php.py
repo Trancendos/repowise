@@ -18,13 +18,13 @@ _REFLECTION_CLASS_RE = re.compile(
     r"new\s+ReflectionClass\s*\(\s*(?:([A-Z]\w*)::class|[\"']([A-Z]\w*)[\"'])"
 )
 # $container->get(Foo::class) / app(Foo::class) / resolve(Foo::class)
-_CONTAINER_GET_RE = re.compile(
-    r"(?:->\s*get|\bapp|\bresolve|\bmake)\s*\(\s*([A-Z]\w*)::class"
-)
+_CONTAINER_GET_RE = re.compile(r"(?:->\s*get|\bapp|\bresolve|\bmake)\s*\(\s*([A-Z]\w*)::class")
 # new $varname(...)  — pure variable instantiation, no static target
 _NEW_DOLLAR_RE = re.compile(r"new\s+\$\w+\s*\(")
 
-_CLASS_DECL_RE = re.compile(r"^\s*(?:abstract\s+|final\s+)?(?:class|interface|trait|enum)\s+([A-Z]\w*)", re.MULTILINE)
+_CLASS_DECL_RE = re.compile(
+    r"^\s*(?:abstract\s+|final\s+)?(?:class|interface|trait|enum)\s+([A-Z]\w*)", re.MULTILINE
+)
 
 
 class PhpDynamicHints(DynamicHintExtractor):
@@ -64,37 +64,48 @@ class PhpDynamicHints(DynamicHintExtractor):
                 name = match.group(1) or match.group(2)
                 target = type_to_file.get(name)
                 if target and target != rel:
-                    edges.append(DynamicEdge(
-                        source=rel, target=target,
-                        edge_type="dynamic_uses",
-                        hint_source=f"{self.name}:call_user_func",
-                    ))
+                    edges.append(
+                        DynamicEdge(
+                            source=rel,
+                            target=target,
+                            edge_type="dynamic_uses",
+                            hint_source=f"{self.name}:call_user_func",
+                        )
+                    )
 
             for match in _REFLECTION_CLASS_RE.finditer(text):
                 name = match.group(1) or match.group(2)
                 target = type_to_file.get(name)
                 if target and target != rel:
-                    edges.append(DynamicEdge(
-                        source=rel, target=target,
-                        edge_type="dynamic_uses",
-                        hint_source=f"{self.name}:reflection_class",
-                    ))
+                    edges.append(
+                        DynamicEdge(
+                            source=rel,
+                            target=target,
+                            edge_type="dynamic_uses",
+                            hint_source=f"{self.name}:reflection_class",
+                        )
+                    )
 
             for match in _CONTAINER_GET_RE.finditer(text):
                 target = type_to_file.get(match.group(1))
                 if target and target != rel:
-                    edges.append(DynamicEdge(
-                        source=rel, target=target,
-                        edge_type="dynamic_uses",
-                        hint_source=f"{self.name}:container_get",
-                    ))
+                    edges.append(
+                        DynamicEdge(
+                            source=rel,
+                            target=target,
+                            edge_type="dynamic_uses",
+                            hint_source=f"{self.name}:container_get",
+                        )
+                    )
 
             if _NEW_DOLLAR_RE.search(text):
-                edges.append(DynamicEdge(
-                    source=rel,
-                    target="external:php_dynamic:new_var",
-                    edge_type="dynamic_uses",
-                    hint_source=f"{self.name}:new_var",
-                ))
+                edges.append(
+                    DynamicEdge(
+                        source=rel,
+                        target="external:php_dynamic:new_var",
+                        edge_type="dynamic_uses",
+                        hint_source=f"{self.name}:new_var",
+                    )
+                )
 
         return edges

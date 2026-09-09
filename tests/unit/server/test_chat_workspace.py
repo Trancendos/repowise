@@ -88,9 +88,7 @@ def _build_app(*, primary_factory, workspace_sessions: dict) -> FastAPI:
 async def test_chat_messages_resolves_non_primary_repo_in_workspace_mode():
     """Pin the workspace-routing fix: the non-primary id must NOT 404."""
     primary = await _make_factory_with_repo(repo_id="primary-id", name="primary")
-    non_primary = await _make_factory_with_repo(
-        repo_id="non-primary-id", name="non-primary"
-    )
+    non_primary = await _make_factory_with_repo(repo_id="non-primary-id", name="non-primary")
 
     app = _build_app(
         primary_factory=primary,
@@ -109,9 +107,7 @@ async def test_chat_messages_resolves_non_primary_repo_in_workspace_mode():
         ),
     ):
         transport = ASGITransport(app=app)
-        async with AsyncClient(
-            transport=transport, base_url="http://testserver"
-        ) as client:
+        async with AsyncClient(transport=transport, base_url="http://testserver") as client:
             response = await client.post(
                 "/api/repos/non-primary-id/chat/messages",
                 json={"message": "hi"},
@@ -143,9 +139,7 @@ async def test_chat_messages_still_finds_primary_repo():
         return_value=fake_provider,
     ):
         transport = ASGITransport(app=app)
-        async with AsyncClient(
-            transport=transport, base_url="http://testserver"
-        ) as client:
+        async with AsyncClient(transport=transport, base_url="http://testserver") as client:
             response = await client.post(
                 "/api/repos/primary-id/chat/messages",
                 json={"message": "hi"},

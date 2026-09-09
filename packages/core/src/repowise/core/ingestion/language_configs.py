@@ -362,7 +362,7 @@ LANGUAGE_CONFIGS: dict[str, LanguageConfig] = {
             # flagged as a follow-up, not attempted here.
             "declType": "class",
             "declProc": "function",  # signature only (interface decl / forward decl)
-            "defProc": "function",   # full definition with body
+            "defProc": "function",  # full definition with body
             # Matches C#'s choice for the same concept (property_declaration ->
             # "variable"). Rust is the one language that keeps fields under a
             # distinct "property" kind; everywhere else a field and a callable
@@ -371,7 +371,7 @@ LANGUAGE_CONFIGS: dict[str, LanguageConfig] = {
             "declProp": "variable",
         },
         import_node_types=["declUses"],
-        export_node_types=[],       # Pascal has no explicit re-export syntax
+        export_node_types=[],  # Pascal has no explicit re-export syntax
         # No pascal_visibility exists yet. Pascal visibility is per-*section*
         # (`strict private`/`protected`/`public`/`published` governs every
         # declaration until the next section keyword, i.e. extractors/

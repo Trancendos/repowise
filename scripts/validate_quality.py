@@ -50,9 +50,7 @@ def main() -> None:
         for call in pf.calls:
             total_calls += 1
             if call.target_name in builtins:
-                builtin_leaks.append(
-                    f"  {pf.file_info.path}:{call.line} -> {call.target_name}()"
-                )
+                builtin_leaks.append(f"  {pf.file_info.path}:{call.line} -> {call.target_name}()")
     if builtin_leaks:
         print(f"  FAIL: {len(builtin_leaks)} builtin calls leaked through:")
         for leak in builtin_leaks[:10]:
@@ -150,22 +148,32 @@ def main() -> None:
     for cid, ci in sorted(info.items(), key=lambda x: -x[1].size)[:10]:
         if ci.size <= 1:
             continue
-        print(f"    [{cid}] {ci.label:20s}  size={ci.size:3d}  cohesion={ci.cohesion:.3f}  lang={ci.dominant_language}")
+        print(
+            f"    [{cid}] {ci.label:20s}  size={ci.size:3d}  cohesion={ci.cohesion:.3f}  lang={ci.dominant_language}"
+        )
 
     # --- Check 5: Execution flows ---
     print("\n--- CHECK 5: Execution Flows ---")
     try:
         report = builder.execution_flows()
         if report.flows:
-            print(f"  {report.total_entry_points_scored} entry points scored, {report.total_flows} flows traced")
+            print(
+                f"  {report.total_entry_points_scored} entry points scored, {report.total_flows} flows traced"
+            )
             for flow in report.flows[:5]:
                 crosses = "CROSSES" if flow.crosses_community else "single"
-                print(f"    {flow.entry_point_name:30s} score={flow.entry_point_score:.3f}  depth={flow.depth:2d}  {crosses}  communities={flow.communities_visited}")
+                print(
+                    f"    {flow.entry_point_name:30s} score={flow.entry_point_score:.3f}  depth={flow.depth:2d}  {crosses}  communities={flow.communities_visited}"
+                )
 
             # Check for demo/test entry points
             bad_entries = [
-                f for f in report.flows
-                if any(x in f.entry_point_id.lower() for x in ("demo", "test", "fixture", "sample", "script"))
+                f
+                for f in report.flows
+                if any(
+                    x in f.entry_point_id.lower()
+                    for x in ("demo", "test", "fixture", "sample", "script")
+                )
             ]
             if bad_entries:
                 print(f"  WARN: {len(bad_entries)} demo/test/script entry points found")
@@ -182,7 +190,13 @@ def main() -> None:
 
     # --- Summary ---
     print(f"\n{'='*70}")
-    issues = len(builtin_leaks) + len(heritage_leaks) + len(cross_lang_edges) + len(bad_labels) + len(test_dominated)
+    issues = (
+        len(builtin_leaks)
+        + len(heritage_leaks)
+        + len(cross_lang_edges)
+        + len(bad_labels)
+        + len(test_dominated)
+    )
     if issues == 0:
         print("  ALL CHECKS PASSED")
     else:

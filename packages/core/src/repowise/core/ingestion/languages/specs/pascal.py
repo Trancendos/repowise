@@ -54,20 +54,58 @@ SPEC = LanguageSpec(
     # conservative -- System-unit built-ins only; framework calls (VCL/FMX/
     # LCL) are ordinary project dependencies and should still show up as
     # graph edges.
-    builtin_calls=frozenset({
-        "WriteLn", "Write", "ReadLn", "Read",
-        "Length", "SetLength", "High", "Low", "Ord", "Chr", "Succ", "Pred",
-        "Inc", "Dec", "Copy", "Pos", "Concat", "Trim", "TrimLeft", "TrimRight",
-        "Format", "IntToStr", "StrToInt", "StrToIntDef", "FloatToStr",
-        "Assigned", "Exit",
-        "New", "Dispose", "GetMem", "FreeMem", "ReallocMem",
-        "FreeAndNil", "Assert", "Supports", "TypeInfo",
-    }),
+    builtin_calls=frozenset(
+        {
+            "WriteLn",
+            "Write",
+            "ReadLn",
+            "Read",
+            "Length",
+            "SetLength",
+            "High",
+            "Low",
+            "Ord",
+            "Chr",
+            "Succ",
+            "Pred",
+            "Inc",
+            "Dec",
+            "Copy",
+            "Pos",
+            "Concat",
+            "Trim",
+            "TrimLeft",
+            "TrimRight",
+            "Format",
+            "IntToStr",
+            "StrToInt",
+            "StrToIntDef",
+            "FloatToStr",
+            "Assigned",
+            "Exit",
+            "New",
+            "Dispose",
+            "GetMem",
+            "FreeMem",
+            "ReallocMem",
+            "FreeAndNil",
+            "Assert",
+            "Supports",
+            "TypeInfo",
+        }
+    ),
     # Universal Delphi/FPC root types -- filtered the same way "object" is
     # filtered from Python heritage or "NSObject" from Swift.
-    builtin_parents=frozenset({
-        "TObject", "TInterfacedObject", "TPersistent", "TComponent",
-        "IUnknown", "IInterface", "IDispatch",
-    }),
+    builtin_parents=frozenset(
+        {
+            "TObject",
+            "TInterfacedObject",
+            "TPersistent",
+            "TComponent",
+            "IUnknown",
+            "IInterface",
+            "IDispatch",
+        }
+    ),
     color_hex="#E3352E",
 )

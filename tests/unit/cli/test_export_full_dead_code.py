@@ -35,8 +35,7 @@ def test_full_export_dead_code_projection_uses_kind():
 
 def test_export_cmd_source_does_not_reference_finding_type():
     src = (
-        Path(__file__).resolve().parents[3]
-        / "packages/cli/src/repowise/cli/commands/export_cmd.py"
+        Path(__file__).resolve().parents[3] / "packages/cli/src/repowise/cli/commands/export_cmd.py"
     ).read_text(encoding="utf-8")
     assert "f.finding_type" not in src
     assert "f.kind" in src

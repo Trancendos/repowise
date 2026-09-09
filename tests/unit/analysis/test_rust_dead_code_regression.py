@@ -3,6 +3,7 @@
 Each test validates that a specific pattern from the Typst audit
 does NOT produce a false positive in dead code analysis.
 """
+
 from __future__ import annotations
 
 import networkx as nx
@@ -17,6 +18,7 @@ class TestRustNeverFlagPatterns:
         import fnmatch
 
         from repowise.core.analysis.dead_code.constants import _NEVER_FLAG_PATTERNS
+
         path = "crates/typst-pdf/build.rs"
         assert any(fnmatch.fnmatch(path, p) for p in _NEVER_FLAG_PATTERNS)
 
@@ -24,6 +26,7 @@ class TestRustNeverFlagPatterns:
         import fnmatch
 
         from repowise.core.analysis.dead_code.constants import _NEVER_FLAG_PATTERNS
+
         path = "examples/hello.rs"
         assert any(fnmatch.fnmatch(path, p) for p in _NEVER_FLAG_PATTERNS)
 
@@ -31,6 +34,7 @@ class TestRustNeverFlagPatterns:
         import fnmatch
 
         from repowise.core.analysis.dead_code.constants import _NEVER_FLAG_PATTERNS
+
         path = "crates/typst/benches/bench.rs"
         assert any(fnmatch.fnmatch(path, p) for p in _NEVER_FLAG_PATTERNS)
 
@@ -38,6 +42,7 @@ class TestRustNeverFlagPatterns:
         import fnmatch
 
         from repowise.core.analysis.dead_code.constants import _NEVER_FLAG_PATTERNS
+
         path = "tests/src/run.rs"
         assert any(fnmatch.fnmatch(path, p) for p in _NEVER_FLAG_PATTERNS)
 
@@ -45,6 +50,7 @@ class TestRustNeverFlagPatterns:
         import fnmatch
 
         from repowise.core.analysis.dead_code.constants import _NEVER_FLAG_PATTERNS
+
         path = "crates/typst-cli/src/bin/typst.rs"
         assert any(fnmatch.fnmatch(path, p) for p in _NEVER_FLAG_PATTERNS)
 
@@ -52,6 +58,7 @@ class TestRustNeverFlagPatterns:
         import fnmatch
 
         from repowise.core.analysis.dead_code.constants import _NEVER_FLAG_PATTERNS
+
         path = "tests/fuzz/fuzz_targets/compile.rs"
         assert any(fnmatch.fnmatch(path, p) for p in _NEVER_FLAG_PATTERNS)
 
@@ -61,14 +68,17 @@ class TestRustNeverPackageDirs:
 
     def test_tests_dir_excluded(self):
         from repowise.core.analysis.dead_code.constants import _NEVER_PACKAGE_DIRS
+
         assert "tests" in _NEVER_PACKAGE_DIRS
 
     def test_benches_dir_excluded(self):
         from repowise.core.analysis.dead_code.constants import _NEVER_PACKAGE_DIRS
+
         assert "benches" in _NEVER_PACKAGE_DIRS
 
     def test_fuzz_dir_excluded(self):
         from repowise.core.analysis.dead_code.constants import _NEVER_PACKAGE_DIRS
+
         assert "fuzz" in _NEVER_PACKAGE_DIRS
 
 
@@ -77,13 +87,15 @@ class TestRustDynamicMarkers:
 
     def test_proc_macro_detected(self):
         from repowise.core.analysis.dead_code.dynamic_markers import _DYNAMIC_IMPORT_MARKERS
+
         rs_markers = _DYNAMIC_IMPORT_MARKERS.get(".rs", ())
         assert any("proc_macro" in m for m in rs_markers)
 
     def test_doc_hidden_detected(self):
         from repowise.core.analysis.dead_code.dynamic_markers import _DYNAMIC_IMPORT_MARKERS
+
         rs_markers = _DYNAMIC_IMPORT_MARKERS.get(".rs", ())
-        assert '#[doc(hidden)]' in rs_markers
+        assert "#[doc(hidden)]" in rs_markers
 
 
 class TestProcMacroCrateDetection:
@@ -122,14 +134,11 @@ class TestProcMacroCrateDetection:
 
     def test_proc_macro_parsed_from_toml(self, tmp_path):
         """Workspace indexing should parse [lib] proc-macro = true from Cargo.toml."""
-        (tmp_path / "Cargo.toml").write_text(
-            '[workspace]\nmembers = ["crates/my-macros"]\n'
-        )
+        (tmp_path / "Cargo.toml").write_text('[workspace]\nmembers = ["crates/my-macros"]\n')
         crate_dir = tmp_path / "crates" / "my-macros"
         crate_dir.mkdir(parents=True)
         (crate_dir / "Cargo.toml").write_text(
-            '[package]\nname = "my-macros"\nversion = "0.1.0"\n\n'
-            '[lib]\nproc-macro = true\n'
+            '[package]\nname = "my-macros"\nversion = "0.1.0"\n\n' "[lib]\nproc-macro = true\n"
         )
         (crate_dir / "src").mkdir()
         (crate_dir / "src" / "lib.rs").write_text("// proc-macro crate\n")
@@ -161,6 +170,7 @@ class TestProcMacroCrateDetection:
 # Graph builder helper (mirrors tests/unit/test_dead_code.py)
 # ---------------------------------------------------------------------------
 
+
 def _build_graph(
     nodes: dict[str, dict],
     edges: list | None = None,
@@ -184,6 +194,7 @@ def _build_graph(
 # ---------------------------------------------------------------------------
 # Fix 1: Rust symbols skipped in _detect_unused_internals
 # ---------------------------------------------------------------------------
+
 
 class TestRustUnusedInternalsSkipped:
     """Private Rust symbols must not be flagged by unused_internals.
@@ -270,6 +281,7 @@ class TestRustUnusedInternalsSkipped:
 # Fix 7: proc_macro-decorated functions exempt from unused_exports
 # ---------------------------------------------------------------------------
 
+
 class TestProcMacroExemptFromUnusedExports:
     """Proc-macro entry points are invoked by the compiler and must not
     be flagged as unused exports.
@@ -309,9 +321,9 @@ class TestProcMacroExemptFromUnusedExports:
             }
         )
         exports = [f for f in report.findings if f.kind == DeadCodeKind.UNUSED_EXPORT]
-        assert all(f.symbol_name != "my_macro" for f in exports), (
-            "proc_macro function should be exempt from unused_exports"
-        )
+        assert all(
+            f.symbol_name != "my_macro" for f in exports
+        ), "proc_macro function should be exempt from unused_exports"
 
     def test_proc_macro_derive_not_flagged(self):
         """A function with #[proc_macro_derive(MyTrait)] should NOT be flagged."""
@@ -419,6 +431,6 @@ class TestProcMacroExemptFromUnusedExports:
             }
         )
         exports = [f for f in report.findings if f.kind == DeadCodeKind.UNUSED_EXPORT]
-        assert any(f.symbol_name == "unused_pub_fn" for f in exports), (
-            "Regular public Rust function should still be flagged"
-        )
+        assert any(
+            f.symbol_name == "unused_pub_fn" for f in exports
+        ), "Regular public Rust function should still be flagged"

@@ -48,9 +48,7 @@ def _get_answer_ast() -> tuple[ast.AsyncFunctionDef, str]:
     src = Path(inspect.getfile(answer_mod)).read_text(encoding="utf-8")
     tree = ast.parse(src)
     fn = next(
-        n
-        for n in ast.walk(tree)
-        if isinstance(n, ast.AsyncFunctionDef) and n.name == "get_answer"
+        n for n in ast.walk(tree) if isinstance(n, ast.AsyncFunctionDef) and n.name == "get_answer"
     )
     return fn, src
 
@@ -107,9 +105,7 @@ def test_the_mainline_return_is_still_the_only_exemption():
     bare = [
         n
         for n in ast.walk(fn)
-        if isinstance(n, ast.Return)
-        and n.lineno > pool_line
-        and isinstance(n.value, ast.Name)
+        if isinstance(n, ast.Return) and n.lineno > pool_line and isinstance(n.value, ast.Name)
     ]
     assert len(bare) == 1, f"expected exactly one bare-name return, found {len(bare)}"
     assert bare[0].value.id == _MAINLINE_RETURN

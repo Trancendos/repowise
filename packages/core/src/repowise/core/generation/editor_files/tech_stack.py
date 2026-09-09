@@ -72,12 +72,27 @@ _DOTNET_MAX_PROJECTS = 200
 # and vendored sample repos are pruned too: a Python/TS repo that keeps
 # .NET solutions under tests/fixtures/ or test-repos/ must not be
 # labelled a C# codebase by its own test data.
-_DOTNET_PRUNE = frozenset({
-    "bin", "obj", ".vs", "node_modules", ".git", "packages",
-    ".idea", "artifacts", ".build", "TestResults",
-    "tests", "test", "fixtures", "test-repos", "testdata", "samples",
-    "local-stash",
-})
+_DOTNET_PRUNE = frozenset(
+    {
+        "bin",
+        "obj",
+        ".vs",
+        "node_modules",
+        ".git",
+        "packages",
+        ".idea",
+        "artifacts",
+        ".build",
+        "TestResults",
+        "tests",
+        "test",
+        "fixtures",
+        "test-repos",
+        "testdata",
+        "samples",
+        "local-stash",
+    }
+)
 
 
 def _find_dotnet_projects(repo_path: Path) -> list[Path]:
@@ -233,7 +248,9 @@ def _detect_tech_stack_uncached(repo_path: Path) -> list[TechStackItem]:
         runtime_deps = pkg.get("dependencies") or {}
         dev_deps = pkg.get("devDependencies") or {}
         all_deps = {**runtime_deps, **dev_deps}
-        node_ver = (pkg.get("engines") or {}).get("node") if isinstance(pkg.get("engines"), dict) else None
+        node_ver = (
+            (pkg.get("engines") or {}).get("node") if isinstance(pkg.get("engines"), dict) else None
+        )
         # Tooling-only manifests (e.g. .NET / Python repos that drop a
         # package.json for Playwright or Husky) declare no runtime
         # dependencies, no entry-point fields, and no engines hint. We
@@ -254,6 +271,7 @@ def _detect_tech_stack_uncached(repo_path: Path) -> list[TechStackItem]:
                 if dep_key in all_deps:
                     raw = all_deps[dep_key].lstrip("^~>=")
                     add(display, raw or None, cat)
+
         # TypeScript can be added independently — many monorepos only use
         # TS via tsconfig.json without depending on a Node.js runtime.
         # Monorepos frequently keep tsconfig.json only inside workspace
@@ -326,10 +344,7 @@ def _detect_tech_stack_uncached(repo_path: Path) -> list[TechStackItem]:
                 **(composer.get("require") or {}),
                 **(composer.get("require-dev") or {}),
             }
-            if (
-                composer.get("type") == "typo3-cms-extension"
-                or "typo3/cms-core" in requires
-            ):
+            if composer.get("type") == "typo3-cms-extension" or "typo3/cms-core" in requires:
                 add("TYPO3", None, "framework")
             elif "symfony/framework-bundle" in requires or "symfony/symfony" in requires:
                 add("Symfony", None, "framework")
@@ -346,10 +361,7 @@ def _detect_tech_stack_uncached(repo_path: Path) -> list[TechStackItem]:
         sln
         for sln in list(repo_path.glob("*.sln")) + list(repo_path.glob("*/*.sln"))
         if sln.parent == repo_path
-        or (
-            sln.parent.name not in _DOTNET_PRUNE
-            and not (sln.parent / ".git").exists()
-        )
+        or (sln.parent.name not in _DOTNET_PRUNE and not (sln.parent / ".git").exists())
     ]
     has_directory_build = (repo_path / "Directory.Build.props").exists() or (
         repo_path / "Directory.Packages.props"
@@ -364,9 +376,7 @@ def _detect_tech_stack_uncached(repo_path: Path) -> list[TechStackItem]:
                 ctext = csproj.read_text(encoding="utf-8", errors="ignore")
             except OSError:
                 continue
-            m = re.search(
-                r"<TargetFrameworks?>\s*([^<;]+)", ctext
-            )
+            m = re.search(r"<TargetFrameworks?>\s*([^<;]+)", ctext)
             if m:
                 target_fw = m.group(1).strip()
                 break
@@ -386,21 +396,20 @@ def _detect_tech_stack_uncached(repo_path: Path) -> list[TechStackItem]:
             add("ASP.NET Core", None, "framework")
         if "Microsoft.EntityFrameworkCore" in joined_csproj:
             add("Entity Framework Core", None, "database")
-        if "Aspire.Hosting" in joined_csproj or any(
-            "AppHost" in p.stem for p in csproj_files
-        ):
+        if "Aspire.Hosting" in joined_csproj or any("AppHost" in p.stem for p in csproj_files):
             add(".NET Aspire", None, "infra")
         if "Grpc.AspNetCore" in joined_csproj or "Google.Protobuf" in joined_csproj:
             add("gRPC", None, "framework")
-        if "MAUI" in joined_csproj.upper() or any(
-            "Maui" in p.stem for p in csproj_files
-        ):
+        if "MAUI" in joined_csproj.upper() or any("Maui" in p.stem for p in csproj_files):
             add(".NET MAUI", None, "framework")
         if "Microsoft.WindowsAppSDK" in joined_csproj or "Microsoft.UI.Xaml" in joined_csproj:
             add("WinUI 3", None, "framework")
         if "Microsoft.NET.Sdk.WindowsDesktop" in joined_csproj or "<UseWPF>true" in joined_csproj:
             add("WPF", None, "framework")
-        if "Microsoft.NET.Sdk.WindowsDesktop" in joined_csproj and "<UseWindowsForms>true" in joined_csproj:
+        if (
+            "Microsoft.NET.Sdk.WindowsDesktop" in joined_csproj
+            and "<UseWindowsForms>true" in joined_csproj
+        ):
             add("Windows Forms", None, "framework")
 
     # --- Docker ---

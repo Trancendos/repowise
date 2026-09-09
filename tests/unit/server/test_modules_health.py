@@ -77,9 +77,7 @@ async def test_get_module_health_detail(client: AsyncClient, app) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_module_health_nested_path_falls_back_to_parent(
-    client: AsyncClient, app
-) -> None:
+async def test_get_module_health_nested_path_falls_back_to_parent(client: AsyncClient, app) -> None:
     """Path-shaped wiki module ids (``src/api``) roll up to the parent module.
 
     Curated module pages key on the module's directory path; health rollups

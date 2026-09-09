@@ -113,8 +113,7 @@ class TestCSharpBindings:
         result = parser.parse_file(_file(), src)
         bindings = [b for imp in result.imports for b in imp.bindings]
         assert any(
-            b.local_name == "Linq" and not b.is_global and not b.is_static_import
-            for b in bindings
+            b.local_name == "Linq" and not b.is_global and not b.is_static_import for b in bindings
         )
 
     def test_global_using(self, parser: ASTParser) -> None:

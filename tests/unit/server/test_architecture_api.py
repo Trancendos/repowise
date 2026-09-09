@@ -40,19 +40,63 @@ async def _seed(client: AsyncClient, app) -> str:
 
     async with app.state.session_factory() as session:
         nodes = [
-            {"node_id": "src/app.py", "node_type": "file", "language": "python", "symbol_count": 5, "is_entry_point": True},
+            {
+                "node_id": "src/app.py",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 5,
+                "is_entry_point": True,
+            },
             {"node_id": "src/db.py", "node_type": "file", "language": "python", "symbol_count": 12},
-            {"node_id": "src/app.py::run", "node_type": "function", "language": "python", "symbol_count": 0, "file_path": "src/app.py", "name": "run", "start_line": 1, "end_line": 20},
-            {"node_id": "external:sqlalchemy", "node_type": "file", "language": "python", "symbol_count": 0},
+            {
+                "node_id": "src/app.py::run",
+                "node_type": "function",
+                "language": "python",
+                "symbol_count": 0,
+                "file_path": "src/app.py",
+                "name": "run",
+                "start_line": 1,
+                "end_line": 20,
+            },
+            {
+                "node_id": "external:sqlalchemy",
+                "node_type": "file",
+                "language": "python",
+                "symbol_count": 0,
+            },
         ]
         await batch_upsert_graph_nodes(session, repo_id, nodes)
-        await batch_upsert_graph_edges(session, repo_id, [
-            {"source_node_id": "src/app.py", "target_node_id": "src/db.py", "edge_type": "imports"},
-            {"source_node_id": "src/db.py", "target_node_id": "external:sqlalchemy", "edge_type": "imports"},
-        ])
-        id_map = await bulk_upsert_external_systems(session, repo_id, [
-            {"name": "sqlalchemy", "display_name": "SQLAlchemy", "ecosystem": "pypi", "category": "library", "version": "2.0", "declared_in": "pyproject.toml", "is_dev_dep": False},
-        ])
+        await batch_upsert_graph_edges(
+            session,
+            repo_id,
+            [
+                {
+                    "source_node_id": "src/app.py",
+                    "target_node_id": "src/db.py",
+                    "edge_type": "imports",
+                },
+                {
+                    "source_node_id": "src/db.py",
+                    "target_node_id": "external:sqlalchemy",
+                    "edge_type": "imports",
+                },
+            ],
+        )
+        id_map = await bulk_upsert_external_systems(
+            session,
+            repo_id,
+            [
+                {
+                    "name": "sqlalchemy",
+                    "display_name": "SQLAlchemy",
+                    "ecosystem": "pypi",
+                    "category": "library",
+                    "version": "2.0",
+                    "declared_in": "pyproject.toml",
+                    "is_dev_dep": False,
+                },
+            ],
+        )
         name_to_id = {n: sid for (n, _), sid in id_map.items()}
         await link_graph_nodes_to_external_systems(session, repo_id, name_to_id)
         await session.commit()
@@ -93,40 +137,57 @@ async def test_api_architecture_curated_fields(client: AsyncClient, app) -> None
     repo_id = await _seed(client, app)
 
     async with app.state.session_factory() as session:
-        await upsert_kg_layers(session, repo_id, [
-            {
-                "id": "layer:api",
-                "name": "API",
-                "description": "Service edge",
-                "nodeIds": ["file:src/app.py", "file:src/db.py"],
-                "display_order": 0,
-                "subGroups": [
-                    {"id": "layer:api:app", "name": "app", "nodeIds": ["file:src/app.py"]},
-                    {"id": "layer:api:db", "name": "db", "nodeIds": ["file:src/db.py"]},
-                ],
-            },
-        ])
-        await upsert_kg_tour_steps(session, repo_id, [
-            {
-                "order": 1,
-                "title": "app.py",
-                "target_path": "src/app.py",
-                "page_type": "file_page",
-                "depth": 0,
-                "kind": "code",
-                "reason": "Top of the stack.",
-                "layer_id": "layer:api",
-            },
-        ])
+        await upsert_kg_layers(
+            session,
+            repo_id,
+            [
+                {
+                    "id": "layer:api",
+                    "name": "API",
+                    "description": "Service edge",
+                    "nodeIds": ["file:src/app.py", "file:src/db.py"],
+                    "display_order": 0,
+                    "subGroups": [
+                        {"id": "layer:api:app", "name": "app", "nodeIds": ["file:src/app.py"]},
+                        {"id": "layer:api:db", "name": "db", "nodeIds": ["file:src/db.py"]},
+                    ],
+                },
+            ],
+        )
+        await upsert_kg_tour_steps(
+            session,
+            repo_id,
+            [
+                {
+                    "order": 1,
+                    "title": "app.py",
+                    "target_path": "src/app.py",
+                    "page_type": "file_page",
+                    "depth": 0,
+                    "kind": "code",
+                    "reason": "Top of the stack.",
+                    "layer_id": "layer:api",
+                },
+            ],
+        )
         await upsert_kg_project_meta(
-            session, repo_id,
+            session,
+            repo_id,
             entry_points=["src/app.py"],
             entry_candidates=["src/app.py", "src/db.py"],
         )
-        await upsert_kg_node_meta(session, repo_id, [
-            {"id": "src/app.py", "type": "file",
-             "summary": "Curated app summary.", "tags": ["entry_point", "python"]},
-        ])
+        await upsert_kg_node_meta(
+            session,
+            repo_id,
+            [
+                {
+                    "id": "src/app.py",
+                    "type": "file",
+                    "summary": "Curated app summary.",
+                    "tags": ["entry_point", "python"],
+                },
+            ],
+        )
         await session.commit()
 
     resp = await client.get(f"/api/graph/{repo_id}/architecture-view")
@@ -177,7 +238,9 @@ async def test_api_architecture_uncurated_defaults(client: AsyncClient, app) -> 
 async def test_api_architecture_with_symbols(client: AsyncClient, app) -> None:
     repo_id = await _seed(client, app)
 
-    resp = await client.get(f"/api/graph/{repo_id}/architecture-view", params={"include_symbols": "true"})
+    resp = await client.get(
+        f"/api/graph/{repo_id}/architecture-view", params={"include_symbols": "true"}
+    )
     assert resp.status_code == 200
 
     body = resp.json()
