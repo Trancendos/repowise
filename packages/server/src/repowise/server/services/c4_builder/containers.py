@@ -113,14 +113,10 @@ def container_id(path: str) -> str:
     return render(ContainerId(path or "."))
 
 
-async def _container_roots_from_manifests(
-    session: AsyncSession, repository_id: str
-) -> set[str]:
+async def _container_roots_from_manifests(session: AsyncSession, repository_id: str) -> set[str]:
     """Return the unique parent directories of every declared manifest."""
     result = await session.execute(
-        select(ExternalSystem.declared_in).where(
-            ExternalSystem.repository_id == repository_id
-        )
+        select(ExternalSystem.declared_in).where(ExternalSystem.repository_id == repository_id)
     )
     roots: set[str] = set()
     for (declared_in,) in result.all():

@@ -120,9 +120,7 @@ _REFERENCE_LANGUAGES = ("cpp", "c", "go", "rust", "kotlin")
 # ``union_specifier`` is absent because neither grammar's query captures one
 # as a symbol today. If a union capture is ever added, add it here too, or a
 # bodiless ``union U;`` goes back to reading as a definition.
-_CPP_TYPE_SPECIFIER_NODES = frozenset(
-    {"class_specifier", "struct_specifier", "enum_specifier"}
-)
+_CPP_TYPE_SPECIFIER_NODES = frozenset({"class_specifier", "struct_specifier", "enum_specifier"})
 
 
 def _is_bodiless_cpp_type(language: str, node_type: str, def_node: Node) -> bool:

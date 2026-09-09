@@ -45,8 +45,7 @@ def _build_repo(tmp_path, *, old_files: int = 3, recent_commits: int = 2):
             # Agent-attributed commit in the DEEP region — the rollup must
             # survive the batched path.
             repo.index.commit(
-                f"fix: adjust old module {i}\n\n"
-                "Co-Authored-By: Claude <noreply@anthropic.com>"
+                f"fix: adjust old module {i}\n\n" "Co-Authored-By: Claude <noreply@anthropic.com>"
             )
         else:
             repo.index.commit(f"fix: adjust old module {i} boundary handling")
@@ -73,9 +72,7 @@ def test_deep_bucket_matches_per_file_fallback(tmp_path) -> None:
     assert set(window) == {"recent.py"}
 
     missed = indexable - set(window)
-    deep = load_deep_commit_index(
-        repo, 2, missed, skip=2, deep_limit=20_000
-    )
+    deep = load_deep_commit_index(repo, 2, missed, skip=2, deep_limit=20_000)
     assert set(deep) == missed
 
     for fp in sorted(missed):
@@ -103,9 +100,7 @@ def test_deep_bucket_respects_per_file_cap(tmp_path) -> None:
     import git as gitpython
 
     repo = gitpython.Repo(tmp_path)
-    deep = load_deep_commit_index(
-        repo, 1, {"old_0.py", "old_1.py"}, skip=2, deep_limit=20_000
-    )
+    deep = load_deep_commit_index(repo, 1, {"old_0.py", "old_1.py"}, skip=2, deep_limit=20_000)
     assert all(len(v) == 1 for v in deep.values())
     # Newest first: the cap keeps each file's most recent deep commit.
     assert all(v[0].subject.startswith("fix:") for v in deep.values())
@@ -117,9 +112,7 @@ def test_deep_bucket_only_contains_wanted_files(tmp_path) -> None:
     import git as gitpython
 
     repo = gitpython.Repo(tmp_path)
-    deep = load_deep_commit_index(
-        repo, 2, {"old_1.py"}, skip=2, deep_limit=20_000
-    )
+    deep = load_deep_commit_index(repo, 2, {"old_1.py"}, skip=2, deep_limit=20_000)
     assert set(deep) == {"old_1.py"}
     repo.close()
 
@@ -133,9 +126,7 @@ def test_empty_wanted_set_skips_the_walk(tmp_path) -> None:
     repo.close()
 
 
-async def test_index_repo_uses_deep_index_instead_of_per_file_logs(
-    tmp_path, monkeypatch
-) -> None:
+async def test_index_repo_uses_deep_index_instead_of_per_file_logs(tmp_path, monkeypatch) -> None:
     """With the deep walk active, files beyond the window must get their
     metadata WITHOUT any per-file git log, and that metadata must equal the
     per-file path's output (rename-free history → semantics align)."""
@@ -155,9 +146,7 @@ async def test_index_repo_uses_deep_index_instead_of_per_file_logs(
 
     # Deep run: threshold 1 forces the deep walk; per-file fallback must
     # never fire for files the deep bucket covers.
-    monkeypatch.setattr(
-        "repowise.core.ingestion.git_indexer.indexer._DEEP_WALK_MIN_FALLBACK", 1
-    )
+    monkeypatch.setattr("repowise.core.ingestion.git_indexer.indexer._DEEP_WALK_MIN_FALLBACK", 1)
     calls: list[str] = []
     import repowise.core.ingestion.git_indexer.file_history as fh
 

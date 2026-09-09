@@ -41,12 +41,12 @@ def _graph(*, calls=False, extra=None):
     ``calls``, so clearing the finding takes all three edges, not one.
     """
     g = nx.DiGraph()
-    g.add_edge("tests/test_round_trips.py", "tests/test_round_trips.py::test_it", edge_type="defines")
+    g.add_edge(
+        "tests/test_round_trips.py", "tests/test_round_trips.py::test_it", edge_type="defines"
+    )
     g.add_edge("src/parser.py", "src/parser.py::parse", edge_type="defines")
     if calls:
-        g.add_edge(
-            "tests/test_round_trips.py::test_it", "src/parser.py::parse", edge_type="calls"
-        )
+        g.add_edge("tests/test_round_trips.py::test_it", "src/parser.py::parse", edge_type="calls")
     if extra:
         g.add_edge(*extra[:2], edge_type=extra[2])
     # Dependents for the centrality gate; untested_hotspot wants at least four.

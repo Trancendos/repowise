@@ -42,9 +42,7 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.func.now(),
         ),
-        sa.UniqueConstraint(
-            "repository_id", "name", "declared_in", name="uq_external_system"
-        ),
+        sa.UniqueConstraint("repository_id", "name", "declared_in", name="uq_external_system"),
     )
     op.create_index(
         "ix_external_systems_repository_id",
@@ -53,9 +51,7 @@ def upgrade() -> None:
     )
 
     with op.batch_alter_table("graph_nodes") as batch_op:
-        batch_op.add_column(
-            sa.Column("external_system_id", sa.Integer(), nullable=True)
-        )
+        batch_op.add_column(sa.Column("external_system_id", sa.Integer(), nullable=True))
         batch_op.create_foreign_key(
             "fk_graph_nodes_external_system",
             "external_systems",

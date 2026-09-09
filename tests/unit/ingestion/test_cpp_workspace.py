@@ -34,11 +34,15 @@ def _make_ctx(tmp_path: Path, paths: list[str]) -> ResolverContext:
 
 
 def test_public_header_layout_includes_lib_dir(tmp_path):
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(coffee STATIC src/brew.cc)
         target_sources(coffee PUBLIC include/coffee/brew.h)
         target_include_directories(coffee PUBLIC include)
-    """)
+    """,
+    )
     _write(tmp_path, "include/coffee/brew.h", "// header\n")
     _write(tmp_path, "src/brew.cc", "// impl\n")
     paths = ["include/coffee/brew.h", "src/brew.cc", "CMakeLists.txt"]
@@ -51,11 +55,15 @@ def test_public_header_layout_includes_lib_dir(tmp_path):
 
 
 def test_resolve_public_header_via_workspace(tmp_path):
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(coffee STATIC src/brew.cc)
         target_sources(coffee PUBLIC include/coffee/brew.h)
         target_include_directories(coffee PUBLIC include)
-    """)
+    """,
+    )
     _write(tmp_path, "include/coffee/brew.h", "// header\n")
     _write(tmp_path, "src/brew.cc", '#include "coffee/brew.h"\n')
     paths = ["include/coffee/brew.h", "src/brew.cc", "CMakeLists.txt"]
@@ -86,16 +94,23 @@ def test_stdlib_includes_are_dropped(tmp_path):
 def test_resolve_all_fans_out_to_target_siblings(tmp_path):
     """A ``#include`` of a public header fans out to every TU sharing
     the owning target so the header's defining files aren't orphaned."""
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(coffee STATIC src/brew.cc src/grind.cc)
         target_sources(coffee PUBLIC include/coffee/brew.h)
         target_include_directories(coffee PUBLIC include)
-    """)
+    """,
+    )
     _write(tmp_path, "include/coffee/brew.h", "")
     _write(tmp_path, "src/brew.cc", '#include "coffee/brew.h"\n')
     _write(tmp_path, "src/grind.cc", "")
     paths = [
-        "include/coffee/brew.h", "src/brew.cc", "src/grind.cc", "CMakeLists.txt",
+        "include/coffee/brew.h",
+        "src/brew.cc",
+        "src/grind.cc",
+        "CMakeLists.txt",
     ]
     ctx = _make_ctx(tmp_path, paths)
 
@@ -106,12 +121,19 @@ def test_resolve_all_fans_out_to_target_siblings(tmp_path):
 
 
 def test_project_export_macro_discovery(tmp_path):
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(coffee STATIC src/brew.cc)
         target_sources(coffee PUBLIC include/coffee/api.h)
         target_include_directories(coffee PUBLIC include)
-    """)
-    _write(tmp_path, "include/coffee/api.h", """
+    """,
+    )
+    _write(
+        tmp_path,
+        "include/coffee/api.h",
+        """
 #if defined(_WIN32)
 #define COFFEE_EXPORT __declspec(dllexport)
 #else
@@ -119,7 +141,8 @@ def test_project_export_macro_discovery(tmp_path):
 #endif
 
 class COFFEE_EXPORT Brewer { };
-""")
+""",
+    )
     _write(tmp_path, "src/brew.cc", "")
     paths = ["include/coffee/api.h", "src/brew.cc", "CMakeLists.txt"]
     ctx = _make_ctx(tmp_path, paths)
@@ -138,10 +161,14 @@ def test_no_workspace_falls_back_to_stem(tmp_path):
 
 
 def test_siblings_in_targets(tmp_path):
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(thing STATIC a.cc b.cc c.cc)
         target_sources(thing PUBLIC a.h)
-    """)
+    """,
+    )
     for f in ("a.cc", "b.cc", "c.cc", "a.h"):
         _write(tmp_path, f, "")
     paths = ["a.cc", "b.cc", "c.cc", "a.h", "CMakeLists.txt"]
@@ -155,18 +182,25 @@ def test_header_only_target_fans_out_to_other_headers(tmp_path):
     # fmt-like header-only library: public headers, zero sources. One
     # included header must pull the target's other headers along,
     # otherwise the rest of the library is orphaned.
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(fmtish INTERFACE)
         target_sources(fmtish INTERFACE include/fmtish/core.h include/fmtish/format.h include/fmtish/ranges.h)
         target_include_directories(fmtish INTERFACE include)
-    """)
+    """,
+    )
     _write(tmp_path, "include/fmtish/core.h", "// core\n")
     _write(tmp_path, "include/fmtish/format.h", "// format\n")
     _write(tmp_path, "include/fmtish/ranges.h", "// ranges\n")
     _write(tmp_path, "app/main.cc", '#include "fmtish/core.h"\n')
     paths = [
-        "include/fmtish/core.h", "include/fmtish/format.h",
-        "include/fmtish/ranges.h", "app/main.cc", "CMakeLists.txt",
+        "include/fmtish/core.h",
+        "include/fmtish/format.h",
+        "include/fmtish/ranges.h",
+        "app/main.cc",
+        "CMakeLists.txt",
     ]
     ctx = _make_ctx(tmp_path, paths)
     targets = resolve_cpp_import_all("fmtish/core.h", "app/main.cc", ctx)
@@ -177,11 +211,15 @@ def test_header_only_target_fans_out_to_other_headers(tmp_path):
 
 def test_source_target_fanout_unchanged_by_header_pool(tmp_path):
     # A target WITH sources keeps the TU fan-out (no header pool mixing).
-    _write(tmp_path, "CMakeLists.txt", """
+    _write(
+        tmp_path,
+        "CMakeLists.txt",
+        """
         add_library(coffee STATIC src/brew.cc src/grind.cc)
         target_sources(coffee PUBLIC include/coffee/brew.h)
         target_include_directories(coffee PUBLIC include)
-    """)
+    """,
+    )
     for rel in ("include/coffee/brew.h", "src/brew.cc", "src/grind.cc"):
         _write(tmp_path, rel, "// x\n")
     paths = ["include/coffee/brew.h", "src/brew.cc", "src/grind.cc", "CMakeLists.txt"]

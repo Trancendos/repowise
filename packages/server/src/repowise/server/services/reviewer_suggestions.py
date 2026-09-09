@@ -42,13 +42,17 @@ async def suggest_reviewers(
 
     # 1) Direct ownership for the touched paths.
     direct_rows = (
-        await session.execute(
-            select(GitMetadata).where(
-                GitMetadata.repository_id == repo_id,
-                GitMetadata.file_path.in_(paths),
+        (
+            await session.execute(
+                select(GitMetadata).where(
+                    GitMetadata.repository_id == repo_id,
+                    GitMetadata.file_path.in_(paths),
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
 
     # 2) For each touched path, look up its co-change partners (cap to 5
     # strongest per file to keep the suggestion noise low) and fetch their
@@ -70,18 +74,31 @@ async def suggest_reviewers(
     cochange_rows = []
     if cochange_paths:
         cochange_rows = (
-            await session.execute(
-                select(GitMetadata).where(
-                    GitMetadata.repository_id == repo_id,
-                    GitMetadata.file_path.in_(cochange_paths),
+            (
+                await session.execute(
+                    select(GitMetadata).where(
+                        GitMetadata.repository_id == repo_id,
+                        GitMetadata.file_path.in_(cochange_paths),
+                    )
                 )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
 
     # Per-author tally.
     tally: dict[str, dict] = {}
 
-    def _bump(name: str, email: str | None, *, score: float, recent: int, path: str, reason: str, owned: bool) -> None:
+    def _bump(
+        name: str,
+        email: str | None,
+        *,
+        score: float,
+        recent: int,
+        path: str,
+        reason: str,
+        owned: bool,
+    ) -> None:
         key = (email or "").strip().lower() or f"name:{name.strip()}"
         slot = tally.setdefault(
             key,

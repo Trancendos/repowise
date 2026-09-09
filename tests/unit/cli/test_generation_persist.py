@@ -82,9 +82,7 @@ async def test_pages_flushed_incrementally(repo_dir, monkeypatch):
             on_page_ready(p)
         return emitted
 
-    monkeypatch.setattr(
-        "repowise.core.pipeline.run_generation", fake_run_generation, raising=True
-    )
+    monkeypatch.setattr("repowise.core.pipeline.run_generation", fake_run_generation, raising=True)
 
     pages = await run_generation_with_persistence(
         repo_path=repo_dir,
@@ -127,9 +125,7 @@ async def test_sink_failure_never_breaks_generation(repo_dir, monkeypatch):
         on_page_ready(_page("delta"))
         return [_page("delta")]
 
-    monkeypatch.setattr(
-        "repowise.core.pipeline.run_generation", fake_run_generation, raising=True
-    )
+    monkeypatch.setattr("repowise.core.pipeline.run_generation", fake_run_generation, raising=True)
 
     pages = await run_generation_with_persistence(repo_path=repo_dir, repo_name=repo_dir.name)
     assert {p.page_id for p in pages} == {"delta"}

@@ -57,7 +57,7 @@ def _edges(parsed, tmp_path, import_targets=None):
     return edges
 
 
-WIDGET_PY = '''
+WIDGET_PY = """
 class Widget:
     def helper(self):
         return 1
@@ -69,23 +69,23 @@ class Widget:
 class Other:
     def lonely(self):
         return self.helper()
-'''
+"""
 
-PAINTER_PY = '''
+PAINTER_PY = """
 class Painter:
     def draw(self):
         return "ok"
-'''
+"""
 
-CALLER_PY = '''
+CALLER_PY = """
 def use():
     return Painter.draw()
-'''
+"""
 
-MISSING_PY = '''
+MISSING_PY = """
 def use_missing():
     return Painter.missing()
-'''
+"""
 
 
 class TestSelfCallStrategy:
@@ -93,9 +93,7 @@ class TestSelfCallStrategy:
         parsed = _parse_all(tmp_path, {"src/widget.py": ("python", WIDGET_PY)})
         edges = _edges(parsed, tmp_path)
         hits = [
-            e
-            for e in edges
-            if e[0].endswith("::Widget::run") and e[1].endswith("::Widget::helper")
+            e for e in edges if e[0].endswith("::Widget::run") and e[1].endswith("::Widget::helper")
         ]
         assert hits, f"self.helper() inside Widget.run must resolve; edges: {edges}"
         assert hits[0][2] == 0.95
@@ -220,9 +218,10 @@ class TestSelfDispatchAcrossLanguages:
         parsed = _parse_all(tmp_path, {rel: (lang, source)})
         receivers = {c.receiver_name for c in parsed[rel].calls if c.target_name == "helper"}
         assert receivers, f"no call site recorded for the self-call in {rel}"
-        assert receivers <= {"this", "self"}, (
-            f"self-call receiver must be this/self so strategy 3 fires; got {receivers}"
-        )
+        assert receivers <= {
+            "this",
+            "self",
+        }, f"self-call receiver must be this/self so strategy 3 fires; got {receivers}"
 
     def test_self_call_resolves_within_same_class(
         self, tmp_path: Path, rel: str, lang: str, source: str
@@ -230,9 +229,7 @@ class TestSelfDispatchAcrossLanguages:
         parsed = _parse_all(tmp_path, {rel: (lang, source)})
         edges = _edges(parsed, tmp_path)
         hits = [
-            e
-            for e in edges
-            if e[0].endswith("::Widget::run") and e[1].endswith("::Widget::helper")
+            e for e in edges if e[0].endswith("::Widget::run") and e[1].endswith("::Widget::helper")
         ]
         assert hits, f"this.helper() inside Widget.run must resolve; edges: {edges}"
         assert hits[0][2] == 0.95

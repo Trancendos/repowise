@@ -119,7 +119,12 @@ def simple_parsed_files():
 @pytest.fixture
 def simple_graph_builder():
     nodes = {
-        "src/main.py": {"node_type": "file", "language": "python", "is_test": False, "is_entry_point": True},
+        "src/main.py": {
+            "node_type": "file",
+            "language": "python",
+            "is_test": False,
+            "is_entry_point": True,
+        },
         "src/core.py": {"node_type": "file", "language": "python", "is_test": False},
         "tests/test_main.py": {"node_type": "file", "language": "python", "is_test": True},
     }
@@ -226,7 +231,9 @@ class TestSkeletonBuilder:
         assert tested_by[0]["source"] == "file:tests/test_main.py"
         assert tested_by[0]["target"] == "file:src/main.py"
 
-    def test_builds_layers_from_communities(self, simple_parsed_files, simple_graph_builder, repo_structure):
+    def test_builds_layers_from_communities(
+        self, simple_parsed_files, simple_graph_builder, repo_structure
+    ):
         result = build_knowledge_graph_skeleton(
             parsed_files=simple_parsed_files,
             graph_builder=simple_graph_builder,
@@ -240,7 +247,9 @@ class TestSkeletonBuilder:
         assert "src/core" in layer_names
         assert "tests" in layer_names
 
-    def test_layers_contain_node_ids(self, simple_parsed_files, simple_graph_builder, repo_structure):
+    def test_layers_contain_node_ids(
+        self, simple_parsed_files, simple_graph_builder, repo_structure
+    ):
         result = build_knowledge_graph_skeleton(
             parsed_files=simple_parsed_files,
             graph_builder=simple_graph_builder,

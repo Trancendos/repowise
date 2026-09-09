@@ -15,7 +15,10 @@ def _write(tmp_path: Path, rel: str, text: str) -> Path:
 
 
 def test_cc_library_with_srcs_and_hdrs(tmp_path):
-    _write(tmp_path, "lib/BUILD.bazel", """
+    _write(
+        tmp_path,
+        "lib/BUILD.bazel",
+        """
 cc_library(
     name = "strings",
     srcs = ["str.cc", "str_util.cc"],
@@ -23,7 +26,8 @@ cc_library(
     deps = ["//base:logging"],
     includes = ["."],
 )
-""")
+""",
+    )
     bf = bazel.parse_bazel_build(tmp_path / "lib/BUILD.bazel", repo_root=tmp_path)
     assert bf.package == "lib"
     assert len(bf.targets) == 1
@@ -36,25 +40,33 @@ cc_library(
 
 
 def test_cc_test_is_testonly(tmp_path):
-    _write(tmp_path, "BUILD", """
+    _write(
+        tmp_path,
+        "BUILD",
+        """
 cc_test(
     name = "str_test",
     srcs = ["str_test.cc"],
     deps = [":strings", "@gtest//:gtest_main"],
 )
-""")
+""",
+    )
     bf = bazel.parse_bazel_build(tmp_path / "BUILD", repo_root=tmp_path)
     assert bf.targets[0].testonly is True
     assert bf.targets[0].kind == "cc_test"
 
 
 def test_label_resolution(tmp_path):
-    _write(tmp_path, "src/foo/BUILD.bazel", """
+    _write(
+        tmp_path,
+        "src/foo/BUILD.bazel",
+        """
 cc_binary(
     name = "tool",
     srcs = ["main.cc", "//src/foo:helper.cc", ":local.cc"],
 )
-""")
+""",
+    )
     bf = bazel.parse_bazel_build(tmp_path / "src/foo/BUILD.bazel", repo_root=tmp_path)
     srcs = bf.targets[0].srcs
     assert "src/foo/main.cc" in srcs

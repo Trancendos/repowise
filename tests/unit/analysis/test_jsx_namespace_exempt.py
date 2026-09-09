@@ -107,9 +107,7 @@ class TestJsxNamespaceExemption:
         g.add_edge("src/importer.ts", "src/types.ts", edge_type="imports", imported_names=[])
         _sym_node(g, "src/types.ts", "IntrinsicElements", kind="interface")
         # No ``namespace JSX`` declaration — exemption must NOT apply.
-        parsed = _fake_parsed(
-            "src/types.ts", "export interface IntrinsicElements {}\n", tmp_path
-        )
+        parsed = _fake_parsed("src/types.ts", "export interface IntrinsicElements {}\n", tmp_path)
 
         analyzer = DeadCodeAnalyzer(g, parsed_files=parsed)
         report = analyzer.analyze({"min_confidence": 0.0})

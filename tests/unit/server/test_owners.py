@@ -135,9 +135,7 @@ async def test_owner_profile_agent_collab_and_totals(client: AsyncClient, app) -
     assert data["co_authors_total"] == len(data["co_authors"])
 
     # Bob owns only utils.py, which has no provenance rollup -> null.
-    bob = await client.get(
-        f"/api/repos/{repo['id']}/owners/{quote('bob@example.com', safe='')}"
-    )
+    bob = await client.get(f"/api/repos/{repo['id']}/owners/{quote('bob@example.com', safe='')}")
     assert bob.json()["agent_collab"] is None
 
 
@@ -191,9 +189,7 @@ async def test_last_commit_uses_authors_own_timestamp(client: AsyncClient, app) 
 
 
 @pytest.mark.asyncio
-async def test_noreply_and_real_email_collapse_to_one_contributor(
-    client: AsyncClient, app
-) -> None:
+async def test_noreply_and_real_email_collapse_to_one_contributor(client: AsyncClient, app) -> None:
     """One person who committed with a real email on one file and a GitHub
     noreply email on another (same display name) is a single contributor —
     not two."""

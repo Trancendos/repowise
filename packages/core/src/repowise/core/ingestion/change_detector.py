@@ -316,7 +316,6 @@ class ChangeDetector:
             symbol_diff=sym_diff,
         )
 
-
     def detect_symbol_renames(
         self,
         old_file: ParsedFile,
@@ -582,9 +581,7 @@ def has_working_tree_changes(repo_path: Path) -> bool:
     except Exception:
         return False
     try:
-        changed = (
-            item.b_path or item.a_path or "" for item in repo.head.commit.diff(None)
-        )
+        changed = (item.b_path or item.a_path or "" for item in repo.head.commit.diff(None))
         return any(
             is_candidate_source_path(p.replace("\\", "/"))
             for p in (*changed, *repo.untracked_files)
@@ -616,8 +613,6 @@ def merge_file_diffs(*sources: list[FileDiff]) -> list[FileDiff]:
     for source in sources:
         for diff in source:
             existing = merged.get(diff.path)
-            if existing is None or (
-                existing.status == "deleted" and diff.status != "deleted"
-            ):
+            if existing is None or (existing.status == "deleted" and diff.status != "deleted"):
                 merged[diff.path] = diff
     return list(merged.values())

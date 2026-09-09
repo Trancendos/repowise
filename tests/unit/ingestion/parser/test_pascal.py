@@ -74,9 +74,7 @@ class TestPascalSymbols:
         assert sym.kind == "method"
         assert sym.parent_name == "TCalculator"
 
-    def test_surviving_symbol_is_the_implementation_with_a_body(
-        self, parser: ASTParser
-    ) -> None:
+    def test_surviving_symbol_is_the_implementation_with_a_body(self, parser: ASTParser) -> None:
         # get_symbol on a method should return the real body, not just the
         # bare interface-section prototype -- the kept symbol's line range
         # must span the implementation (with `begin ... end;`), not the
@@ -284,9 +282,7 @@ end.
         result = parser.parse_file(_pas("Only.pas"), src)
         assert [i.module_path for i in result.imports] == ["SysUtils"]
 
-    def test_separate_interface_and_implementation_uses_clauses(
-        self, parser: ASTParser
-    ) -> None:
+    def test_separate_interface_and_implementation_uses_clauses(self, parser: ASTParser) -> None:
         # `uses` is valid in both sections of a unit, and the query isn't
         # scoped to either -- two separate multi-unit clauses in one file
         # must not interfere with each other's extraction.
@@ -302,9 +298,7 @@ end.
         modules = {i.module_path for i in result.imports}
         assert modules == {"SysUtils", "Classes", "Windows", "Messages"}
 
-    def test_unit_named_in_both_uses_clauses_dedupes_to_one_import(
-        self, parser: ASTParser
-    ) -> None:
+    def test_unit_named_in_both_uses_clauses_dedupes_to_one_import(self, parser: ASTParser) -> None:
         # Review feedback on PR #1353: a unit named in both the interface
         # and implementation `uses` clauses of the same file produced two
         # identical Import entries -- the Pascal branch in
@@ -366,9 +360,7 @@ end.
         modules = {i.module_path for i in result.imports}
         assert modules == {"FlagUnit", "SysUtils"}
 
-    def test_in_clause_sanitization_does_not_touch_pas_files(
-        self, parser: ASTParser
-    ) -> None:
+    def test_in_clause_sanitization_does_not_touch_pas_files(self, parser: ASTParser) -> None:
         # Scoped to .dpr/.dpk/.lpr on purpose -- this syntax is invalid in
         # a regular unit file, so the sanitizer must not run there. Uses a
         # plain .pas path (not .dpr) with the same shape to prove it.
@@ -393,9 +385,7 @@ class TestPascalHeritage:
         # IInterface is also a builtin_parent for Pascal.
         assert not any(child == "ICalcTarget" for child, _kind, _parent in rels)
 
-    def test_class_helper_extends_both_ancestor_and_extended_type(
-        self, parser: ASTParser
-    ) -> None:
+    def test_class_helper_extends_both_ancestor_and_extended_type(self, parser: ASTParser) -> None:
         # `class helper(TBaseHelper) for TFoo` carries two distinct
         # relationships: the helper's own ancestor helper (`parent`, same
         # list as a plain class) and the type it extends (`for TFoo`,
@@ -432,9 +422,7 @@ class TestPascalEncoding:
     verifying repowise's Pascal support against a Russian-language codebase.
     """
 
-    def test_cyrillic_comments_and_string_literals_parse_cleanly(
-        self, parser: ASTParser
-    ) -> None:
+    def test_cyrillic_comments_and_string_literals_parse_cleanly(self, parser: ASTParser) -> None:
         # Identifiers stay ASCII (matches this repo's actual Delphi
         # convention); comments and string literals carry Cyrillic text.
         # node_text() decodes via tree-sitter's own byte-accurate

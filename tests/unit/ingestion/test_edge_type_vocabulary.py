@@ -175,7 +175,9 @@ def _string_members(value: ast.expr) -> set[str]:
         return _string_members(value.left) | _string_members(value.right)
     if isinstance(value, ast.Set | ast.List | ast.Tuple):
         return {
-            el.value for el in value.elts if isinstance(el, ast.Constant) and isinstance(el.value, str)
+            el.value
+            for el in value.elts
+            if isinstance(el, ast.Constant) and isinstance(el.value, str)
         }
     return set()  # a bare Name — checked where it is defined
 
@@ -219,9 +221,9 @@ def test_exemptions_still_call_add_edge(exempt: str) -> None:
     """
     path = _PACKAGES.parents[0] / exempt
     assert path.exists(), f"{exempt} no longer exists — remove it from the exemption list"
-    assert "add_edge" in path.read_text(encoding="utf-8"), (
-        f"{exempt} no longer calls add_edge — remove it from the exemption list"
-    )
+    assert "add_edge" in path.read_text(
+        encoding="utf-8"
+    ), f"{exempt} no longer calls add_edge — remove it from the exemption list"
 
 
 def test_every_dynamic_kind_maps_into_the_vocabulary() -> None:
@@ -259,9 +261,9 @@ def test_edge_type_map_covers_the_vocabulary() -> None:
         "edge type(s) silently dropped from the knowledge-graph export: "
         f"{sorted(expected - _EDGE_TYPE_MAP.keys())}"
     )
-    assert not (_EDGE_TYPE_MAP.keys() - EDGE_TYPE_VALUES), (
-        f"export mapping keyed on a type nothing emits: {sorted(_EDGE_TYPE_MAP.keys() - EDGE_TYPE_VALUES)}"
-    )
+    assert not (
+        _EDGE_TYPE_MAP.keys() - EDGE_TYPE_VALUES
+    ), f"export mapping keyed on a type nothing emits: {sorted(_EDGE_TYPE_MAP.keys() - EDGE_TYPE_VALUES)}"
     assert not (_EDGE_TYPE_MAP.keys() & TEMPORAL_EDGE_TYPES), (
         "a temporal edge reached the dependency export — that is how a co-change"
         " partner starts looking like an import"
@@ -357,9 +359,7 @@ def _resolved_call_origins() -> dict[str, set[float]]:
                 continue
             confidence = node.args[2] if len(node.args) > 2 else None
             confs = found.setdefault(origin.value, set())  # type: ignore[attr-defined]
-            if isinstance(confidence, ast.Constant) and isinstance(
-                confidence.value, int | float
-            ):
+            if isinstance(confidence, ast.Constant) and isinstance(confidence.value, int | float):
                 confs.add(float(confidence.value))
     return found
 
@@ -386,9 +386,7 @@ def test_every_declared_resolution_origin_has_a_producer() -> None:
     from repowise.core.ingestion.models import RESOLUTION_ORIGIN_VALUES
 
     orphans = RESOLUTION_ORIGIN_VALUES - set(_resolved_call_origins())
-    assert not orphans, (
-        f"resolution origin(s) declared with no producer: {sorted(orphans)}"
-    )
+    assert not orphans, f"resolution origin(s) declared with no producer: {sorted(orphans)}"
 
 
 def test_each_resolution_origin_carries_one_confidence() -> None:

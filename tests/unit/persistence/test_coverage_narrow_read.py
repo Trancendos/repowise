@@ -20,10 +20,20 @@ from repowise.core.persistence.crud import (
 )
 
 _FILES = [
-    {"file_path": "src/a.py", "line_coverage_pct": 20.0, "covered_lines": [1, 2],
-     "total_coverable_lines": 10, "branch_coverage_pct": 10.0},
-    {"file_path": "src/b.py", "line_coverage_pct": 80.0, "covered_lines": [1, 2, 3, 4],
-     "total_coverable_lines": 5, "branch_coverage_pct": None},
+    {
+        "file_path": "src/a.py",
+        "line_coverage_pct": 20.0,
+        "covered_lines": [1, 2],
+        "total_coverable_lines": 10,
+        "branch_coverage_pct": 10.0,
+    },
+    {
+        "file_path": "src/b.py",
+        "line_coverage_pct": 80.0,
+        "covered_lines": [1, 2, 3, 4],
+        "total_coverable_lines": 5,
+        "branch_coverage_pct": None,
+    },
 ]
 
 # Every field the route serializers and the summary read off a row.
@@ -45,12 +55,8 @@ async def repo(async_session, tmp_path):
     return r
 
 
-async def test_narrow_read_drops_the_blob_and_keeps_everything_else(
-    async_session, repo
-) -> None:
-    narrow = await load_coverage_for_repo(
-        async_session, repo.id, include_covered_lines=False
-    )
+async def test_narrow_read_drops_the_blob_and_keeps_everything_else(async_session, repo) -> None:
+    narrow = await load_coverage_for_repo(async_session, repo.id, include_covered_lines=False)
 
     assert len(narrow) == 2
     for row in narrow:
@@ -69,12 +75,11 @@ async def test_wide_read_still_carries_the_blob(async_session, repo) -> None:
     }
 
 
-async def test_narrow_and_wide_agree_on_every_other_column(
-    async_session, repo
-) -> None:
-    narrow = {r.file_path: r for r in
-              await load_coverage_for_repo(async_session, repo.id,
-                                           include_covered_lines=False)}
+async def test_narrow_and_wide_agree_on_every_other_column(async_session, repo) -> None:
+    narrow = {
+        r.file_path: r
+        for r in await load_coverage_for_repo(async_session, repo.id, include_covered_lines=False)
+    }
     wide = {r.file_path: r for r in await load_coverage_for_repo(async_session, repo.id)}
 
     assert narrow.keys() == wide.keys()
@@ -91,22 +96,16 @@ async def test_narrow_read_honors_file_paths(async_session, repo) -> None:
     assert [r.file_path for r in rows] == ["src/b.py"]
 
 
-async def test_summary_from_handed_over_rows_matches_its_own_read(
-    async_session, repo
-) -> None:
+async def test_summary_from_handed_over_rows_matches_its_own_read(async_session, repo) -> None:
     """The ``rows=`` hand-off must not change a single figure."""
-    rows = await load_coverage_for_repo(
-        async_session, repo.id, include_covered_lines=False
-    )
+    rows = await load_coverage_for_repo(async_session, repo.id, include_covered_lines=False)
 
     assert await get_coverage_summary(async_session, repo.id, rows=rows) == (
         await get_coverage_summary(async_session, repo.id)
     )
 
 
-async def test_summary_weights_branch_coverage_over_rows_that_have_it(
-    async_session, repo
-) -> None:
+async def test_summary_weights_branch_coverage_over_rows_that_have_it(async_session, repo) -> None:
     """Guards the narrow row's ``None`` branch column, which the weighting skips."""
     summary = await get_coverage_summary(async_session, repo.id)
 

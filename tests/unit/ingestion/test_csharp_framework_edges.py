@@ -60,9 +60,7 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 class TestAspNetEdges:
@@ -113,9 +111,7 @@ public class AppDbContext : DbContext {
         )
         # Need a Program.cs or any ASP.NET signal to enable the path; use the
         # Microsoft.EntityFrameworkCore using directive as the fallback signal.
-        (tmp_path / "Program.cs").write_text(
-            "using Microsoft.AspNetCore.Builder;\nvar app = 1;\n"
-        )
+        (tmp_path / "Program.cs").write_text("using Microsoft.AspNetCore.Builder;\nvar app = 1;\n")
         parsed = _build_parsed_files(tmp_path)
         graph = nx.DiGraph()
         for p in parsed:
@@ -221,9 +217,7 @@ public static class CatalogExtensions {
         assert graph["App.xaml.cs"]["Catalog.cs"]["edge_type"] == "framework"
 
     def test_no_edges_when_no_aspnet_signal(self, tmp_path: Path) -> None:
-        (tmp_path / "Plain.cs").write_text(
-            "namespace Plain;\npublic class Foo {}\n"
-        )
+        (tmp_path / "Plain.cs").write_text("namespace Plain;\npublic class Foo {}\n")
         parsed = _build_parsed_files(tmp_path)
         graph = nx.DiGraph()
         for p in parsed:
@@ -262,9 +256,7 @@ builder.Services.AddScoped<IUserService, UserService>();
         assert ("IUserService.cs", "UserService.cs") in targets
 
     def test_activator_create_instance_typeof(self, tmp_path: Path) -> None:
-        (tmp_path / "Plugin.cs").write_text(
-            "namespace Acme;\npublic class Plugin { }\n"
-        )
+        (tmp_path / "Plugin.cs").write_text("namespace Acme;\npublic class Plugin { }\n")
         (tmp_path / "Loader.cs").write_text(
             "namespace Acme;\npublic class Loader { void Load() { var p = Activator.CreateInstance(typeof(Plugin)); } }\n"
         )
@@ -272,9 +264,7 @@ builder.Services.AddScoped<IUserService, UserService>();
         assert any(e.source == "Loader.cs" and e.target == "Plugin.cs" for e in edges)
 
     def test_type_gettype_string_form(self, tmp_path: Path) -> None:
-        (tmp_path / "Worker.cs").write_text(
-            "namespace Acme;\npublic class Worker { }\n"
-        )
+        (tmp_path / "Worker.cs").write_text("namespace Acme;\npublic class Worker { }\n")
         (tmp_path / "Boot.cs").write_text(
             'namespace Acme;\npublic class Boot { void Go() { var t = Type.GetType("Acme.Worker"); } }\n'
         )
@@ -285,9 +275,7 @@ builder.Services.AddScoped<IUserService, UserService>();
         """``nameof(MySettings)`` must surface as a dynamic edge to the
         defining file (audit item #26).
         """
-        (tmp_path / "MySettings.cs").write_text(
-            "namespace Acme;\npublic class MySettings { }\n"
-        )
+        (tmp_path / "MySettings.cs").write_text("namespace Acme;\npublic class MySettings { }\n")
         (tmp_path / "Program.cs").write_text(
             """namespace Acme;
 public class Bootstrap {
@@ -344,15 +332,13 @@ public class Settings {
         identifiers are scanned to keep noise out.
         """
         (tmp_path / "Foo.cs").write_text(
-            'namespace Acme;\npublic class Foo { void Go(int someLocal) { var n = nameof(someLocal); } }\n'
+            "namespace Acme;\npublic class Foo { void Go(int someLocal) { var n = nameof(someLocal); } }\n"
         )
         edges = DotNetDynamicHints().extract(tmp_path)
         assert not any(e.hint_source.endswith(":nameof") for e in edges)
 
     def test_internals_visible_to_emits_friend_edge(self, tmp_path: Path) -> None:
-        (tmp_path / "AssemblyInfo.cs").write_text(
-            '[assembly: InternalsVisibleTo("Acme.Tests")]\n'
-        )
+        (tmp_path / "AssemblyInfo.cs").write_text('[assembly: InternalsVisibleTo("Acme.Tests")]\n')
         edges = DotNetDynamicHints().extract(tmp_path)
         assert any(
             e.source == "AssemblyInfo.cs" and e.target == "external:friend:Acme.Tests"
@@ -362,7 +348,7 @@ public class Settings {
     def test_skips_bin_obj_directories(self, tmp_path: Path) -> None:
         (tmp_path / "obj" / "Debug").mkdir(parents=True)
         (tmp_path / "obj" / "Debug" / "Generated.cs").write_text(
-            'public class Junk { void X() { Activator.CreateInstance(typeof(Plugin)); } }\n'
+            "public class Junk { void X() { Activator.CreateInstance(typeof(Plugin)); } }\n"
         )
         (tmp_path / "Plugin.cs").write_text("public class Plugin { }\n")
         edges = DotNetDynamicHints().extract(tmp_path)

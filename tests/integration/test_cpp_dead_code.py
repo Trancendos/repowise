@@ -88,8 +88,7 @@ class TestPlantedDeadStillFlagged:
         # carrier file flags as unreachable_file (already asserted above).
         # We assert at least one carries through.
         carrier_unreachable = any(
-            "legacy_unused.cc" in p
-            for p in _paths(cpp_report, DeadCodeKind.UNREACHABLE_FILE)
+            "legacy_unused.cc" in p for p in _paths(cpp_report, DeadCodeKind.UNREACHABLE_FILE)
         )
         assert "GenuinelyDead" in all_dead_names or carrier_unreachable
 
@@ -97,27 +96,27 @@ class TestPlantedDeadStillFlagged:
 class TestLivePathNotFlagged:
     def test_public_header_reachable(self, cpp_report) -> None:
         unreachable = _paths(cpp_report, DeadCodeKind.UNREACHABLE_FILE)
-        assert not any("coffee/brew.h" in p for p in unreachable), (
-            "brew.h is included by main.cc and brew.cc — must be reachable"
-        )
+        assert not any(
+            "coffee/brew.h" in p for p in unreachable
+        ), "brew.h is included by main.cc and brew.cc — must be reachable"
 
     def test_types_header_reachable(self, cpp_report) -> None:
         unreachable = _paths(cpp_report, DeadCodeKind.UNREACHABLE_FILE)
-        assert not any("coffee/types.h" in p for p in unreachable), (
-            "types.h is included by brew.h — must be reachable transitively"
-        )
+        assert not any(
+            "coffee/types.h" in p for p in unreachable
+        ), "types.h is included by brew.h — must be reachable transitively"
 
     def test_main_carrier_reachable(self, cpp_report) -> None:
         unreachable = _paths(cpp_report, DeadCodeKind.UNREACHABLE_FILE)
-        assert not any(p.endswith("app/main.cc") for p in unreachable), (
-            "main.cc is the binary entry — must be rescued by main-carrier rule"
-        )
+        assert not any(
+            p.endswith("app/main.cc") for p in unreachable
+        ), "main.cc is the binary entry — must be rescued by main-carrier rule"
 
     def test_implementation_file_reachable(self, cpp_report) -> None:
         unreachable = _paths(cpp_report, DeadCodeKind.UNREACHABLE_FILE)
-        assert not any("libcoffee/src/brew.cc" in p for p in unreachable), (
-            "brew.cc implements brew.h — must be reachable"
-        )
+        assert not any(
+            "libcoffee/src/brew.cc" in p for p in unreachable
+        ), "brew.cc implements brew.h — must be reachable"
 
     def test_brewer_class_not_unused_export(self, cpp_report) -> None:
         exports = _names(cpp_report, DeadCodeKind.UNUSED_EXPORT)

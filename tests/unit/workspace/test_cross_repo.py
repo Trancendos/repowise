@@ -453,9 +453,7 @@ class TestCoChangeTruncationTotals:
         now = int(time.time())
         results, total = self._detect(
             {
-                "backend": _make_commits(
-                    "backend", [("alice@co.com", now - 3600, ["src/api.py"])]
-                ),
+                "backend": _make_commits("backend", [("alice@co.com", now - 3600, ["src/api.py"])]),
                 "frontend": _make_commits(
                     "frontend", [("alice@co.com", now - 7200, ["src/client.ts"])]
                 ),

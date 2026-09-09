@@ -125,19 +125,23 @@ async def test_cached_empty_answer_row_is_bypassed(setup_mcp, factory, session, 
     repo = res.scalars().first()
     # Legacy row: current schema version (so the schema gate passes) but the
     # old empty-answer gated shape.
-    session.add(AnswerCache(
-        repository_id=repo.id,
-        question_hash=_hash_question(QUESTION),
-        question=QUESTION,
-        payload_json=_json.dumps({
-            "answer": "",
-            "confidence": "low",
-            "fallback_targets": ["src/auth/service.py"],
-            "_schema_version": _ANSWER_SCHEMA_VERSION,
-        }),
-        provider_name="mock",
-        model_name="mock-1",
-    ))
+    session.add(
+        AnswerCache(
+            repository_id=repo.id,
+            question_hash=_hash_question(QUESTION),
+            question=QUESTION,
+            payload_json=_json.dumps(
+                {
+                    "answer": "",
+                    "confidence": "low",
+                    "fallback_targets": ["src/auth/service.py"],
+                    "_schema_version": _ANSWER_SCHEMA_VERSION,
+                }
+            ),
+            provider_name="mock",
+            model_name="mock-1",
+        )
+    )
     await session.commit()
 
     direct = _Provider("Auth flows through src/auth/service.py via AuthService.check().")

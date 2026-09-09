@@ -31,15 +31,21 @@ def _git_repo(parent: Path, name: str, file_content: str = "x") -> Path:
     p.mkdir(parents=True)
     subprocess.run(["git", "init"], cwd=str(p), capture_output=True)
     subprocess.run(
-        ["git", "config", "user.email", "t@t.com"], cwd=str(p), capture_output=True,
+        ["git", "config", "user.email", "t@t.com"],
+        cwd=str(p),
+        capture_output=True,
     )
     subprocess.run(
-        ["git", "config", "user.name", "T"], cwd=str(p), capture_output=True,
+        ["git", "config", "user.name", "T"],
+        cwd=str(p),
+        capture_output=True,
     )
     (p / "main.py").write_text(f"# {name}\nprint('{file_content}')\n")
     subprocess.run(["git", "add", "."], cwd=str(p), capture_output=True)
     subprocess.run(
-        ["git", "commit", "-m", "initial"], cwd=str(p), capture_output=True,
+        ["git", "commit", "-m", "initial"],
+        cwd=str(p),
+        capture_output=True,
     )
     return p
 
@@ -47,7 +53,9 @@ def _git_repo(parent: Path, name: str, file_content: str = "x") -> Path:
 def _head(p: Path) -> str:
     r = subprocess.run(
         ["git", "rev-parse", "HEAD"],
-        cwd=str(p), capture_output=True, text=True,
+        cwd=str(p),
+        capture_output=True,
+        text=True,
     )
     return r.stdout.strip()
 
@@ -100,10 +108,13 @@ def test_drift_recovery(tmp_path: Path) -> None:
     into agreement with the on-disk state.json on the next update call."""
     a = _git_repo(tmp_path, "alpha")
     cfg = WorkspaceConfig(
-        repos=[RepoEntry(
-            path="alpha", alias="alpha",
-            last_commit_at_index="stale-stale-stale",
-        )],
+        repos=[
+            RepoEntry(
+                path="alpha",
+                alias="alpha",
+                last_commit_at_index="stale-stale-stale",
+            )
+        ],
         default_repo="alpha",
     )
     cfg.save(tmp_path)
@@ -111,9 +122,7 @@ def test_drift_recovery(tmp_path: Path) -> None:
     # Pretend the user ran `repowise update` inside alpha directly,
     # writing a state.json that the workspace config doesn't know about.
     (a / ".repowise").mkdir(exist_ok=True)
-    (a / ".repowise" / "state.json").write_text(
-        json.dumps({"last_sync_commit": _head(a)})
-    )
+    (a / ".repowise" / "state.json").write_text(json.dumps({"last_sync_commit": _head(a)}))
 
     changed = sync_workspace_state_from_disk(tmp_path, cfg)
     assert changed == ["alpha"]

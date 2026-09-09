@@ -44,9 +44,7 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 class TestNextAppRouter:
@@ -68,9 +66,7 @@ class TestNextAppRouter:
 
 class TestHonoRouter:
     def test_app_get_links_handler(self, tmp_path: Path) -> None:
-        (tmp_path / "handlers.ts").write_text(
-            "export function userHandler() { return 'ok'; }\n"
-        )
+        (tmp_path / "handlers.ts").write_text("export function userHandler() { return 'ok'; }\n")
         (tmp_path / "app.ts").write_text(
             "import { Hono } from 'hono';\n"
             "import { userHandler } from './handlers';\n"
@@ -105,9 +101,7 @@ class TestRemixConvention:
 
 class TestTrpc:
     def test_procedure_query_links_handler(self, tmp_path: Path) -> None:
-        (tmp_path / "users.ts").write_text(
-            "export function getUserHandler() { return null; }\n"
-        )
+        (tmp_path / "users.ts").write_text("export function getUserHandler() { return null; }\n")
         (tmp_path / "router.ts").write_text(
             "import { publicProcedure, router } from '@trpc/server';\n"
             "import { getUserHandler } from './users';\n"

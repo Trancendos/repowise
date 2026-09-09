@@ -17,9 +17,7 @@ import re
 from repowise.core.analysis.execution_flows import FLOW_TERMINATION_VALUES
 from repowise.core.ingestion.models import RESOLUTION_ORIGIN_VALUES
 
-_TYPES = (
-    pathlib.Path(__file__).resolve().parents[3] / "packages/types/src/graph.ts"
-)
+_TYPES = pathlib.Path(__file__).resolve().parents[3] / "packages/types/src/graph.ts"
 
 
 def _union_members(alias: str) -> set[str]:

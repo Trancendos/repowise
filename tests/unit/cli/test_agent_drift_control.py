@@ -246,9 +246,9 @@ def test_a_stale_plugin_is_reported_with_the_host_command_that_fixes_it(fake_hom
     skew = [issue for issue in report.issues if "0.16.0" in issue]
     assert skew, report.issues
     assert __version__ in skew[0]
-    assert "pip install -U repowise" in skew[0], (
-        "the point of the message is that upgrading the CLI does not do this"
-    )
+    assert (
+        "pip install -U repowise" in skew[0]
+    ), "the point of the message is that upgrading the CLI does not do this"
     assert report.fix_command == claude_code.PLUGIN_UPDATE_COMMAND
 
 
@@ -325,9 +325,7 @@ def test_the_skew_report_does_not_claim_repair_can_fix_it(fake_home) -> None:
     assert claude_code.TARGET.doctor().repairable is False
 
 
-def test_a_skewed_plugin_does_not_suppress_the_stale_matcher_repair(
-    fake_home, monkeypatch
-) -> None:
+def test_a_skewed_plugin_does_not_suppress_the_stale_matcher_repair(fake_home, monkeypatch) -> None:
     """The repair that `repairable` must not take away.
 
     A stale matcher is rewritten by refresh. Setting `repairable=False` because a

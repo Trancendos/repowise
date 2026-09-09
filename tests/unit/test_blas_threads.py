@@ -106,13 +106,13 @@ def test_entry_point_pins_before_any_other_import(entry: Path) -> None:
     assert statements, f"no statements found in {entry}"
     first, second = statements[0], statements[1]
 
-    assert isinstance(first, ast.ImportFrom), (
-        f"{entry}: expected the BLAS import first, got {ast.dump(first)[:80]}"
-    )
-    assert first.module == "repowise.core.blas_threads", (
-        f"{entry}: first import is {first.module}, not the BLAS pin"
-    )
-    assert isinstance(second, ast.Expr) and isinstance(second.value, ast.Call), (
-        f"{entry}: expected limit_blas_threads() to be called immediately"
-    )
+    assert isinstance(
+        first, ast.ImportFrom
+    ), f"{entry}: expected the BLAS import first, got {ast.dump(first)[:80]}"
+    assert (
+        first.module == "repowise.core.blas_threads"
+    ), f"{entry}: first import is {first.module}, not the BLAS pin"
+    assert isinstance(second, ast.Expr) and isinstance(
+        second.value, ast.Call
+    ), f"{entry}: expected limit_blas_threads() to be called immediately"
     assert second.value.func.id == "limit_blas_threads"  # type: ignore[attr-defined]

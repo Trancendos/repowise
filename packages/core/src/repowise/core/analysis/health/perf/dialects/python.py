@@ -60,9 +60,7 @@ PY_SUBPROC_METHODS: frozenset[str] = frozenset(
 # ``glob``) are deliberately absent. A stat in a loop is cheap and usually
 # correct, so flagging it is the obvious false-positive class — the same call
 # the C++ dialect makes when it excludes buffered stdio.
-PY_FS_METHODS: frozenset[str] = frozenset(
-    {"read_text", "read_bytes", "write_text", "write_bytes"}
-)
+PY_FS_METHODS: frozenset[str] = frozenset({"read_text", "read_bytes", "write_text", "write_bytes"})
 # ``os`` and ``shutil`` verbs, gated on the literal module root the way
 # ``subprocess`` is. ``os`` is far too broad to classify wholesale (``os.environ``
 # / ``os.getpid`` / ``os.path.join`` are not I/O), so it never goes through

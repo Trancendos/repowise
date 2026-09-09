@@ -32,7 +32,12 @@ def _file_info(rel: str, abs_path: str, language: str) -> FileInfo:
 def _build_parsed(repo: Path) -> dict[str, ParsedFile]:
     parser = ASTParser()
     out: dict[str, ParsedFile] = {}
-    for src in list(repo.rglob("*.cc")) + list(repo.rglob("*.cpp")) + list(repo.rglob("*.h")) + list(repo.rglob("*.hpp")):
+    for src in (
+        list(repo.rglob("*.cc"))
+        + list(repo.rglob("*.cpp"))
+        + list(repo.rglob("*.h"))
+        + list(repo.rglob("*.hpp"))
+    ):
         rel = src.resolve().relative_to(repo.resolve()).as_posix()
         fi = _file_info(rel, str(src.resolve()), "cpp")
         out[rel] = parser.parse_file(fi, src.read_bytes())
@@ -45,9 +50,7 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 def _graph_with_nodes(parsed: dict[str, ParsedFile]) -> nx.DiGraph:
@@ -82,9 +85,7 @@ class TestGoogleTestFixtureEdges:
             "template <class T> class MyTyped : public ::testing::Test {};\n"
         )
         (tmp_path / "typed_test.cc").write_text(
-            "#include <gtest/gtest.h>\n"
-            '#include "ty_fix.h"\n'
-            "TYPED_TEST(MyTyped, RunsIt) {}\n"
+            "#include <gtest/gtest.h>\n" '#include "ty_fix.h"\n' "TYPED_TEST(MyTyped, RunsIt) {}\n"
         )
         parsed = _build_parsed(tmp_path)
         graph = _graph_with_nodes(parsed)
@@ -94,8 +95,7 @@ class TestGoogleTestFixtureEdges:
 
     def test_plain_test_marks_entry_no_fixture_edge(self, tmp_path: Path) -> None:
         (tmp_path / "plain_test.cc").write_text(
-            "#include <gtest/gtest.h>\n"
-            "TEST(Suite, ExampleCase) { EXPECT_EQ(1, 1); }\n"
+            "#include <gtest/gtest.h>\n" "TEST(Suite, ExampleCase) { EXPECT_EQ(1, 1); }\n"
         )
         parsed = _build_parsed(tmp_path)
         graph = _graph_with_nodes(parsed)
@@ -166,9 +166,7 @@ class TestBenchmarkAndFuzzer:
 
 class TestNonTestFilesUnaffected:
     def test_plain_cpp_not_marked(self, tmp_path: Path) -> None:
-        (tmp_path / "lib.cc").write_text(
-            "int add(int a, int b) { return a + b; }\n"
-        )
+        (tmp_path / "lib.cc").write_text("int add(int a, int b) { return a + b; }\n")
         parsed = _build_parsed(tmp_path)
         graph = _graph_with_nodes(parsed)
         ctx = _ctx(tmp_path, parsed)

@@ -79,9 +79,7 @@ async def _build_repo_engine(repo_path: Path):
     from repowise.core.persistence.database import get_session
 
     async with get_session(sf) as session:
-        repo = await upsert_repository(
-            session, name=repo_path.name, local_path=str(repo_path)
-        )
+        repo = await upsert_repository(session, name=repo_path.name, local_path=str(repo_path))
         await session.commit()
     fts = FullTextSearch(engine)
     await fts.ensure_index()
@@ -129,9 +127,7 @@ async def workspace_app(tmp_path, app):
 # ---------------------------------------------------------------------------
 
 
-async def test_list_repos_includes_unindexed_workspace_entries(
-    workspace_app, client: AsyncClient
-):
+async def test_list_repos_includes_unindexed_workspace_entries(workspace_app, client: AsyncClient):
     """Frontend pulled /api/repos and used to silently drop unindexed
     workspace repos. Now they must appear as ``ws:<alias>`` synthetic
     rows with status="needs_index"."""
@@ -231,9 +227,7 @@ async def test_workspace_sync_endpoint_indexes_unindexed(
     # repo_id we generated in the fixture.
     db_path = ws_root / "backend" / ".repowise" / "wiki.db"
     conn = sqlite3.connect(str(db_path))
-    conn.execute(
-        "CREATE TABLE repositories (id TEXT PRIMARY KEY, name TEXT, local_path TEXT)"
-    )
+    conn.execute("CREATE TABLE repositories (id TEXT PRIMARY KEY, name TEXT, local_path TEXT)")
     conn.execute(
         "INSERT INTO repositories(id, name, local_path) VALUES (?, ?, ?)",
         (repo_id, "backend", str(ws_root / "backend")),

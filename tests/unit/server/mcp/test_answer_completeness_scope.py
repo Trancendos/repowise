@@ -152,12 +152,12 @@ async def test_exclusivity_claim_over_truncated_body_fires(setup_mcp, monkeypatc
         "exclusivity claim over a truncated symbol body, but got 'high'."
     )
     note = result.get("note", "")
-    assert "truncated" in note.lower(), (
-        f"Expected the note to name the truncation doubt, got: {note!r}"
-    )
-    assert "may not cover" in note.lower() or "other functions" in note.lower(), (
-        f"Expected the note to describe the completeness axis of doubt, got: {note!r}"
-    )
+    assert (
+        "truncated" in note.lower()
+    ), f"Expected the note to name the truncation doubt, got: {note!r}"
+    assert (
+        "may not cover" in note.lower() or "other functions" in note.lower()
+    ), f"Expected the note to describe the completeness axis of doubt, got: {note!r}"
 
 
 @pytest.mark.asyncio

@@ -36,8 +36,7 @@ def _reference_has_paired_test_file(rel_path: str, all_paths: set[str]) -> bool:
         f"{stem}_test.go",
     }
     return any(
-        any(other.endswith("/" + c) or other == c for c in candidates)
-        for other in all_paths
+        any(other.endswith("/" + c) or other == c for c in candidates) for other in all_paths
     )
 
 

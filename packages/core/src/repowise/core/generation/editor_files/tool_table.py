@@ -109,8 +109,7 @@ TOOL_TABLE_ROWS: dict[str, tuple[str, str]] = {
     ),
     "get_overview": (
         "get_overview()",
-        "Architecture map. Call once, first, in an unfamiliar repo; skip it after "
-        "that.",
+        "Architecture map. Call once, first, in an unfamiliar repo; skip it after " "that.",
     ),
 }
 

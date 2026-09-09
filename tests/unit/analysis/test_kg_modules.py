@@ -84,9 +84,7 @@ class TestInvariants:
     def test_never_merges_across_layers(self):
         layers, id_to_path = _monorepo()
         modules = _derive(layers, id_to_path)
-        layer_of = {
-            nid: layer["id"] for layer in layers for nid in layer["nodeIds"]
-        }
+        layer_of = {nid: layer["id"] for layer in layers for nid in layer["nodeIds"]}
         for m in modules:
             assert {layer_of[nid] for nid in m["nodeIds"]} == {m["layerId"]}
 
@@ -95,8 +93,7 @@ class TestInvariants:
         a = json.dumps(_derive(layers, id_to_path), sort_keys=True)
         # Re-derive from shuffled inputs: dict/list order must not leak.
         shuffled_layers = [
-            {**layer, "nodeIds": list(reversed(layer["nodeIds"]))}
-            for layer in layers
+            {**layer, "nodeIds": list(reversed(layer["nodeIds"]))} for layer in layers
         ]
         shuffled_map = dict(reversed(list(id_to_path.items())))
         b = json.dumps(_derive(shuffled_layers, shuffled_map), sort_keys=True)
@@ -156,9 +153,7 @@ class TestGranularity:
             + [f"pkg/sub2/f{i}.py" for i in range(10)]
             + [f"pkg/r{i}.py" for i in range(6)]
         )
-        modules = _derive(
-            [_layer("Application", paths)], _id_map(paths), target_max=12
-        )
+        modules = _derive([_layer("Application", paths)], _id_map(paths), target_max=12)
         names = {m["name"] for m in modules}
         assert "Application (top-level)" in names
         assert {"sub1", "sub2"} <= names
@@ -194,7 +189,10 @@ class TestNaming:
         layers, id_to_path = _monorepo()
         names = [m["name"] for m in _derive(layers, id_to_path)]
         assert len(names) == len(set(names))
-        assert not any(n.rstrip().endswith(")") and "(" in n and n.split("(")[-1].rstrip(") ").isdigit() for n in names)
+        assert not any(
+            n.rstrip().endswith(")") and "(" in n and n.split("(")[-1].rstrip(") ").isdigit()
+            for n in names
+        )
 
     def test_collision_extends_path_leftward(self):
         paths = (
@@ -220,8 +218,7 @@ class TestNaming:
     def test_dominant_language_tag(self):
         layers, id_to_path = _monorepo()
         lang_by_id = {
-            nid: ("typescript" if p.endswith(".tsx") else "python")
-            for nid, p in id_to_path.items()
+            nid: ("typescript" if p.endswith(".tsx") else "python") for nid, p in id_to_path.items()
         }
         modules = _derive(layers, id_to_path, lang_by_id=lang_by_id)
         by_name = {m["name"]: m for m in modules}
@@ -282,9 +279,7 @@ def _curated_repo():
     tests = {f"tests/unit/test_{i}.py" for i in range(30)}
     paths += sorted(tests)
     code = [p for p in paths if p not in tests]
-    edges = [
-        (code[i], code[i + step]) for step in (1, 2, 3) for i in range(len(code) - step)
-    ]
+    edges = [(code[i], code[i + step]) for step in (1, 2, 3) for i in range(len(code) - step)]
     return build_repo(paths, tests=tests, edges=edges)
 
 

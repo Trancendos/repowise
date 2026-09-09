@@ -349,9 +349,9 @@ class TestInitYesFlag:
             ),
         ):
             runner.invoke(cli, ["init", "-y", str(tmp_path)])
-            assert not mode_select_called, (
-                "-y must bypass the interactive mode-selection menu even on a TTY"
-            )
+            assert (
+                not mode_select_called
+            ), "-y must bypass the interactive mode-selection menu even on a TTY"
 
 
 class TestBuildFilteredChangedPaths:

@@ -32,9 +32,7 @@ async def session(async_session):
 
 async def _new_repo(session, name: str) -> str:
     repo_id = uuid.uuid4().hex[:32]
-    session.add(
-        Repository(id=repo_id, name=name, local_path=f"/tmp/{name}", url="")
-    )
+    session.add(Repository(id=repo_id, name=name, local_path=f"/tmp/{name}", url=""))
     await session.flush()
     return repo_id
 
@@ -85,9 +83,7 @@ async def _ids(session, repo_id: str) -> set[str]:
 
 
 @pytest.mark.asyncio
-async def test_a_row_whose_coverage_moved_to_a_new_page_is_retired(
-    session, repo_id
-):
+async def test_a_row_whose_coverage_moved_to_a_new_page_is_retired(session, repo_id):
     """The bug: the same page under a new id, with the old row left behind."""
     members = ["src/a.py", "src/b.py"]
     await _add(session, repo_id, "module_page:src/old", "module_page", members)
@@ -135,9 +131,7 @@ async def test_a_page_whose_generation_failed_is_not_deleted(session, repo_id):
 @pytest.mark.asyncio
 async def test_partial_overlap_does_not_retire_a_row(session, repo_id):
     """Supersession means *all* of it, not some of it."""
-    await _add(
-        session, repo_id, "module_page:src/old", "module_page", ["src/a.py", "src/b.py"]
-    )
+    await _add(session, repo_id, "module_page:src/old", "module_page", ["src/a.py", "src/b.py"])
     swept = await sweep_superseded_generated_pages(
         session,
         repo_id,

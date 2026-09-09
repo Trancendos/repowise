@@ -29,8 +29,7 @@ if TYPE_CHECKING:
 
 
 _ANDROID_NAME_RE = re.compile(r"android:name=\"([\w.$]+)\"")
-_ANDROID_COMPONENT_TAGS = ("<activity", "<service", "<receiver",
-                           "<provider", "<application")
+_ANDROID_COMPONENT_TAGS = ("<activity", "<service", "<receiver", "<provider", "<application")
 
 
 def _has_android_manifests(parsed_files: dict[str, Any]) -> bool:

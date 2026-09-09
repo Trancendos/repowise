@@ -28,27 +28,29 @@ from __future__ import annotations
 
 # Method names reserved by COM / IUnknown / IDispatch. Case-sensitive —
 # Windows COM uses PascalCase universally.
-_COM_CONTRACT_METHOD_NAMES: frozenset[str] = frozenset({
-    # IUnknown
-    "QueryInterface",
-    "AddRef",
-    "Release",
-    # IDispatch
-    "GetTypeInfoCount",
-    "GetTypeInfo",
-    "GetIDsOfNames",
-    "Invoke",
-    # IClassFactory
-    "CreateInstance",
-    "LockServer",
-    # IMarshal (rarely user-implemented but same rationale)
-    "GetUnmarshalClass",
-    "GetMarshalSizeMax",
-    "MarshalInterface",
-    "UnmarshalInterface",
-    "ReleaseMarshalData",
-    "DisconnectObject",
-})
+_COM_CONTRACT_METHOD_NAMES: frozenset[str] = frozenset(
+    {
+        # IUnknown
+        "QueryInterface",
+        "AddRef",
+        "Release",
+        # IDispatch
+        "GetTypeInfoCount",
+        "GetTypeInfo",
+        "GetIDsOfNames",
+        "Invoke",
+        # IClassFactory
+        "CreateInstance",
+        "LockServer",
+        # IMarshal (rarely user-implemented but same rationale)
+        "GetUnmarshalClass",
+        "GetMarshalSizeMax",
+        "MarshalInterface",
+        "UnmarshalInterface",
+        "ReleaseMarshalData",
+        "DisconnectObject",
+    }
+)
 
 
 # Languages where COM contract names are load-bearing. C++ / C# are the
@@ -65,35 +67,37 @@ _COM_LANGUAGES: frozenset[str] = frozenset({"cpp", "c", "csharp", "rust"})
 # language-emitted runtime helpers — never via a static call edge the
 # graph can observe. A live class with no other inbound edges should not
 # read as dead simply because it overrode ``equals`` and ``hashCode``.
-_JVM_CONTRACT_METHOD_NAMES: frozenset[str] = frozenset({
-    # java.lang.Object overrides
-    "equals",
-    "hashCode",
-    "toString",
-    "clone",
-    "finalize",
-    # java.lang.Comparable / Comparator
-    "compareTo",
-    "compare",
-    # java.io.Serializable / Externalizable
-    "readObject",
-    "writeObject",
-    "readObjectNoData",
-    "readResolve",
-    "writeReplace",
-    "readExternal",
-    "writeExternal",
-    # Lombok-generated equality helper
-    "canEqual",
-    # Kotlin data-class synthesised members (also valid as a Java record
-    # accessor pattern when the name happens to collide)
-    "copy",
-    # Enum-class static helpers emitted by ``javac`` / Kotlin
-    "values",
-    "valueOf",
-    # ``componentN()`` accessors emitted by Kotlin data classes — names
-    # are ``component1`` .. ``component22``. Listed individually below.
-})
+_JVM_CONTRACT_METHOD_NAMES: frozenset[str] = frozenset(
+    {
+        # java.lang.Object overrides
+        "equals",
+        "hashCode",
+        "toString",
+        "clone",
+        "finalize",
+        # java.lang.Comparable / Comparator
+        "compareTo",
+        "compare",
+        # java.io.Serializable / Externalizable
+        "readObject",
+        "writeObject",
+        "readObjectNoData",
+        "readResolve",
+        "writeReplace",
+        "readExternal",
+        "writeExternal",
+        # Lombok-generated equality helper
+        "canEqual",
+        # Kotlin data-class synthesised members (also valid as a Java record
+        # accessor pattern when the name happens to collide)
+        "copy",
+        # Enum-class static helpers emitted by ``javac`` / Kotlin
+        "values",
+        "valueOf",
+        # ``componentN()`` accessors emitted by Kotlin data classes — names
+        # are ``component1`` .. ``component22``. Listed individually below.
+    }
+)
 
 # Kotlin data-class ``componentN`` accessors — ``component1`` through
 # ``component22`` is the practical ceiling (Kotlin stdlib's ``Tuple``
@@ -119,63 +123,108 @@ _JVM_LANGUAGES: frozenset[str] = frozenset({"java", "kotlin"})
 # matches constructors and destructors by symbol *kind* rather than by
 # name, because the parser emits the bare class name for constructors
 # and ``~ClassName`` for destructors.
-_CPP_CONTRACT_METHOD_NAMES: frozenset[str] = frozenset({
-    # ---- Comparison & arithmetic operator overloads -----------------
-    "operator=",
-    "operator==", "operator!=",
-    "operator<", "operator<=", "operator>", "operator>=", "operator<=>",
-    "operator+", "operator-", "operator*", "operator/", "operator%",
-    "operator&", "operator|", "operator^", "operator~",
-    "operator!", "operator&&", "operator||",
-    "operator++", "operator--",
-    "operator+=", "operator-=", "operator*=", "operator/=", "operator%=",
-    "operator&=", "operator|=", "operator^=",
-    "operator<<", "operator>>", "operator<<=", "operator>>=",
-    "operator,",
-    # ---- Indexing / call / member-access operators ------------------
-    "operator[]",
-    "operator()",
-    "operator->",
-    "operator->*",
-    "operator*",                 # also dereference; deduped by set  # noqa: B033
-    # ---- Allocation operators (overloaded new/delete) ---------------
-    "operator new",
-    "operator new[]",
-    "operator delete",
-    "operator delete[]",
-    # ---- Conversion operators (typed by the parser as operator T) ----
-    "operator bool",
-    "operator int",
-    "operator double",
-    "operator float",
-    # ---- STL container / iteration customization points -------------
-    "begin", "end",
-    "cbegin", "cend",
-    "rbegin", "rend",
-    "crbegin", "crend",
-    "size", "max_size", "empty",
-    "data", "swap",
-    "hash_value",
-    "to_string",
-    # ---- Hash specialization customization (called via std::hash) ----
-    # ``operator()`` already covered above.
-    # ---- Coroutine customization points -----------------------------
-    "await_ready", "await_suspend", "await_resume",
-    "promise_type",
-    "get_return_object",
-    "initial_suspend", "final_suspend",
-    "return_void", "return_value",
-    "unhandled_exception",
-    "yield_value",
-    # ---- std::format / std::print customization ---------------------
-    "format", "format_to", "parse",
-    # ---- std::error_code / std::error_category interface ------------
-    "message", "name", "default_error_condition",
-    # ---- Standard library tag / trait override methods --------------
-    "value_type", "key_type", "mapped_type",
-    "iterator", "const_iterator",
-    "reference", "const_reference",
-})
+_CPP_CONTRACT_METHOD_NAMES: frozenset[str] = frozenset(
+    {
+        # ---- Comparison & arithmetic operator overloads -----------------
+        "operator=",
+        "operator==",
+        "operator!=",
+        "operator<",
+        "operator<=",
+        "operator>",
+        "operator>=",
+        "operator<=>",
+        "operator+",
+        "operator-",
+        "operator*",
+        "operator/",
+        "operator%",
+        "operator&",
+        "operator|",
+        "operator^",
+        "operator~",
+        "operator!",
+        "operator&&",
+        "operator||",
+        "operator++",
+        "operator--",
+        "operator+=",
+        "operator-=",
+        "operator*=",
+        "operator/=",
+        "operator%=",
+        "operator&=",
+        "operator|=",
+        "operator^=",
+        "operator<<",
+        "operator>>",
+        "operator<<=",
+        "operator>>=",
+        "operator,",
+        # ---- Indexing / call / member-access operators ------------------
+        "operator[]",
+        "operator()",
+        "operator->",
+        "operator->*",
+        "operator*",  # also dereference; deduped by set  # noqa: B033
+        # ---- Allocation operators (overloaded new/delete) ---------------
+        "operator new",
+        "operator new[]",
+        "operator delete",
+        "operator delete[]",
+        # ---- Conversion operators (typed by the parser as operator T) ----
+        "operator bool",
+        "operator int",
+        "operator double",
+        "operator float",
+        # ---- STL container / iteration customization points -------------
+        "begin",
+        "end",
+        "cbegin",
+        "cend",
+        "rbegin",
+        "rend",
+        "crbegin",
+        "crend",
+        "size",
+        "max_size",
+        "empty",
+        "data",
+        "swap",
+        "hash_value",
+        "to_string",
+        # ---- Hash specialization customization (called via std::hash) ----
+        # ``operator()`` already covered above.
+        # ---- Coroutine customization points -----------------------------
+        "await_ready",
+        "await_suspend",
+        "await_resume",
+        "promise_type",
+        "get_return_object",
+        "initial_suspend",
+        "final_suspend",
+        "return_void",
+        "return_value",
+        "unhandled_exception",
+        "yield_value",
+        # ---- std::format / std::print customization ---------------------
+        "format",
+        "format_to",
+        "parse",
+        # ---- std::error_code / std::error_category interface ------------
+        "message",
+        "name",
+        "default_error_condition",
+        # ---- Standard library tag / trait override methods --------------
+        "value_type",
+        "key_type",
+        "mapped_type",
+        "iterator",
+        "const_iterator",
+        "reference",
+        "const_reference",
+    }
+)
 
 
 _CPP_LANGUAGES: frozenset[str] = frozenset({"cpp", "c"})

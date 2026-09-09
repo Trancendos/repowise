@@ -149,9 +149,7 @@ class TestSingleRepoTrigger:
             calls.append(kwargs)
             done.set()
 
-        monkeypatch.setattr(
-            "repowise.cli.commands.update_cmd.command.run_update", fake_run_update
-        )
+        monkeypatch.setattr("repowise.cli.commands.update_cmd.command.run_update", fake_run_update)
         monkeypatch.setattr(watch_cmd, "ensure_repowise_dir", lambda _p: None)
 
         started = threading.Event()
@@ -200,9 +198,7 @@ class TestSingleRepoTrigger:
         assert calls[0]["path"] == str(tmp_path)
         assert calls[0]["index_only"] is False
 
-    def test_index_only_is_passed_through(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path
-    ) -> None:
+    def test_index_only_is_passed_through(self, monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
         calls = self._fire(monkeypatch, tmp_path, index_only=True)
 
         assert calls[0]["index_only"] is True

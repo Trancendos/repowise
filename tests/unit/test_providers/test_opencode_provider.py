@@ -161,9 +161,7 @@ def test_custom_model_is_normalized(monkeypatch, tmp_path):
     monkeypatch.setattr("shutil.which", lambda _cmd: "opencode")
 
     assert (
-        OpenCodeProvider(
-            model="opencode/deepseek/deepseek-v4-pro", repo_path=tmp_path
-        ).model_name
+        OpenCodeProvider(model="opencode/deepseek/deepseek-v4-pro", repo_path=tmp_path).model_name
         == "opencode/deepseek/deepseek-v4-pro"
     )
     assert (
@@ -204,9 +202,7 @@ async def test_generate_invokes_opencode_with_stdin(monkeypatch, tmp_path):
 
     monkeypatch.setattr("asyncio.create_subprocess_exec", fake_exec)
 
-    provider = OpenCodeProvider(
-        model="opencode/deepseek/deepseek-v4-pro", repo_path=tmp_path
-    )
+    provider = OpenCodeProvider(model="opencode/deepseek/deepseek-v4-pro", repo_path=tmp_path)
     result = await provider.generate("system rules", "user context")
 
     assert isinstance(result, GeneratedResponse)
@@ -220,9 +216,7 @@ async def test_generate_invokes_opencode_with_stdin(monkeypatch, tmp_path):
     assert "--dangerously-skip-permissions" not in args
     assert args[args.index("--dir") + 1] == str(tmp_path.resolve())
     assert args[args.index("--model") + 1] == "deepseek/deepseek-v4-pro"
-    assert re.fullmatch(
-        r"repowise_auto_[0-9a-f]{32}", args[args.index("--title") + 1]
-    )
+    assert re.fullmatch(r"repowise_auto_[0-9a-f]{32}", args[args.index("--title") + 1])
     assert captured["kwargs"]["stdin"] == asyncio.subprocess.PIPE
     env = captured["kwargs"].get("env", {})
     assert "OPENCODE_CONFIG_CONTENT" in env

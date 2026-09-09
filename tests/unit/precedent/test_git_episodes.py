@@ -318,7 +318,9 @@ def test_only_the_indexing_paths_opt_in() -> None:
 
     assert inspect.signature(GitIndexer.__init__).parameters["record_episodes"].default is False
 
-    roots = [_Path(__file__).resolve().parents[3] / "packages" / p for p in ("cli", "core", "server")]
+    roots = [
+        _Path(__file__).resolve().parents[3] / "packages" / p for p in ("cli", "core", "server")
+    ]
     found = {
         path.as_posix().split("/src/")[-1]
         for root in roots

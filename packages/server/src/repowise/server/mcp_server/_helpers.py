@@ -65,6 +65,7 @@ def vector_search_timeout_s() -> float:
         return _VECTOR_TIMEOUT_DEFAULT_S
     return min(seconds, _VECTOR_TIMEOUT_MAX_S)
 
+
 # Words that mark a string as a natural-language question rather than a path.
 # Keep this small — false positives here send genuine paths to the NL branch,
 # which is harmless (path lookup also runs as a fallback) but slower.

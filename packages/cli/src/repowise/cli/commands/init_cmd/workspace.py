@@ -382,8 +382,7 @@ def _ingest_and_generate_repo(repo: Any, idx: int, total: int, ctx: _WorkspaceCt
         pages_generated = len(generated_pages)
         docs_mode = "deterministic"
         console.print(
-            f"    [{OK}]✓[/] Rendered {len(generated_pages)} pages from structure "
-            "(no model)\n"
+            f"    [{OK}]✓[/] Rendered {len(generated_pages)} pages from structure " "(no model)\n"
         )
 
     if ctx.dry_run:

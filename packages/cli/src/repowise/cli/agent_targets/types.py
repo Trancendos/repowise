@@ -431,9 +431,7 @@ class InstallLifecycle(Protocol):
         """Register user-level client configuration for this agent."""
         ...
 
-    def refresh_project_files(
-        self, console_obj: object, repo_path: Path, options: object
-    ) -> None:
+    def refresh_project_files(self, console_obj: object, repo_path: Path, options: object) -> None:
         """Refresh managed project files after repository content changes."""
         ...
 

@@ -140,9 +140,7 @@ def _read_text(ctx: ResolverContext, rel_path: str) -> str:
     return source_text(rel_path, ctx.repo_path / rel_path, source_map) or ""
 
 
-def _import_path_for_dir(
-    pkg_dir: str, go_modules: tuple[tuple[str, str], ...]
-) -> str | None:
+def _import_path_for_dir(pkg_dir: str, go_modules: tuple[tuple[str, str], ...]) -> str | None:
     """Compute a package's import path from the enclosing module.
 
     *go_modules* is ``((module_dir, module_path), ...)`` sorted longest
@@ -160,7 +158,7 @@ def _import_path_for_dir(
     if best is None:
         return None
     module_dir, mod_path = best
-    suffix = pkg_dir[len(module_dir):].lstrip("/") if module_dir else pkg_dir
+    suffix = pkg_dir[len(module_dir) :].lstrip("/") if module_dir else pkg_dir
     return f"{mod_path}/{suffix}" if suffix else mod_path
 
 

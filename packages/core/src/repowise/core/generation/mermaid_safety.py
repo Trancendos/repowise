@@ -58,9 +58,7 @@ _RAW_ID_CHARS = r"A-Za-z0-9_./\\-"
 # A path/dotted token anywhere (used to also catch bare edge endpoints that
 # never got a shape definition, e.g. ``A --> pkg/foo.py``). Requires at least
 # one ``.``/``/``/``\`` so plain identifiers and ``-`` IDs are left alone.
-_PATHY_TOKEN_RE = re.compile(
-    r"(?<![\w./\\])([A-Za-z0-9_][\w]*(?:[./\\][\w]+)+)"
-)
+_PATHY_TOKEN_RE = re.compile(r"(?<![\w./\\])([A-Za-z0-9_][\w]*(?:[./\\][\w]+)+)")
 
 # Label characters that force quoting.
 _LABEL_NEEDS_QUOTE_RE = re.compile(r"[()\[\]{}\"<>|/]")
@@ -247,15 +245,9 @@ def _quote_labels(body: str) -> str:
                     label = text[i + len(opener) : end]
                     stripped = label.strip()
                     already_quoted = (
-                        len(stripped) >= 2
-                        and stripped[0] == '"'
-                        and stripped[-1] == '"'
+                        len(stripped) >= 2 and stripped[0] == '"' and stripped[-1] == '"'
                     )
-                    if (
-                        stripped
-                        and not already_quoted
-                        and _LABEL_NEEDS_QUOTE_RE.search(label)
-                    ):
+                    if stripped and not already_quoted and _LABEL_NEEDS_QUOTE_RE.search(label):
                         safe = label.replace('"', "&quot;")
                         out.append(opener + '"' + safe + '"' + closer)
                     else:
@@ -268,9 +260,7 @@ def _quote_labels(body: str) -> str:
                 i += 1
         return "".join(out)
 
-    return "\n".join(
-        line if _is_skippable(line) else _process(line) for line in body.split("\n")
-    )
+    return "\n".join(line if _is_skippable(line) else _process(line) for line in body.split("\n"))
 
 
 def _rewrite_ids(body: str, id_map: dict[str, str]) -> str:
@@ -280,9 +270,7 @@ def _rewrite_ids(body: str, id_map: dict[str, str]) -> str:
     patterns = [
         (
             re.compile(
-                r"(?<![" + _RAW_ID_CHARS + r"])"
-                + re.escape(raw)
-                + r"(?![" + _RAW_ID_CHARS + r"])"
+                r"(?<![" + _RAW_ID_CHARS + r"])" + re.escape(raw) + r"(?![" + _RAW_ID_CHARS + r"])"
             ),
             slug,
         )

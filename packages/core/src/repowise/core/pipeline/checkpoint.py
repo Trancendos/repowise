@@ -57,18 +57,14 @@ class _EventKind(enum.Enum):
     STOP = "stop"  # sentinel to shut the consumer down
 
 
-async def find_completed_phases(
-    job_store: JobStore, repository_id: str
-) -> set[str]:
+async def find_completed_phases(job_store: JobStore, repository_id: str) -> set[str]:
     """Return the set of phases already COMPLETED for *repository_id*.
 
     Used by the resume path to skip work that a prior run finished.
     """
     from repowise.core.persistence._interfaces.job_store import JobState
 
-    jobs = await job_store.list_jobs(
-        repository_id=repository_id, state=JobState.COMPLETED
-    )
+    jobs = await job_store.list_jobs(repository_id=repository_id, state=JobState.COMPLETED)
     return {j.phase for j in jobs}
 
 
@@ -159,9 +155,7 @@ class PhaseCheckpointer:
                 elif kind is _EventKind.DONE:
                     job_id = self._job_ids.get(phase)
                     if job_id is not None:
-                        await self._job_store.update_state(
-                            job_id, JobState.COMPLETED
-                        )
+                        await self._job_store.update_state(job_id, JobState.COMPLETED)
             except Exception as exc:  # checkpointing must never break a run
                 logger.warning(
                     "checkpoint_write_failed", phase=phase, kind=kind.value, error=str(exc)

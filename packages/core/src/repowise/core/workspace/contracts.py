@@ -686,9 +686,7 @@ def save_contract_store(store: ContractStore, workspace_root: Path) -> Path:
     out_path = data_dir / CONTRACTS_FILENAME
     # Atomic: the MCP enricher reads these artifacts from a separate
     # process and must never observe a half-written file.
-    atomic_write_text(
-        out_path, json.dumps(store.to_dict(), indent=2, ensure_ascii=False)
-    )
+    atomic_write_text(out_path, json.dumps(store.to_dict(), indent=2, ensure_ascii=False))
     return out_path
 
 
@@ -934,9 +932,7 @@ async def run_contract_extraction(
                 else {}
             )
             found = await asyncio.to_thread(
-                lambda e=extractor, kw=kwargs: e.extract(
-                    repo_path, alias, exclude, files, **kw
-                )
+                lambda e=extractor, kw=kwargs: e.extract(repo_path, alias, exclude, files, **kw)
             )
             for c in found:
                 c.service = assign_service(c.file_path, boundaries)

@@ -126,9 +126,9 @@ def test_docs_generating_update_advances_docs_pointer(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.output
 
     state = _state(repo)
-    assert state.get(DOCS_POINTER_KEY) == new_head, (
-        "a run that generates pages must advance the docs pointer to HEAD"
-    )
+    assert (
+        state.get(DOCS_POINTER_KEY) == new_head
+    ), "a run that generates pages must advance the docs pointer to HEAD"
 
 
 # ---------------------------------------------------------------------------
@@ -162,6 +162,7 @@ def test_stale_prose_is_reachable_after_intervening_index_only_updates(tmp_path:
 
     # Clear lock because atexit doesn't run in CliRunner
     from repowise.cli.commands.update_cmd.command import clear_update_queued, release_update_lock
+
     release_update_lock(repo)
     clear_update_queued(repo)
 
@@ -196,9 +197,9 @@ def test_index_only_diff_base_is_unaffected(tmp_path: Path) -> None:
 
     result = CliRunner().invoke(cli, ["update", str(repo), "--index-only", "--no-workspace"])
     assert result.exit_code == 0, result.output
-    assert "No changed files detected" not in result.output, (
-        "index-only should still detect and index the new commit"
-    )
+    assert (
+        "No changed files detected" not in result.output
+    ), "index-only should still detect and index the new commit"
     assert _state(repo)[SYNC_POINTER_KEY] == new_head
 
 

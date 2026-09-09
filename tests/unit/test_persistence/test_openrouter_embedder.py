@@ -163,11 +163,10 @@ async def test_embed_raises_when_api_returns_wrong_width():
             await emb.embed(["hello"])
 
     msg = str(exc_info.value)
-    assert "3" in msg       # actual width named
-    assert "_DIMS" in msg   # points at the table entry
+    assert "3" in msg  # actual width named
+    assert "_DIMS" in msg  # points at the table entry
 
 
 async def test_embed_width_check_not_triggered_on_empty():
     emb = OpenRouterEmbedder(api_key="k")
     assert await emb.embed([]) == []
-

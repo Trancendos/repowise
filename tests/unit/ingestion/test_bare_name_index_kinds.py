@@ -48,9 +48,7 @@ def _parse_all(tmp_path: Path, files: dict[str, tuple[str, str]]) -> dict[str, P
 
 
 def _edges(parsed: dict[str, ParsedFile], tmp_path: Path) -> list[tuple[str, str, str]]:
-    resolver = CallResolver(
-        parsed, {p: set() for p in parsed}, repo_path=str(tmp_path)
-    )
+    resolver = CallResolver(parsed, {p: set() for p in parsed}, repo_path=str(tmp_path))
     return [
         (rc.caller_id, rc.callee_id, rc.origin)
         for path, pf in parsed.items()
@@ -71,21 +69,15 @@ class TestFieldsAreNotCallable:
                 "model.rs": ("rust", "pub struct Reply {\n    pub ok: bool,\n}\n"),
                 "caller.rs": (
                     "rust",
-                    "pub fn run(v: &str) -> Option<u64> {\n"
-                    "    v.parse::<u64>().ok()\n"
-                    "}\n",
+                    "pub fn run(v: &str) -> Option<u64> {\n" "    v.parse::<u64>().ok()\n" "}\n",
                 ),
             },
         )
         # Guard the premise: `ok` is indexed, and only as a field.
         assert _kinds(parsed, "ok") == {"property"}
-        assert not [
-            e for e in _edges(parsed, tmp_path) if e[1] == "model.rs::ok"
-        ]
+        assert not [e for e in _edges(parsed, tmp_path) if e[1] == "model.rs::ok"]
 
-    def test_a_real_function_still_answers_the_same_bare_name(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_real_function_still_answers_the_same_bare_name(self, tmp_path: Path) -> None:
         """The tier itself is untouched -- only non-callable answers are refused."""
         parsed = _parse_all(
             tmp_path,
@@ -120,9 +112,7 @@ class TestFieldsAreNotCallable:
             },
         )
         assert _kinds(parsed, "emit") == {"property", "function"}
-        assert not [
-            e for e in _edges(parsed, tmp_path) if e[0] == "caller.rs::run"
-        ]
+        assert not [e for e in _edges(parsed, tmp_path) if e[0] == "caller.rs::run"]
 
 
 class TestThePredicateStaysNarrow:

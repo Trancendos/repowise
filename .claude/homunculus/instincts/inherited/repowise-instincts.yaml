@@ -82,7 +82,7 @@ Place code in the appropriate type folder (components/, services/, utils/, etc.)
 ## Evidence
 
 - Type-based module organization detected
-- Folders: 
+- Folders:
 
 ---
 id: repowise-test-separate
@@ -163,4 +163,3 @@ Write unit, integration tests to match project standards
 
 - Test types detected: unit, integration
 - Coverage config: yes
-

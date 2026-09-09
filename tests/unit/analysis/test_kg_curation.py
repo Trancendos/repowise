@@ -232,11 +232,7 @@ def large_repo():
     # A realistic monorepo HAS imports: wire a dense chain so the honest-
     # degradation detector classifies it as flow, not structural.
     code = [p for p in paths if not p.endswith(".yaml") and p not in tests]
-    edges = [
-        (code[i], code[i + step])
-        for step in (1, 2, 3)
-        for i in range(len(code) - step)
-    ]
+    edges = [(code[i], code[i + step]) for step in (1, 2, 3) for i in range(len(code) - step)]
     return build_repo(paths, tests=tests, edges=edges)
 
 
@@ -680,9 +676,7 @@ class TestEntryPointFallback:
 
     def test_code_files_never_typed_infra_by_name(self):
         # A Python module that *parses* Dockerfiles is code, not infra.
-        repo = build_repo(
-            ["core/ingestion/languages/specs/dockerfile.py", "Dockerfile"]
-        )
+        repo = build_repo(["core/ingestion/languages/specs/dockerfile.py", "Dockerfile"])
         kg = _curate(repo, enabled=True)
         by_path = {
             n["filePath"]: n
@@ -919,8 +913,16 @@ class TestClosingStopParity:
         # faces the python suite but names the TypeScript one.
         repo = build_repo(
             [
-                "src/a.py", "src/b.py", "src/c.py", "src/d.py", "src/e.py", "src/f.py",
-                "web/x.ts", "web/y.ts", "web/z.ts", "web/w.ts",
+                "src/a.py",
+                "src/b.py",
+                "src/c.py",
+                "src/d.py",
+                "src/e.py",
+                "src/f.py",
+                "web/x.ts",
+                "web/y.ts",
+                "web/z.ts",
+                "web/w.ts",
                 "tests/conftest.py",
                 "web/__tests__/x.test.ts",
             ],
@@ -1017,7 +1019,9 @@ class TestHonestDegradation:
     def test_structural_anchor_states_the_evidence_and_the_gap(self):
         repo = _edgeless_zig_repo()
         kg = _curate(repo, enabled=True)
-        code_steps = [s for s in kg.tour if s["kind"] == "code" and "test" not in s["reason"].lower()]
+        code_steps = [
+            s for s in kg.tour if s["kind"] == "code" and "test" not in s["reason"].lower()
+        ]
         assert code_steps, kg.tour
         anchor = code_steps[0]
         assert "isn't supported for Zig yet" in anchor["reason"]
@@ -1068,9 +1072,7 @@ class TestHonestDegradation:
         # Density in the sparse band with weak resolution, edges
         # concentrated in m0..m5: the walk's later slots fill with
         # unreached files, whose reasons are under test.
-        edges = [
-            (paths[i], paths[j]) for i in range(6) for j in range(i + 1, 6)
-        ][:12]
+        edges = [(paths[i], paths[j]) for i in range(6) for j in range(i + 1, 6)][:12]
         edges += [(paths[i], f"external:mystery{i}") for i in range(6, 30)]
         repo = build_repo(paths, entries={"src/m0.py"}, edges=edges)
         kg = _curate(repo, enabled=True)
@@ -1194,12 +1196,16 @@ class TestFanoutCollapse:
             g.add_edge("tests/test_x.py", t, edge_type="imports", imported_names=["pkg"])
         # …and one explicit single-target import.
         g.add_edge(
-            "tests/test_x.py", "tests/harness.py",
-            edge_type="imports", imported_names=["Harness"],
+            "tests/test_x.py",
+            "tests/harness.py",
+            edge_type="imports",
+            imported_names=["Harness"],
         )
         g.add_edge(
-            "tests/test_y.py", "tests/harness.py",
-            edge_type="imports", imported_names=["Harness"],
+            "tests/test_y.py",
+            "tests/harness.py",
+            edge_type="imports",
+            imported_names=["Harness"],
         )
         return SimpleNamespace(graph=lambda: g)
 

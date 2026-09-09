@@ -61,9 +61,7 @@ async def _seed(
 
 
 @pytest.mark.asyncio
-async def test_a_terse_record_with_the_rare_word_beats_a_long_one_without_it(
-    session, setup_mcp
-):
+async def test_a_terse_record_with_the_rare_word_beats_a_long_one_without_it(session, setup_mcp):
     """The ruff case, reduced to its shape.
 
     "Never run ruff format" is 48 characters and matches two words of the
@@ -91,7 +89,7 @@ async def test_a_terse_record_with_the_rare_word_beats_a_long_one_without_it(
 
 @pytest.mark.asyncio
 async def test_a_plural_in_the_question_matches_a_singular_record(session, setup_mcp):
-    """"why must issue comments avoid em dashes" is answered by a record that
+    """ "why must issue comments avoid em dashes" is answered by a record that
     writes "comment" and "dashes", and ``comments`` is the word carrying most of
     that question's weight."""
     for n in range(6):
@@ -131,9 +129,7 @@ def test_a_word_in_every_record_still_carries_weight():
 
 
 @pytest.mark.asyncio
-async def test_the_answer_is_found_below_the_old_two_hundred_record_cut(
-    session, setup_mcp
-):
+async def test_the_answer_is_found_below_the_old_two_hundred_record_cut(session, setup_mcp):
     """Search ranked over 200 records against a store of 614.
 
     ``list_decisions`` sorts confirmed-then-confident, so the records below the

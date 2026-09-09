@@ -56,7 +56,11 @@ def test_render_never_references_repowise_repo_paths(gen):
 
     data = dataclasses.replace(_minimal_data(), code_health=_health_block(6.4))
     result = gen.render(data)
-    for repo_relative in ("docs/layers/CODE_HEALTH.md", "docs/agent/MCP_TOOLS.md", "docs/agent/DISTILL.md"):
+    for repo_relative in (
+        "docs/layers/CODE_HEALTH.md",
+        "docs/agent/MCP_TOOLS.md",
+        "docs/agent/DISTILL.md",
+    ):
         assert repo_relative not in result
 
 

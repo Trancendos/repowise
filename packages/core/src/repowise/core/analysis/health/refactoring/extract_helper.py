@@ -331,9 +331,7 @@ class ExtractHelperDetector(RefactoringDetector):
         # same import/parse block reads as "5 sites" when it is really one).
         # Clones are detected within a language, so every occurrence in a block
         # shares ``ctx.language`` — which the ambiguous ``spec/`` rule needs.
-        kept = [
-            o for o in block.occurrences if not _is_skippable_occurrence(o[0], ctx.language)
-        ]
+        kept = [o for o in block.occurrences if not _is_skippable_occurrence(o[0], ctx.language)]
         occurrences = _merge_ranges_per_file(kept)
         if len(occurrences) < 2:
             return None

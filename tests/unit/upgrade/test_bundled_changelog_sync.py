@@ -35,6 +35,6 @@ def test_bundled_changelog_in_sync():
         f"copy {source} -> {_BUNDLED}\n"
         f"  (bash: cp '{source}' '{_BUNDLED}'  |  PowerShell: Copy-Item '{source}' '{_BUNDLED}')"
     )
-    assert _BUNDLED.read_text(encoding="utf-8") == source.read_text(encoding="utf-8"), (
-        f"bundled changelog is stale; resync with:\n  {resync}"
-    )
+    assert _BUNDLED.read_text(encoding="utf-8") == source.read_text(
+        encoding="utf-8"
+    ), f"bundled changelog is stale; resync with:\n  {resync}"

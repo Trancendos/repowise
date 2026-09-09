@@ -46,9 +46,7 @@ def _finding(
 
 
 def _analyzer(repo: Path, skipped: list[tuple[str, str]]) -> DeadCodeAnalyzer:
-    return DeadCodeAnalyzer(
-        nx.DiGraph(), repo_root=repo, unindexed_source_files=skipped
-    )
+    return DeadCodeAnalyzer(nx.DiGraph(), repo_root=repo, unindexed_source_files=skipped)
 
 
 @pytest.fixture

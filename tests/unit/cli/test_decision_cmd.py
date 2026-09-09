@@ -75,15 +75,24 @@ def test_decision_add_records_without_prompting(indexed_repo: Path) -> None:
     result = CliRunner().invoke(
         cli,
         [
-            "decision", "add",
-            "--title", "Escape LIKE patterns",
-            "--decision", "Escape % and _ before interpolating",
-            "--rationale", "an unescaped pattern scans the table",
-            "--alternative", "match in Python",
-            "--consequence", "one more helper on the query path",
-            "--affects", "src/db/models.py",
-            "--tag", "database",
-            "--format", "json",
+            "decision",
+            "add",
+            "--title",
+            "Escape LIKE patterns",
+            "--decision",
+            "Escape % and _ before interpolating",
+            "--rationale",
+            "an unescaped pattern scans the table",
+            "--alternative",
+            "match in Python",
+            "--consequence",
+            "one more helper on the query path",
+            "--affects",
+            "src/db/models.py",
+            "--tag",
+            "database",
+            "--format",
+            "json",
             str(indexed_repo),
         ],
         input="",
@@ -116,10 +125,14 @@ def test_a_flag_driven_decision_lands_proposed(indexed_repo: Path) -> None:
     result = CliRunner().invoke(
         cli,
         [
-            "decision", "add",
-            "--title", "Prefer ruff check",
-            "--decision", "Run ruff check, never ruff format",
-            "--format", "json",
+            "decision",
+            "add",
+            "--title",
+            "Prefer ruff check",
+            "--decision",
+            "Run ruff check, never ruff format",
+            "--format",
+            "json",
             str(indexed_repo),
         ],
         input="",
@@ -132,14 +145,10 @@ def test_a_flag_driven_decision_lands_proposed(indexed_repo: Path) -> None:
 def test_decision_add_prompts_record_active(indexed_repo: Path) -> None:
     """The interactive path is unchanged, including the status it writes."""
     answers = "Interactive title\ncontext\nthe decision\nwhy\n\n\n\n\n"
-    result = CliRunner().invoke(
-        cli, ["decision", "add", str(indexed_repo)], input=answers
-    )
+    result = CliRunner().invoke(cli, ["decision", "add", str(indexed_repo)], input=answers)
 
     assert result.exit_code == 0, result.output
-    listed = CliRunner().invoke(
-        cli, ["decision", "list", str(indexed_repo), "--format", "json"]
-    )
+    listed = CliRunner().invoke(cli, ["decision", "list", str(indexed_repo), "--format", "json"])
     records = json.loads(listed.output)["decisions"]
     assert [d["status"] for d in records if d["title"] == "Interactive title"] == ["active"]
 

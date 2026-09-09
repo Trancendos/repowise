@@ -172,9 +172,7 @@ class TestModulePages:
             _make_page("file_page", "src/store/db.py"),
         ]
 
-        attach_related_pages(
-            pages, import_edges=[("src/ingest/a.py", "src/store/db.py")]
-        )
+        attach_related_pages(pages, import_edges=[("src/ingest/a.py", "src/store/db.py")])
 
         ingest = _related(pages[0])
         assert [(r["target_page_id"], r["reason"]) for r in ingest] == [
@@ -225,9 +223,7 @@ class TestModulePages:
             ],
         )
 
-        assert [r["target_page_id"] for r in _related(pages[0])] == [
-            "module_page:src/store"
-        ]
+        assert [r["target_page_id"] for r in _related(pages[0])] == ["module_page:src/store"]
 
     def test_same_module_is_never_a_reason_for_a_module(self):
         """It *is* the module; the reason is meaningless at this scale."""
@@ -306,9 +302,7 @@ class TestModulePages:
 
         assert _related(pages[0]) == []
         # The children still see each other; only the chapter filters them out.
-        assert [r["target_page_id"] for r in _related(pages[1])] == [
-            "module_page:src/ingest/graph"
-        ]
+        assert [r["target_page_id"] for r in _related(pages[1])] == ["module_page:src/ingest/graph"]
 
     def test_a_chapter_that_owns_files_keeps_its_own_edges(self):
         """It has real evidence, so it is not given its subtree's second-hand set."""
@@ -327,9 +321,7 @@ class TestModulePages:
             ],
         )
 
-        assert [r["target_page_id"] for r in _related(pages[0])] == [
-            "module_page:src/store"
-        ]
+        assert [r["target_page_id"] for r in _related(pages[0])] == ["module_page:src/store"]
 
     def test_prose_links_still_win(self):
         """Related fills the gaps left by prose, and never duplicates one."""
@@ -341,9 +333,7 @@ class TestModulePages:
             {"anchor": "src/store", "target_page_id": "module_page:src/store", "kind": "file"}
         ]
 
-        attach_related_pages(
-            pages, import_edges=[("src/ingest/a.py", "src/store/db.py")]
-        )
+        attach_related_pages(pages, import_edges=[("src/ingest/a.py", "src/store/db.py")])
 
         assert _related(pages[0]) == []
 

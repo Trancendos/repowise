@@ -133,10 +133,14 @@ async def test_file_the_index_has_never_seen_still_scores_stale(session):
 async def test_existing_rows_have_their_module_scope_re_derived(session):
     import json
 
-    rec = await _add_decision(session, files=["packages/core/src/pipeline/persist.py"], staleness=0.0)
+    rec = await _add_decision(
+        session, files=["packages/core/src/pipeline/persist.py"], staleness=0.0
+    )
     rec.affected_modules_json = json.dumps(["packages"])  # the pre-change shape
     await session.flush()
-    await _add_git_metadata(session, "packages/core/src/pipeline/persist.py", days_ago=60, commits=1)
+    await _add_git_metadata(
+        session, "packages/core/src/pipeline/persist.py", days_ago=60, commits=1
+    )
 
     await recompute_decision_staleness(session, _REPO_ID, {})
 
