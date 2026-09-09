@@ -20,8 +20,7 @@ def _kg(
     entry_points: list[str] | None = None,
 ) -> dict:
     nodes = [
-        {"id": f"file:{p}", "type": "file", "filePath": p, "language": lang}
-        for p, lang in files
+        {"id": f"file:{p}", "type": "file", "filePath": p, "language": lang} for p, lang in files
     ]
     edges = [
         {
@@ -131,9 +130,7 @@ class TestSmells:
         assert "edgeless_graph" in codes
 
     def test_edgeless_graph_ok_for_none_support(self) -> None:
-        kg = _kg(
-            files=[(f"f{i}.ex", "elixir") for i in range(10)], tour=self._clean_tour()
-        )
+        kg = _kg(files=[(f"f{i}.ex", "elixir") for i in range(10)], tour=self._clean_tour())
         codes = {s.code for s in run_smells(kg, compute_stats(kg, SUPPORT))}
         assert "edgeless_graph" not in codes
 
@@ -163,16 +160,17 @@ class TestSmells:
         )
         stats = compute_stats(kg, SUPPORT)
         baseline = {"stats": {"by_language": {"go": {"edges_per_file": 1.1}}}}
-        assert not any(
-            s.code == "density_regression" for s in run_smells(kg, stats, baseline)
-        )
+        assert not any(s.code == "density_regression" for s in run_smells(kg, stats, baseline))
 
     def test_catchall_layer_warns(self) -> None:
         layers = [
-            {"id": "layer:app", "name": "Application", "display_order": 0,
-             "nodeIds": [f"file:f{i}.py" for i in range(9)]},
-            {"id": "layer:test", "name": "Test", "display_order": 1,
-             "nodeIds": ["file:t.py"]},
+            {
+                "id": "layer:app",
+                "name": "Application",
+                "display_order": 0,
+                "nodeIds": [f"file:f{i}.py" for i in range(9)],
+            },
+            {"id": "layer:test", "name": "Test", "display_order": 1, "nodeIds": ["file:t.py"]},
         ]
         kg = _kg(
             files=[(f"f{i}.py", "python") for i in range(9)] + [("t.py", "python")],
@@ -213,10 +211,13 @@ class TestSmells:
     def test_catchall_layer_fails_above_95_when_big_enough(self) -> None:
         n = 40
         layers = [
-            {"id": "layer:app", "name": "Application", "display_order": 0,
-             "nodeIds": [f"file:f{i}.py" for i in range(n - 1)]},
-            {"id": "layer:test", "name": "Test", "display_order": 1,
-             "nodeIds": ["file:t.py"]},
+            {
+                "id": "layer:app",
+                "name": "Application",
+                "display_order": 0,
+                "nodeIds": [f"file:f{i}.py" for i in range(n - 1)],
+            },
+            {"id": "layer:test", "name": "Test", "display_order": 1, "nodeIds": ["file:t.py"]},
         ]
         kg = _kg(
             files=[(f"f{i}.py", "python") for i in range(n - 1)] + [("t.py", "python")],
@@ -231,10 +232,13 @@ class TestSmells:
     def test_catchall_layer_stays_warn_below_size_gate(self) -> None:
         # 96% catch-all but only 10 code files — tiny flat repos are honest.
         layers = [
-            {"id": "layer:app", "name": "Application", "display_order": 0,
-             "nodeIds": [f"file:f{i}.py" for i in range(24)]},
-            {"id": "layer:test", "name": "Test", "display_order": 1,
-             "nodeIds": ["file:t.py"]},
+            {
+                "id": "layer:app",
+                "name": "Application",
+                "display_order": 0,
+                "nodeIds": [f"file:f{i}.py" for i in range(24)],
+            },
+            {"id": "layer:test", "name": "Test", "display_order": 1, "nodeIds": ["file:t.py"]},
         ]
         kg = _kg(
             files=[(f"f{i}.py", "python") for i in range(9)] + [("t.py", "python")],
@@ -281,13 +285,21 @@ class TestModuleSmells:
         app_files = [(f"src/app/f{i}.py", "python") for i in range(n_app)]
         test_files = [(f"tests/t{i}.py", "python") for i in range(n_test)]
         layers = [
-            {"id": "layer:app", "name": "Application", "display_order": 0,
-             "nodeIds": [f"file:{p}" for p, _ in app_files]},
+            {
+                "id": "layer:app",
+                "name": "Application",
+                "display_order": 0,
+                "nodeIds": [f"file:{p}" for p, _ in app_files],
+            },
         ]
         if test_files:
             layers.append(
-                {"id": "layer:test", "name": "Test", "display_order": 1,
-                 "nodeIds": [f"file:{p}" for p, _ in test_files]}
+                {
+                    "id": "layer:test",
+                    "name": "Test",
+                    "display_order": 1,
+                    "nodeIds": [f"file:{p}" for p, _ in test_files],
+                }
             )
         kg = _kg(
             files=app_files + test_files,
@@ -299,7 +311,9 @@ class TestModuleSmells:
             kg["modules"] = modules
         return kg
 
-    def _module(self, name: str, path: str, node_ids: list[str], layer_id: str = "layer:app") -> dict:
+    def _module(
+        self, name: str, path: str, node_ids: list[str], layer_id: str = "layer:app"
+    ) -> dict:
         return {
             "id": f"module:{name.replace('/', '-')}",
             "name": name,
@@ -315,8 +329,12 @@ class TestModuleSmells:
         app = [(f"src/app/f{i}.py", "python") for i in range(6)]
         web = [(f"src/web/w{i}.py", "python") for i in range(6)]
         layers = [
-            {"id": "layer:app", "name": "Application", "display_order": 0,
-             "nodeIds": [f"file:{p}" for p, _ in app + web]},
+            {
+                "id": "layer:app",
+                "name": "Application",
+                "display_order": 0,
+                "nodeIds": [f"file:{p}" for p, _ in app + web],
+            },
         ]
         kg = _kg(files=app + web, imports=[], layers=layers, tour=self._clean_tour())
         kg["modules"] = [
@@ -358,8 +376,12 @@ class TestModuleSmells:
         app = [(f"src/app/f{i}.py", "python") for i in range(6)]
         web = [(f"src/web/w{i}.py", "python") for i in range(6)]
         layers = [
-            {"id": "layer:app", "name": "Application", "display_order": 0,
-             "nodeIds": [f"file:{p}" for p, _ in app + web]},
+            {
+                "id": "layer:app",
+                "name": "Application",
+                "display_order": 0,
+                "nodeIds": [f"file:{p}" for p, _ in app + web],
+            },
         ]
         kg = _kg(files=app + web, imports=[], layers=layers, tour=self._clean_tour())
         kg["modules"] = [
@@ -374,13 +396,16 @@ class TestModuleSmells:
         # flagging it would demand a name that cannot exist.
         files = [(f"suite/case{i}.json", "python") for i in range(10)]
         layers = [
-            {"id": "layer:test", "name": "Test", "display_order": 0,
-             "nodeIds": [f"file:{p}" for p, _ in files]},
+            {
+                "id": "layer:test",
+                "name": "Test",
+                "display_order": 0,
+                "nodeIds": [f"file:{p}" for p, _ in files],
+            },
         ]
         kg = _kg(files=files, imports=[], layers=layers, tour=self._clean_tour())
         kg["modules"] = [
-            self._module("suite", "suite", [f"file:{p}" for p, _ in files],
-                         layer_id="layer:test")
+            self._module("suite", "suite", [f"file:{p}" for p, _ in files], layer_id="layer:test")
         ]
         assert "module_generic_name" not in self._codes(kg)
 
@@ -389,18 +414,24 @@ class TestModuleSmells:
         # the lowercased layer name is also a dominant path segment.
         kg = self._kg_with_modules()
         kg["nodes"] = [
-            {"id": f"file:application/f{i}.py", "type": "file",
-             "filePath": f"application/f{i}.py", "language": "python"}
+            {
+                "id": f"file:application/f{i}.py",
+                "type": "file",
+                "filePath": f"application/f{i}.py",
+                "language": "python",
+            }
             for i in range(12)
         ]
         kg["layers"] = [
-            {"id": "layer:app", "name": "Application", "display_order": 0,
-             "nodeIds": [f"file:application/f{i}.py" for i in range(12)]}
+            {
+                "id": "layer:app",
+                "name": "Application",
+                "display_order": 0,
+                "nodeIds": [f"file:application/f{i}.py" for i in range(12)],
+            }
         ]
         kg["modules"] = [
-            self._module(
-                "Application", "", [f"file:application/f{i}.py" for i in range(12)]
-            )
+            self._module("Application", "", [f"file:application/f{i}.py" for i in range(12)])
         ]
         codes = self._codes(kg)
         assert "module_generic_name" not in codes
@@ -409,28 +440,27 @@ class TestModuleSmells:
         n = 130
         deep_files = [(f"src/app/sub{i % 4}/f{i}.py", "python") for i in range(n)]
         layers = [
-            {"id": "layer:app", "name": "Application", "display_order": 0,
-             "nodeIds": [f"file:{p}" for p, _ in deep_files]},
+            {
+                "id": "layer:app",
+                "name": "Application",
+                "display_order": 0,
+                "nodeIds": [f"file:{p}" for p, _ in deep_files],
+            },
         ]
         kg = _kg(files=deep_files, imports=[], layers=layers, tour=self._clean_tour())
-        kg["modules"] = [
-            self._module("app", "src/app", [f"file:{p}" for p, _ in deep_files])
-        ]
+        kg["modules"] = [self._module("app", "src/app", [f"file:{p}" for p, _ in deep_files])]
         assert "module_oversized" in self._codes(kg)
 
         flat_files = [(f"src/app/f{i}.py", "python") for i in range(n)]
         layers[0]["nodeIds"] = [f"file:{p}" for p, _ in flat_files]
         kg2 = _kg(files=flat_files, imports=[], layers=layers, tour=self._clean_tour())
-        kg2["modules"] = [
-            self._module("app", "src/app", [f"file:{p}" for p, _ in flat_files])
-        ]
+        kg2["modules"] = [self._module("app", "src/app", [f"file:{p}" for p, _ in flat_files])]
         assert "module_oversized" not in self._codes(kg2)
 
     def test_confetti_module_count_warns(self) -> None:
         kg = self._kg_with_modules(n_app=32)
         kg["modules"] = [
-            self._module(f"m{i}", f"src/app/m{i}", [f"file:src/app/f{i}.py"])
-            for i in range(32)
+            self._module(f"m{i}", f"src/app/m{i}", [f"file:src/app/f{i}.py"]) for i in range(32)
         ]
         assert "module_count" in self._codes(kg)
 

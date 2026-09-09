@@ -98,17 +98,12 @@ class TestCTypeRefExtraction:
         return _PARSER.parse_file(info, body.encode("utf-8")).type_refs
 
     def test_struct_field_and_param_types_captured(self) -> None:
-        refs = self._parse(
-            'struct Box { Widget *w; };\n'
-            "int use(Gadget *g) { return 0; }\n"
-        )
+        refs = self._parse("struct Box { Widget *w; };\n" "int use(Gadget *g) { return 0; }\n")
         names = {r.type_name for r in refs}
         assert {"Widget", "Gadget"} <= names
 
     def test_primitive_and_stdlib_builtins_filtered(self) -> None:
-        refs = self._parse(
-            "int f(int n, char *s, size_t len, unsigned long u) { return 0; }\n"
-        )
+        refs = self._parse("int f(int n, char *s, size_t len, unsigned long u) { return 0; }\n")
         names = {r.type_name for r in refs}
         assert names.isdisjoint({"int", "char", "size_t", "unsigned", "long"})
 
@@ -149,11 +144,7 @@ class TestHonestyGuard:
         # WASM-marker work must not silence ordinary dead exports.
         graph = _build_graph(tmp_path)
         findings = DeadCodeAnalyzer(graph).analyze().findings
-        dead_exports = {
-            f.symbol_name
-            for f in findings
-            if f.kind == DeadCodeKind.UNUSED_EXPORT
-        }
+        dead_exports = {f.symbol_name for f in findings if f.kind == DeadCodeKind.UNUSED_EXPORT}
         assert "json_count" in dead_exports
 
     def test_exported_wasm_fn_not_flagged(self, tmp_path: Path) -> None:

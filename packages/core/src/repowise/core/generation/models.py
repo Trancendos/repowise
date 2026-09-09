@@ -86,7 +86,9 @@ def _retired_page_keys() -> set[str]:
     """
     from .page_redirects import RETIRED_IDS
 
-    return {page_id.split(":", 1)[1] for page_id in RETIRED_IDS if page_id.startswith("onboarding:")}
+    return {
+        page_id.split(":", 1)[1] for page_id in RETIRED_IDS if page_id.startswith("onboarding:")
+    }
 
 
 def _normalize_evidence_files(

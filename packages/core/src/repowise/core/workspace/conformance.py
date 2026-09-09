@@ -367,9 +367,7 @@ def save_conformance_report(report: ConformanceReport, workspace_root: Path) -> 
     out_path = data_dir / CONFORMANCE_FILENAME
     # Atomic: the MCP enricher reads these artifacts from a separate
     # process and must never observe a half-written file.
-    atomic_write_text(
-        out_path, json.dumps(report.to_dict(), indent=2, ensure_ascii=False)
-    )
+    atomic_write_text(out_path, json.dumps(report.to_dict(), indent=2, ensure_ascii=False))
     return out_path
 
 

@@ -209,12 +209,10 @@ class TestGoSamePackageIsNotACycle:
         pkg.mkdir()
         (pkg / "acl.go").write_text("package acl\n\ntype ACL struct{}\n")
         (pkg / "a_test.go").write_text(
-            'package acl_test\n\nimport "example.com/app/acl"\n\n'
-            "func A() { _ = acl.ACL{} }\n"
+            'package acl_test\n\nimport "example.com/app/acl"\n\n' "func A() { _ = acl.ACL{} }\n"
         )
         (pkg / "b_test.go").write_text(
-            'package acl_test\n\nimport "example.com/app/acl"\n\n'
-            "func B() { _ = acl.ACL{} }\n"
+            'package acl_test\n\nimport "example.com/app/acl"\n\n' "func B() { _ = acl.ACL{} }\n"
         )
         b = _builder(tmp_path)
         assert _cycles(b.cycle_subgraph()) == []
@@ -234,8 +232,8 @@ class TestGoSamePackageIsNotACycle:
             d = tmp_path / name
             d.mkdir()
             (d / f"{name}.go").write_text(
-                f"package {name}\n\nimport \"example.com/app/{other}\"\n\n"
-                f"func Use() {{ _ = {other}.Name }}\n\nvar Name = \"{name}\"\n"
+                f'package {name}\n\nimport "example.com/app/{other}"\n\n'
+                f'func Use() {{ _ = {other}.Name }}\n\nvar Name = "{name}"\n'
             )
         b = _builder(tmp_path)
         assert _cycles(b.cycle_subgraph()) == [{"alpha/alpha.go", "beta/beta.go"}]
@@ -254,7 +252,7 @@ class TestGoImportResolutionHonesty:
         helpers.mkdir()
         (helpers / "general.go").write_text(
             'package helpers\n\nimport "strings"\n\n'
-            'func Up(s string) string { return strings.ToUpper(s) }\n'
+            "func Up(s string) string { return strings.ToUpper(s) }\n"
         )
         (tpl / "strings.go").write_text(
             'package strings\n\nimport "example.com/app/helpers"\n\n'
@@ -286,8 +284,7 @@ class TestGoImportResolutionHonesty:
         store.mkdir()
         (store / "store.go").write_text("package store\n\ntype S struct{}\n")
         (tmp_path / "main.go").write_text(
-            'package main\n\nimport "example.com/app/store"\n\n'
-            "func main() { _ = store.S{} }\n"
+            'package main\n\nimport "example.com/app/store"\n\n' "func main() { _ = store.S{} }\n"
         )
         graph = _builder(tmp_path).graph()
         assert graph.has_edge("main.go", "store/store.go")
@@ -304,9 +301,7 @@ class TestExternalTargetsAreNeverCohesion:
             "func main() { _ = strings.ToUpper; _ = http.Get }\n"
         )
         graph = _builder(tmp_path).graph()
-        externals = [
-            (u, v, d) for u, v, d in graph.edges(data=True) if v.startswith("external:")
-        ]
+        externals = [(u, v, d) for u, v, d in graph.edges(data=True) if v.startswith("external:")]
         assert externals, "expected stdlib imports to resolve external"
         for u, v, d in externals:
             assert not is_cohesion_edge(d), f"{u} -> {v} wrongly marked cohesion"
@@ -361,8 +356,7 @@ class TestGoLocalReplaceDirectives:
         # A Go monorepo wires a library in with `replace`; the import path no
         # `module` directive mentions is still local and must keep its edge.
         (tmp_path / "go.mod").write_text(
-            "module example.com/app\n\ngo 1.22\n\n"
-            "replace github.com/acme/lib => ./lib\n"
+            "module example.com/app\n\ngo 1.22\n\n" "replace github.com/acme/lib => ./lib\n"
         )
         lib = tmp_path / "lib"
         lib.mkdir()
@@ -428,10 +422,11 @@ class TestGoImportSurfaceExcludesTestFiles:
         store = tmp_path / "store"
         store.mkdir()
         (store / "store.go").write_text("package store\n\ntype S struct{}\n")
-        (store / "store_test.go").write_text("package store\n\nfunc TestS(t *T) {}\ntype T struct{}\n")
+        (store / "store_test.go").write_text(
+            "package store\n\nfunc TestS(t *T) {}\ntype T struct{}\n"
+        )
         (tmp_path / "main.go").write_text(
-            'package main\n\nimport "example.com/app/store"\n\n'
-            "func main() { _ = store.S{} }\n"
+            'package main\n\nimport "example.com/app/store"\n\n' "func main() { _ = store.S{} }\n"
         )
         graph = _builder(tmp_path).graph()
         assert graph.has_edge("main.go", "store/store.go")

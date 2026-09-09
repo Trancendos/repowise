@@ -32,7 +32,9 @@ def parser() -> ASTParser:
 
 class TestGoSymbols:
     def test_function_and_struct(self, parser: ASTParser) -> None:
-        src = b"package x\n\ntype User struct { Name string }\n\nfunc Hello() string { return \"\" }\n"
+        src = (
+            b'package x\n\ntype User struct { Name string }\n\nfunc Hello() string { return "" }\n'
+        )
         result = parser.parse_file(_file(), src)
         names = {s.name for s in result.symbols}
         assert "User" in names
@@ -59,9 +61,7 @@ class TestGoHeritage:
         assert "io.Reader" in parents
         assert "Reader" not in parents
 
-    def test_qualified_interface_embed_keeps_package_qualifier(
-        self, parser: ASTParser
-    ) -> None:
+    def test_qualified_interface_embed_keeps_package_qualifier(self, parser: ASTParser) -> None:
         src = b"package x\n\ntype Reader interface{}\n\ntype Foo interface {\n  io.Reader\n}\n"
         result = parser.parse_file(_file(), src)
         parents = {r.parent_name for r in result.heritage}
@@ -71,7 +71,7 @@ class TestGoHeritage:
 
 class TestGoBindings:
     def test_imports(self, parser: ASTParser) -> None:
-        src = b"package x\n\nimport (\n  \"fmt\"\n  \"net/http\"\n)\n"
+        src = b'package x\n\nimport (\n  "fmt"\n  "net/http"\n)\n'
         result = parser.parse_file(_file(), src)
         modules = [imp.module_path for imp in result.imports]
         assert "fmt" in modules
@@ -80,15 +80,13 @@ class TestGoBindings:
 
 class TestGoMethodReceiver:
     def test_method_parent_extracted_from_receiver(self, parser: ASTParser) -> None:
-        src = b"package x\n\ntype User struct{}\n\nfunc (u *User) Greet() string { return \"\" }\n"
+        src = b'package x\n\ntype User struct{}\n\nfunc (u *User) Greet() string { return "" }\n'
         result = parser.parse_file(_file(), src)
         greet = [s for s in result.symbols if s.name == "Greet"]
         assert greet
         assert greet[0].parent_name == "User"
 
-    def test_unexported_receiver_type_still_parents_the_method(
-        self, parser: ASTParser
-    ) -> None:
+    def test_unexported_receiver_type_still_parents_the_method(self, parser: ASTParser) -> None:
         """Export status says nothing about whether a name is a type."""
         src = b"package x\n\ntype startEnd struct{}\n\nfunc (s *startEnd) add() {}\n"
         result = parser.parse_file(_file(), src)

@@ -45,9 +45,7 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 class TestSpringDI:
@@ -72,9 +70,7 @@ class TestSpringDI:
         assert graph.has_edge("UserController.java", "UserService.java")
 
     def test_constructor_injection_resolves_interface_to_impl(self, tmp_path: Path) -> None:
-        (tmp_path / "PaymentService.java").write_text(
-            "public interface PaymentService {}\n"
-        )
+        (tmp_path / "PaymentService.java").write_text("public interface PaymentService {}\n")
         (tmp_path / "StripePayment.java").write_text(
             "import org.springframework.stereotype.Service;\n"
             "@Service\npublic class StripePayment implements PaymentService {}\n"
@@ -118,8 +114,7 @@ class TestSpringDI:
 class TestSpringKotlin:
     def test_kotlin_service_with_autowired_field(self, tmp_path: Path) -> None:
         (tmp_path / "Repo.kt").write_text(
-            "import org.springframework.stereotype.Repository\n"
-            "@Repository\nclass Repo\n"
+            "import org.springframework.stereotype.Repository\n" "@Repository\nclass Repo\n"
         )
         (tmp_path / "Svc.kt").write_text(
             "import org.springframework.beans.factory.annotation.Autowired\n"
@@ -166,11 +161,7 @@ def _build_graph(repo: Path):
 
 
 def _bound(graph) -> set[tuple[str, str]]:
-    return {
-        (s, t)
-        for s, t, d in graph.edges(data=True)
-        if d.get("edge_type") == "framework_binds"
-    }
+    return {(s, t) for s, t, d in graph.edges(data=True) if d.get("edge_type") == "framework_binds"}
 
 
 class TestSpringSymbolEdges:

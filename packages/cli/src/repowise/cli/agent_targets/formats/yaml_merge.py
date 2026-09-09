@@ -184,9 +184,7 @@ def _key_pattern(key: str, indent: str) -> re.Pattern[str]:
     added was a duplicate key and the write refused for good.
     """
     name = re.escape(key)
-    return re.compile(
-        rf'^{re.escape(indent)}(?:{name}|"{name}"|\'{name}\'):(?=\s|$)'
-    )
+    return re.compile(rf'^{re.escape(indent)}(?:{name}|"{name}"|\'{name}\'):(?=\s|$)')
 
 
 def _find_top_level(lines: list[str], key: str) -> tuple[int, int] | None:
@@ -216,7 +214,9 @@ def _child_indent(lines: list[str], start: int, end: int) -> int:
     return DEFAULT_INDENT
 
 
-def _find_child(lines: list[str], start: int, end: int, child: str, indent: int) -> tuple[int, int] | None:
+def _find_child(
+    lines: list[str], start: int, end: int, child: str, indent: int
+) -> tuple[int, int] | None:
     """Line range ``[start, end)`` of *child* inside its parent's block.
 
     All three spellings of the key are matched, bare and either quote. Quoting a
@@ -353,9 +353,7 @@ def set_child(text: str, parent: str, child: str, value: Any) -> str:
     existing = _find_child(lines, start, end, child, indent)
     if existing is not None:
         child_start, child_end = existing
-        rendered = render_child(
-            child, value, indent, flow=_is_flow_value(lines[child_start])
-        )
+        rendered = render_child(child, value, indent, flow=_is_flow_value(lines[child_start]))
         comment = _trailing_comment(lines[child_start])
         if comment:
             rendered = [f"{rendered[0]}  {comment}", *rendered[1:]]
@@ -435,9 +433,7 @@ def _set_child_in_flow_parent(
     return _join(lines[:start] + rendered + lines[stop:])
 
 
-def _flow_span(
-    lines: list[str], start: int, end: int, parent: str
-) -> tuple[int, object] | None:
+def _flow_span(lines: list[str], start: int, end: int, parent: str) -> tuple[int, object] | None:
     """Where the inline value ends, and what it holds. ``None`` to leave it alone.
 
     An inline value may wrap across lines, so the shortest slice from *start*

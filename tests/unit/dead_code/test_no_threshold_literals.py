@@ -93,8 +93,7 @@ def test_no_bare_threshold_literal(relative: str) -> None:
     assert not offenders, (
         f"{relative} compares against a dead-code confidence threshold by value. "
         "Import SAFE_CONFIDENCE_THRESHOLD / RISK_CAP_CONFIDENCE from "
-        "repowise.core.analysis.dead_code.risk_factors instead:\n  "
-        + "\n  ".join(offenders)
+        "repowise.core.analysis.dead_code.risk_factors instead:\n  " + "\n  ".join(offenders)
     )
 
 

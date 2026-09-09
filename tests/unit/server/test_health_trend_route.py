@@ -84,15 +84,11 @@ async def test_the_total_counts_everything_the_slice_dropped(client, session, tm
     assert body["file_deltas_total"] == n
 
 
-async def test_the_total_equals_the_list_when_nothing_is_dropped(
-    client, session, tmp_path
-) -> None:
+async def test_the_total_equals_the_list_when_nothing_is_dropped(client, session, tmp_path) -> None:
     """The common case, and the one that makes the UI say "all N" rather than
     "the N largest of N"."""
     repo_id = await _repo(client, session, tmp_path)
-    await _two_snapshots(
-        session, repo_id, {"a.py": 8.0, "b.py": 5.0}, {"a.py": 7.0, "b.py": 6.0}
-    )
+    await _two_snapshots(session, repo_id, {"a.py": 8.0, "b.py": 5.0}, {"a.py": 7.0, "b.py": 6.0})
 
     body = (await client.get(f"/api/repos/{repo_id}/health/trend")).json()
 

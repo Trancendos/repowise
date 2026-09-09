@@ -78,7 +78,9 @@ def _project_one(card: dict) -> dict:
     for key in _LIFTED_DOC_KEYS:
         if docs.get(key):
             out[key] = docs[key]
-    rest = {k: v for k, v in docs.items() if k not in _LIFTED_DOC_KEYS and v not in (None, [], {}, "")}
+    rest = {
+        k: v for k, v in docs.items() if k not in _LIFTED_DOC_KEYS and v not in (None, [], {}, "")
+    }
     if rest:
         out["docs"] = rest
     layer = card.get("architectural_layer") or {}
@@ -152,7 +154,9 @@ def project(payload: dict, targets: tuple[str, ...]) -> dict:
     # Requested but absent from the response at all: neither a card nor a
     # recorded drop. Without this a typo'd path is indistinguishable from a
     # path the index simply has nothing to say about.
-    missing = [t for t in targets if t not in cards and t not in (payload.get("dropped_targets") or [])]
+    missing = [
+        t for t in targets if t not in cards and t not in (payload.get("dropped_targets") or [])
+    ]
     if missing:
         out["not_found"] = missing
     note = _ta.index_note(payload)

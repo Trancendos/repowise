@@ -111,9 +111,7 @@ async def test_a_traced_flow_carries_an_origin_per_hop(client: AsyncClient, app)
 
 
 @pytest.mark.asyncio
-async def test_a_depth_limited_flow_is_not_reported_as_an_ending(
-    client: AsyncClient, app
-) -> None:
+async def test_a_depth_limited_flow_is_not_reported_as_an_ending(client: AsyncClient, app) -> None:
     """The case the field exists for: the walk stopped, the code did not."""
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
@@ -133,9 +131,7 @@ async def test_callers_callees_carry_the_origin(client: AsyncClient, app) -> Non
     repo = await create_test_repo(client)
     await _seed(app.state.session_factory, repo["id"])
 
-    resp = await client.get(
-        f"/api/graph/{repo['id']}/callers-callees", params={"symbol_id": _MID}
-    )
+    resp = await client.get(f"/api/graph/{repo['id']}/callers-callees", params={"symbol_id": _MID})
     assert resp.status_code == 200
     body = resp.json()
 
@@ -190,9 +186,7 @@ async def test_a_node_with_null_columns_degrades_instead_of_failing_the_response
                 )
             )
 
-    resp = await client.get(
-        f"/api/graph/{repo['id']}/callers-callees", params={"symbol_id": _MID}
-    )
+    resp = await client.get(f"/api/graph/{repo['id']}/callers-callees", params={"symbol_id": _MID})
     assert resp.status_code == 200
     rows = {c["symbol_id"]: c for c in resp.json()["callees"]}
 

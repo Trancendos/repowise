@@ -198,9 +198,7 @@ class TestNodeSubpathImports:
             {"src/lib/components/Modal.svelte", "src/routes/Page.svelte"},
         )
         assert (
-            resolve_import(
-                "#lib/components/Modal.svelte", "src/routes/Page.svelte", "svelte", ctx
-            )
+            resolve_import("#lib/components/Modal.svelte", "src/routes/Page.svelte", "svelte", ctx)
             == "src/lib/components/Modal.svelte"
         )
 
@@ -221,9 +219,7 @@ class TestNodeSubpathImports:
             {"imports": {"#config": "./src/config.ts"}},
             {"src/config.ts", "src/routes/Page.svelte"},
         )
-        assert (
-            resolve_import("#config", "src/routes/Page.svelte", "svelte", ctx) == "src/config.ts"
-        )
+        assert resolve_import("#config", "src/routes/Page.svelte", "svelte", ctx) == "src/config.ts"
 
     def test_conditional_target_is_flattened(self, tmp_path) -> None:
         ctx = self._ctx(
@@ -242,8 +238,7 @@ class TestNodeSubpathImports:
             {"src/routes/Page.svelte"},
         )
         assert (
-            resolve_import("#nope/x", "src/routes/Page.svelte", "svelte", ctx)
-            == "external:#nope/x"
+            resolve_import("#nope/x", "src/routes/Page.svelte", "svelte", ctx) == "external:#nope/x"
         )
 
     def test_typescript_gets_the_same_treatment(self, tmp_path) -> None:

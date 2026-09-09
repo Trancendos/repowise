@@ -338,9 +338,7 @@ def _plan_write(existing_text: str | None) -> tuple[str, dict, dict | None]:
     servers = base_doc.get(MCP_KEY)
     stored = servers.get(SERVER_NAME) if isinstance(servers, dict) else None
     if isinstance(stored, dict) and _is_remote_entry(stored):
-        raise RemoteServerEntryError(
-            f"{MCP_KEY}.{SERVER_NAME} names a remote server"
-        )
+        raise RemoteServerEntryError(f"{MCP_KEY}.{SERVER_NAME} names a remote server")
 
     entry = _merge_entry(stored, generated)
 
@@ -568,9 +566,7 @@ def _remove_server_entry() -> tuple[Path, FileAction, str | None]:
             # Never report REMOVED over a file that still holds our entry. A
             # read-only bit is enough to cause this, and swallowing it turns a
             # loud failure into a silent false success on the destructive verb.
-            yaml_merge.write_if_changed(
-                path, merged_text, intended, existing_doc, newline=newline
-            )
+            yaml_merge.write_if_changed(path, merged_text, intended, existing_doc, newline=newline)
         return path, FileAction.REMOVED, None
 
     yaml_merge.write_if_changed(path, merged_text, intended, existing_doc, newline=newline)
@@ -979,9 +975,7 @@ class HermesTarget:
         """
         from ..formats import yaml_merge
 
-        return "\n".join(
-            [f"{MCP_KEY}:", *yaml_merge.render_child(SERVER_NAME, server_entry(), 2)]
-        )
+        return "\n".join([f"{MCP_KEY}:", *yaml_merge.render_child(SERVER_NAME, server_entry(), 2)])
 
     def describe_paths(self, scope: Scope, *, repo_path: Path | None = None) -> list[str]:
         if scope is Scope.USER:

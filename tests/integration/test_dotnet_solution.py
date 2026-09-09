@@ -91,8 +91,7 @@ class TestSolutionIngestion:
         for p in ingest_solution["parsed"]:
             relations.extend(p.heritage)
         assert any(
-            r.child_name == "AppDbContext" and r.parent_name == "DbContext"
-            for r in relations
+            r.child_name == "AppDbContext" and r.parent_name == "DbContext" for r in relations
         )
 
     def test_program_to_controller_framework_edge(self, ingest_solution) -> None:

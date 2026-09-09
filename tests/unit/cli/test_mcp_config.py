@@ -264,9 +264,7 @@ def test_save_codex_hooks_config_migration_spares_a_user_hook_on_a_retired_event
     mcp_config.save_codex_hooks_config(tmp_path)
 
     saved = json.loads(hooks_path.read_text(encoding="utf-8"))["hooks"]
-    remaining = [
-        hook["command"] for entry in saved["UserPromptSubmit"] for hook in entry["hooks"]
-    ]
+    remaining = [hook["command"] for entry in saved["UserPromptSubmit"] for hook in entry["hooks"]]
     assert remaining == ["echo alongside", "echo mine"]
 
 

@@ -108,8 +108,7 @@ class InProcessGraphStore(GraphStore):
             return list(self._graph.predecessors(node_id))
         if direction == "both":
             return list(
-                set(self._graph.successors(node_id))
-                | set(self._graph.predecessors(node_id))
+                set(self._graph.successors(node_id)) | set(self._graph.predecessors(node_id))
             )
         raise ValueError(f"direction must be 'out' | 'in' | 'both', got {direction!r}")
 

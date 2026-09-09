@@ -325,7 +325,9 @@ class HealthConfig:
         rules: list[HealthRule] = []
         raw_rules = raw.get("rules")
         if raw_rules is not None and not isinstance(raw_rules, list | tuple):
-            log.warning("health_rules_field_not_a_list", field="rules", got=type(raw_rules).__name__)
+            log.warning(
+                "health_rules_field_not_a_list", field="rules", got=type(raw_rules).__name__
+            )
             raw_rules = []
         for entry in raw_rules or []:
             if not isinstance(entry, dict):

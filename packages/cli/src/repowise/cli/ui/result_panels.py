@@ -50,9 +50,8 @@ def print_analysis_summary(
     # dims its blurb, and a bold count inside a dim wrapper renders bold *and*
     # dim, which is quieter than the plain bold it replaced.
     print_section(console, "Analysis complete")
-    headline = (
-        f"[bold]{file_count:,}[/bold] files · [bold]{symbol_count:,}[/bold] symbols"
-        + (f" · [bold]{community_count}[/bold] communities" if community_count else "")
+    headline = f"[bold]{file_count:,}[/bold] files · [bold]{symbol_count:,}[/bold] symbols" + (
+        f" · [bold]{community_count}[/bold] communities" if community_count else ""
     )
     console.print(f"  {headline}")
     if lang_summary:

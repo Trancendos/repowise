@@ -417,9 +417,7 @@ async def upsert_pages_from_generated(
             _apply_page_upsert(
                 session,
                 existing_by_id.get(gp.page_id),
-                keep_existing_prose=_would_bury_prose(
-                    existing_by_id.get(gp.page_id), gp.metadata
-                ),
+                keep_existing_prose=_would_bury_prose(existing_by_id.get(gp.page_id), gp.metadata),
                 page_id=gp.page_id,
                 repository_id=repository_id,
                 page_type=gp.page_type,
@@ -558,9 +556,7 @@ async def backfill_related_pages(
         page_rows = (
             (
                 await session.execute(
-                    select(Page).where(
-                        Page.repository_id == repository_id, Page.id.in_(batch)
-                    )
+                    select(Page).where(Page.repository_id == repository_id, Page.id.in_(batch))
                 )
             )
             .scalars()

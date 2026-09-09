@@ -21,8 +21,7 @@ _ENTRY_ATTRS = (
     "#[proc_macro_attribute]",
 )
 _ROUTE_RE = re.compile(
-    r"#\[(?:(?:rocket|actix_web|axum)::)?"
-    r"(?:get|post|put|delete|patch|head|options)\s*\("
+    r"#\[(?:(?:rocket|actix_web|axum)::)?" r"(?:get|post|put|delete|patch|head|options)\s*\("
 )
 
 # Test markers

@@ -66,9 +66,7 @@ class TestShape:
         pages = _wiki()
         assign_page_tree(pages, LAYER_ORDER)
         orphans = [
-            p.page_id
-            for p in pages
-            if p.page_type != "repo_overview" and p.parent_page_id is None
+            p.page_id for p in pages if p.page_type != "repo_overview" and p.parent_page_id is None
         ]
         assert orphans == []
 
@@ -98,7 +96,9 @@ class TestShape:
     def test_file_with_no_module_falls_back_to_its_layer(self):
         pages = _wiki()
         assign_page_tree(pages, LAYER_ORDER)
-        assert _by_id(pages)["file_page:scripts/tool.py"].parent_page_id == "layer_page:layer:service"
+        assert (
+            _by_id(pages)["file_page:scripts/tool.py"].parent_page_id == "layer_page:layer:service"
+        )
 
     def test_spotlight_sits_under_the_file_it_documents(self):
         pages = _wiki()
@@ -303,7 +303,9 @@ class TestConceptReadingOrder:
 
         assert self._ordered(pages) == ["src/zzz", "src/mmm", "src/aaa"]
         # The fixture is only meaningful if it disagrees with path order.
-        assert self._ordered(pages) != sorted(p.target_path for p in pages if p.page_type == "module_page")
+        assert self._ordered(pages) != sorted(
+            p.target_path for p in pages if p.page_type == "module_page"
+        )
 
     def test_pages_written_before_naming_keep_their_path_order(self):
         """A wiki indexed before this existed carries no order at all."""
@@ -438,9 +440,7 @@ class TestChapterNesting:
         pages = _wiki_with_chapters()
         assign_page_tree(pages, LAYER_ORDER)
         by_id = _by_id(pages)
-        assert (
-            by_id["module_page:src/core/ingest"].parent_page_id == "module_page:src/core"
-        )
+        assert by_id["module_page:src/core/ingest"].parent_page_id == "module_page:src/core"
 
     def test_chapters_nest_nearest_first(self):
         """The spine is a path, not a fan: each chapter sits under the next one up."""
@@ -455,9 +455,7 @@ class TestChapterNesting:
             by_id["module_page:src/core/analysis/health"].parent_page_id
             == "module_page:src/core/analysis"
         )
-        assert (
-            by_id["module_page:src/core/analysis"].parent_page_id == "module_page:src/core"
-        )
+        assert by_id["module_page:src/core/analysis"].parent_page_id == "module_page:src/core"
 
     def test_the_top_chapter_falls_back_to_its_layer(self):
         """Nothing above it, so the old rule still has to work."""
@@ -481,8 +479,7 @@ class TestChapterNesting:
             == "module_page:src/core/analysis"
         )
         assert (
-            by_id["file_page:src/core/ingest/a.py"].parent_page_id
-            == "module_page:src/core/ingest"
+            by_id["file_page:src/core/ingest/a.py"].parent_page_id == "module_page:src/core/ingest"
         )
 
     def test_no_page_is_its_own_ancestor(self):

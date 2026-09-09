@@ -1,4 +1,4 @@
-﻿"""MCP Tool 6: get_dependency_path — dependency graph path finding."""
+"""MCP Tool 6: get_dependency_path — dependency graph path finding."""
 
 from __future__ import annotations
 

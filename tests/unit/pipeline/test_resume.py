@@ -250,9 +250,7 @@ async def test_a_failed_index_checkpoint_is_reported(sf, monkeypatch):
     def _boom(*_a: object, **_k: object):
         raise RuntimeError("database is locked")
 
-    monkeypatch.setattr(
-        "repowise.core.pipeline.resume.controller.persist_ingestion", _boom
-    )
+    monkeypatch.setattr("repowise.core.pipeline.resume.controller.persist_ingestion", _boom)
 
     progress = _RecordingProgress()
     ctrl = ResumeController(sf, repo_id, resume=False)

@@ -240,9 +240,9 @@ class TestPersistenceStoreRetrieve:
             async with sf() as session:
                 filtered = await list_pages(session, repo_id, page_type=pt, limit=200)
             expected_count = sum(1 for p in pages if p.page_type == pt)
-            assert len(filtered) == expected_count, (
-                f"Expected {expected_count} pages of type {pt!r}, got {len(filtered)}"
-            )
+            assert (
+                len(filtered) == expected_count
+            ), f"Expected {expected_count} pages of type {pt!r}, got {len(filtered)}"
 
     async def test_stored_page_version_is_1_on_first_insert(self, persisted, sf):
         pages = persisted["pages"]

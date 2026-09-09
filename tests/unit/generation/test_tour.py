@@ -123,9 +123,7 @@ def test_build_tour_only_references_documented_pages():
     pr = {"main.py": 0.9, "a.py": 0.5, "b.py": 0.3, "undocumented.py": 0.2}
     edges = [("main.py", "a.py"), ("a.py", "b.py"), ("main.py", "undocumented.py")]
     documented = {"main.py", "a.py", "b.py"}  # undocumented.py NOT selected
-    stops = build_tour(
-        files, pr, edges, file_page_paths=documented, repo_name="myrepo"
-    )
+    stops = build_tour(files, pr, edges, file_page_paths=documented, repo_name="myrepo")
     targets = {s.target_path for s in stops}
     assert "undocumented.py" not in targets
     assert "myrepo" in targets  # overview opens the tour
@@ -164,9 +162,7 @@ def test_build_tour_unreached_files_get_honest_reasons():
     files = _repo({"main.py": True, "a.py": False, "disconnected.py": False})
     pr = {"main.py": 0.9, "a.py": 0.5, "disconnected.py": 0.1}
     edges = [("main.py", "a.py")]
-    stops = build_tour(
-        files, pr, edges, file_page_paths={"main.py", "a.py", "disconnected.py"}
-    )
+    stops = build_tour(files, pr, edges, file_page_paths={"main.py", "a.py", "disconnected.py"})
     by_path = {s.target_path: s for s in stops}
     assert "Off the import path" in by_path["disconnected.py"].reason
     assert "Reached" not in by_path["disconnected.py"].reason
@@ -203,9 +199,7 @@ def test_build_tour_seedless_repo_reasons_do_not_overclaim():
     # entry points that don't exist.
     files = _repo({"src/pkg/models.py": False, "src/pkg/cookies.py": False})
     pr = {"src/pkg/models.py": 0.8, "src/pkg/cookies.py": 0.6}
-    stops = build_tour(
-        files, pr, [], file_page_paths={"src/pkg/models.py", "src/pkg/cookies.py"}
-    )
+    stops = build_tour(files, pr, [], file_page_paths={"src/pkg/models.py", "src/pkg/cookies.py"})
     for s in stops:
         assert "An entry point" not in s.reason
         # the offending phrase referenced entry points that don't exist;

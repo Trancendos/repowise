@@ -293,9 +293,7 @@ def _render_card(name: str, card: dict) -> None:
             # integer; ``:g`` keeps a whole number whole and trims the rest.
             weight = p.get("weight", 0)
             shown = f"{float(weight):.1f}".rstrip("0").rstrip(".") if weight else "0"
-            console.print(
-                f"    {escape(str(p.get('file_path', '')))} [dim]x{shown}[/dim]{link}"
-            )
+            console.print(f"    {escape(str(p.get('file_path', '')))} [dim]x{shown}[/dim]{link}")
         if len(partners) > 8:
             console.print(f"    [dim]… and {len(partners) - 8} more (--format json).[/dim]")
     episodes = card.get("episodes")

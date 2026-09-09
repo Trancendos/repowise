@@ -28,7 +28,9 @@ from repowise.core.workspace.config import ContractConfig, RepoEntry, WorkspaceC
 from repowise.core.workspace.contracts import ContractStore, run_contract_extraction
 
 REPO_SOURCE = {
-    "svc/api.py": ('router = APIRouter(prefix="/api")\n\n\n@router.get("/users")\ndef users(): ...\n'),
+    "svc/api.py": (
+        'router = APIRouter(prefix="/api")\n\n\n@router.get("/users")\ndef users(): ...\n'
+    ),
     "svc/db.py": 'Q = "SELECT id FROM users WHERE id = :id"\n',
     "svc/pyproject.toml": '[project]\nname = "svc"\n',
     # An HTTP consumer, so the annotation the carry-forward path has to
@@ -155,7 +157,9 @@ async def test_moved_head_is_re_extracted_even_when_not_in_changed_repos(
     """
     first = await _first_run(workspace, tmp_path)
     beta = tmp_path / "beta"
-    (beta / "svc" / "extra.py").write_text('@router.get("/added")\ndef added(): ...\n', encoding="utf-8")
+    (beta / "svc" / "extra.py").write_text(
+        '@router.get("/added")\ndef added(): ...\n', encoding="utf-8"
+    )
     _git(beta, "add", "-A")
     _git(beta, "commit", "-q", "-m", "second")
     extracted.clear()
@@ -375,7 +379,12 @@ async def test_provenance_round_trips_through_json(
 async def test_legacy_artifact_without_provenance_loads(tmp_path: Path) -> None:
     """Reading an artifact from before this field existed must not raise."""
     store = ContractStore.from_dict(
-        {"version": 1, "generated_at": "2026-01-01T00:00:00Z", "contracts": [], "contract_links": []}
+        {
+            "version": 1,
+            "generated_at": "2026-01-01T00:00:00Z",
+            "contracts": [],
+            "contract_links": [],
+        }
     )
     assert store.repo_provenance == {}
 
@@ -414,10 +423,13 @@ async def test_a_new_provider_links_a_carried_forward_consumer(
         contracts=ContractConfig(),
     )
     first = await run_contract_extraction(config, tmp_path, [])
-    assert not [lk for lk in first.contract_links if lk.contract_id.startswith("http::GET::/api/orders")]
+    assert not [
+        lk for lk in first.contract_links if lk.contract_id.startswith("http::GET::/api/orders")
+    ]
 
     (alpha / "api.py").write_text(
-        'router = APIRouter()\n\n\n@router.get("/api/orders")\ndef orders(): ...\n', encoding="utf-8"
+        'router = APIRouter()\n\n\n@router.get("/api/orders")\ndef orders(): ...\n',
+        encoding="utf-8",
     )
     _git(alpha, "add", "-A")
     _git(alpha, "commit", "-q", "-m", "add provider")
@@ -446,20 +458,14 @@ async def test_carried_consumer_drops_a_target_that_left_the_workspace(
     # re-extracted repo is impossible by construction — its contracts are new
     # objects — so injecting there would assert nothing.
     carried = [
-        c
-        for c in first.rows_for_repo("beta")
-        if c.role == "consumer" and c.contract_type == "http"
+        c for c in first.rows_for_repo("beta") if c.role == "consumer" and c.contract_type == "http"
     ]
     assert carried, "fixture must give beta an HTTP consumer or this asserts nothing"
     carried[0].meta["target_repo"] = "gamma_that_is_gone"
 
     second = await run_contract_extraction(workspace, tmp_path, ["alpha"], None, first)
 
-    stale = [
-        c
-        for c in second.contracts
-        if c.meta.get("target_repo") == "gamma_that_is_gone"
-    ]
+    stale = [c for c in second.contracts if c.meta.get("target_repo") == "gamma_that_is_gone"]
     assert not stale, "a carried-forward consumer kept a target repo that no longer exists"
 
 

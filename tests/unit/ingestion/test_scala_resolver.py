@@ -58,8 +58,7 @@ class TestScalaIndex:
 
     def test_mill_modules_detected(self, tmp_path: Path) -> None:
         (tmp_path / "build.sc").write_text(
-            "import mill._\n"
-            "object core extends ScalaModule { def scalaVersion = T(\"3.0.0\") }\n"
+            "import mill._\n" 'object core extends ScalaModule { def scalaVersion = T("3.0.0") }\n'
         )
         rel = _make_mill_module(tmp_path, "core", "com.example", "Engine")
         index = build_scala_index(tmp_path)
@@ -84,9 +83,7 @@ class TestScalaIndex:
         result = resolve_scala_import("com.example.Foo", "main.scala", ctx)
         assert result == "external:com.example.Foo"
 
-    def test_no_build_file_falls_through_on_a_matching_path(
-        self, tmp_path: Path
-    ) -> None:
+    def test_no_build_file_falls_through_on_a_matching_path(self, tmp_path: Path) -> None:
         # Same shape, still no build file and no package clause, but the path
         # mirrors the package: the directory fallback answers.
         src = tmp_path / "src" / "com" / "example"
@@ -114,7 +111,9 @@ class TestScalaWorkspaceResolution:
     def test_type_in_differently_named_file(self, tmp_path: Path) -> None:
         # FQN lookup keys on declared type names, not stems.
         a = _make_scala(
-            tmp_path, "src/main/scala/com/foo/models.scala", "com.foo",
+            tmp_path,
+            "src/main/scala/com/foo/models.scala",
+            "com.foo",
             "case class User(name: String)\ncase class Order(id: Int)",
         )
         ctx = _ctx(tmp_path, [a])
@@ -123,7 +122,9 @@ class TestScalaWorkspaceResolution:
 
     def test_trait_and_object_resolution(self, tmp_path: Path) -> None:
         a = _make_scala(tmp_path, "src/main/scala/com/foo/Api.scala", "com.foo", "trait Api")
-        b = _make_scala(tmp_path, "src/main/scala/com/foo/Defaults.scala", "com.foo", "object Defaults")
+        b = _make_scala(
+            tmp_path, "src/main/scala/com/foo/Defaults.scala", "com.foo", "object Defaults"
+        )
         ctx = _ctx(tmp_path, [a, b])
         assert resolve_scala_import("com.foo.Api", "Main.scala", ctx) == a
         assert resolve_scala_import("com.foo.Defaults", "Main.scala", ctx) == b
@@ -173,16 +174,19 @@ class TestScalaWorkspaceResolution:
 
     def test_multi_module_resolution(self, tmp_path: Path) -> None:
         (tmp_path / "build.sbt").write_text(
-            'lazy val core = project.in(file("core"))\n'
-            'lazy val app = project.in(file("app"))\n'
+            'lazy val core = project.in(file("core"))\n' 'lazy val app = project.in(file("app"))\n'
         )
         core = _make_scala(
-            tmp_path, "core/src/main/scala/com/example/core/Engine.scala",
-            "com.example.core", "class Engine",
+            tmp_path,
+            "core/src/main/scala/com/example/core/Engine.scala",
+            "com.example.core",
+            "class Engine",
         )
         app = _make_scala(
-            tmp_path, "app/src/main/scala/com/example/app/Main.scala",
-            "com.example.app", "object Main extends App",
+            tmp_path,
+            "app/src/main/scala/com/example/app/Main.scala",
+            "com.example.app",
+            "object Main extends App",
         )
         ctx = _ctx(tmp_path, [core, app])
         result = resolve_scala_import("com.example.core.Engine", app, ctx)
@@ -192,8 +196,10 @@ class TestScalaWorkspaceResolution:
         self, tmp_path: Path
     ) -> None:
         local = _make_scala(
-            tmp_path, "core/src/main/scala/com/acme/json/Reader.scala",
-            "com.acme.json", "class Reader",
+            tmp_path,
+            "core/src/main/scala/com/acme/json/Reader.scala",
+            "com.acme.json",
+            "class Reader",
         )
         ctx = _ctx(tmp_path, [local])
         result = resolve_scala_import("io.circe.parser.Reader", "Main.scala", ctx)

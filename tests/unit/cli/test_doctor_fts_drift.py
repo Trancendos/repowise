@@ -146,9 +146,7 @@ def test_a_plain_run_heals_the_drift_on_its_own(tmp_path: Path) -> None:
     repo_path = asyncio.run(_build_drifted_repo(tmp_path))
 
     async def _open() -> None:
-        engine = create_engine(
-            f"sqlite+aiosqlite:///{repo_path / '.repowise' / 'wiki.db'}"
-        )
+        engine = create_engine(f"sqlite+aiosqlite:///{repo_path / '.repowise' / 'wiki.db'}")
         await FullTextSearch(engine).ensure_index()
         await engine.dispose()
 

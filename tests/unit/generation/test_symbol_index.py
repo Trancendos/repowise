@@ -89,7 +89,5 @@ def test_assemble_file_page_identical_with_index() -> None:
     index = build_symbol_index(g)
 
     plain = assembler.assemble_file_page(parsed, g, {}, {}, {}, b"x = 1\n")
-    indexed = assembler.assemble_file_page(
-        parsed, g, {}, {}, {}, b"x = 1\n", symbol_index=index
-    )
+    indexed = assembler.assemble_file_page(parsed, g, {}, {}, {}, b"x = 1\n", symbol_index=index)
     assert plain == indexed

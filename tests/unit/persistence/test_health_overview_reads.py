@@ -189,9 +189,7 @@ async def test_snapshot_headline_window_is_bounded_but_the_count_is_not(
     assert headline.hotspot_health == 14.0
 
 
-async def test_snapshot_headline_window_never_exceeds_the_history(
-    async_session, tmp_path
-) -> None:
+async def test_snapshot_headline_window_never_exceeds_the_history(async_session, tmp_path) -> None:
     repo = await upsert_repository(async_session, name="repo", local_path=str(tmp_path))
     await _history(async_session, repo.id, 3)
 
@@ -201,9 +199,7 @@ async def test_snapshot_headline_window_never_exceeds_the_history(
     assert len(headline.recent) == 3
 
 
-async def test_snapshot_headline_asks_for_no_window_by_default(
-    async_session, tmp_path
-) -> None:
+async def test_snapshot_headline_asks_for_no_window_by_default(async_session, tmp_path) -> None:
     """The header-only caller pays for no rows it will not read."""
     repo = await upsert_repository(async_session, name="repo", local_path=str(tmp_path))
     await _history(async_session, repo.id, 4)
@@ -231,9 +227,7 @@ async def test_snapshot_file_counts_reads_the_newest_rows_oldest_first(
     ]
 
 
-async def test_snapshot_file_counts_matches_the_headline_ordering(
-    async_session, tmp_path
-) -> None:
+async def test_snapshot_file_counts_matches_the_headline_ordering(async_session, tmp_path) -> None:
     """Both reads must agree on which rows are "the newest two".
 
     They order in opposite directions — the headline ascends and takes the
@@ -261,17 +255,19 @@ async def test_snapshot_file_counts_matches_the_headline_ordering(
     assert [s.hotspot_health for s in headline.recent] == [float(c) for c in counts]
 
 
-async def test_snapshot_file_counts_tolerates_an_unusable_map(
-    async_session, tmp_path
-) -> None:
+async def test_snapshot_file_counts_tolerates_an_unusable_map(async_session, tmp_path) -> None:
     """A malformed blob counts 0, which the caller reads as "no delta"."""
     repo = await upsert_repository(async_session, name="repo", local_path=str(tmp_path))
     await _history(async_session, repo.id, 2)
     rows = (
-        await async_session.execute(
-            select(HealthSnapshot).order_by(HealthSnapshot.taken_at.asc())
+        (
+            await async_session.execute(
+                select(HealthSnapshot).order_by(HealthSnapshot.taken_at.asc())
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     rows[0].per_file_scores_json = "{not json"
     rows[1].per_file_scores_json = "[]"
     await async_session.flush()
@@ -279,9 +275,7 @@ async def test_snapshot_file_counts_tolerates_an_unusable_map(
     assert await get_health_snapshot_file_counts(async_session, repo.id, limit=2) == [0, 0]
 
 
-async def test_snapshot_file_counts_refuse_a_map_that_is_not_a_map(
-    async_session, tmp_path
-) -> None:
+async def test_snapshot_file_counts_refuse_a_map_that_is_not_a_map(async_session, tmp_path) -> None:
     """A JSON array parses fine and ``len()``s fine, and means nothing.
 
     Deliberately stricter than the ``len(json.loads(...))`` this replaced, which
@@ -291,10 +285,14 @@ async def test_snapshot_file_counts_refuse_a_map_that_is_not_a_map(
     repo = await upsert_repository(async_session, name="repo", local_path=str(tmp_path))
     await _history(async_session, repo.id, 2)
     rows = (
-        await async_session.execute(
-            select(HealthSnapshot).order_by(HealthSnapshot.taken_at.asc())
+        (
+            await async_session.execute(
+                select(HealthSnapshot).order_by(HealthSnapshot.taken_at.asc())
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     rows[0].per_file_scores_json = "[1, 2, 3]"
     rows[1].per_file_scores_json = '"a.py"'
     await async_session.flush()
@@ -302,9 +300,7 @@ async def test_snapshot_file_counts_refuse_a_map_that_is_not_a_map(
     assert await get_health_snapshot_file_counts(async_session, repo.id, limit=2) == [0, 0]
 
 
-async def test_snapshot_file_counts_on_a_repo_with_no_history(
-    async_session, tmp_path
-) -> None:
+async def test_snapshot_file_counts_on_a_repo_with_no_history(async_session, tmp_path) -> None:
     repo = await upsert_repository(async_session, name="repo", local_path=str(tmp_path))
 
     assert await get_health_snapshot_file_counts(async_session, repo.id) == []

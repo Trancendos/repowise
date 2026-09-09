@@ -122,8 +122,8 @@ class TestGlobalUsings:
             tmp_path,
             {
                 "test/Specs/Specs.csproj": (
-                    "<Project Sdk=\"Microsoft.NET.Sdk\">\n  <ItemGroup>\n"
-                    "    <Using Include=\"Acme.Specs.Helpers\" />\n"
+                    '<Project Sdk="Microsoft.NET.Sdk">\n  <ItemGroup>\n'
+                    '    <Using Include="Acme.Specs.Helpers" />\n'
                     "  </ItemGroup>\n</Project>\n"
                 ),
                 "test/Specs/Helpers/Doer.cs": (
@@ -151,8 +151,7 @@ class TestGlobalUsings:
         texts = {
             "src/Helpers/Doer.cs": "namespace Acme.Helpers;\npublic class Doer {}\n",
             "src/Consumer.cs": (
-                "using Acme.Helpers;\n"
-                "namespace Acme;\npublic class Consumer { Doer d; }\n"
+                "using Acme.Helpers;\n" "namespace Acme;\npublic class Consumer { Doer d; }\n"
             ),
         }
         g = _graph_for(texts)

@@ -53,7 +53,9 @@ class MSBuildProject:
     root_namespace: str | None = None
     assembly_name: str | None = None
     implicit_usings: bool = False
-    project_references: list[Path] = field(default_factory=list)  # absolute paths to referenced .csproj
+    project_references: list[Path] = field(
+        default_factory=list
+    )  # absolute paths to referenced .csproj
     package_references: set[str] = field(default_factory=set)  # NuGet package ids
     project_usings: set[str] = field(default_factory=set)  # <Using Include="X"/> namespaces
 
@@ -119,9 +121,7 @@ def find_csproj_files(
 ) -> list[Path]:
     """Return all .csproj files under *repo_path*, skipping bin/obj output."""
     out: list[Path] = []
-    for csproj in glob_via(
-        snapshot, repo_path, "*.csproj", prune_nested_git=prune_nested_git
-    ):
+    for csproj in glob_via(snapshot, repo_path, "*.csproj", prune_nested_git=prune_nested_git):
         if path_has_dotnet_scan_skip_dir(csproj, repo_path):
             continue
         out.append(csproj)

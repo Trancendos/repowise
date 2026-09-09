@@ -47,7 +47,7 @@ VOCAB_HEADING = "## In the code"
 # the diagnosis was built on: an `--order` flag on `gh release list`. Its
 # generated page carried a path header, two symbol names and 29 dependency
 # paths, and not one of the tokens below.
-GO_SOURCE = '''
+GO_SOURCE = """
 package list
 
 // ListOptions carries the flags for the release list command.
@@ -66,7 +66,7 @@ func listRun(opts *ListOptions) error {
 	query := `orderBy: {field: CREATED_AT, direction: DESC}`
 	return nil
 }
-'''
+"""
 
 
 class TestWhatItLifts:
@@ -130,7 +130,7 @@ class TestWhatItLifts:
 
 class TestBounds:
     def test_capped(self):
-        source = "\n".join(f'    Field{i} string // comment number {i}' for i in range(4000))
+        source = "\n".join(f"    Field{i} string // comment number {i}" for i in range(4000))
         assert len(file_vocabulary(source)) <= 1200
 
     def test_the_cap_cuts_the_least_specific_material(self):
@@ -258,7 +258,7 @@ class TestRendering:
         b = tmpl.render(
             ctx=_file_page(
                 file_path="api/client.go",
-                file_vocabulary=file_vocabulary('type Client struct {\n\tHTTP string\n}'),
+                file_vocabulary=file_vocabulary("type Client struct {\n\tHTTP string\n}"),
             )
         )
         assert "Order of releases returned" in a

@@ -114,9 +114,7 @@ class TestTierOrder:
         added = emit_scope_edges(
             g,
             [("a.x", "Widget w;")],
-            lambda p, t: self._two_tiers(
-                {"Widget": ["n1.x", "n2.x"]}, {"Widget": ["far.x"]}
-            ),
+            lambda p, t: self._two_tiers({"Widget": ["n1.x", "n2.x"]}, {"Widget": ["far.x"]}),
             skip_names=_EMPTY,
         )
         assert added == 0
@@ -161,9 +159,7 @@ class TestSuppression:
 
     def test_a_file_with_no_scope_is_skipped(self) -> None:
         g = _graph("a.x", "b.x")
-        added = emit_scope_edges(
-            g, [("a.x", "Widget w;")], lambda p, t: None, skip_names=_EMPTY
-        )
+        added = emit_scope_edges(g, [("a.x", "Widget w;")], lambda p, t: None, skip_names=_EMPTY)
         assert added == 0
 
 

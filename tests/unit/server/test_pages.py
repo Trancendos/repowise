@@ -65,13 +65,9 @@ async def test_list_pages_defaults_to_full_rows(client: AsyncClient, app) -> Non
 
 
 @pytest.mark.asyncio
-async def test_list_pages_summary_drops_the_heavy_fields(
-    client: AsyncClient, app
-) -> None:
+async def test_list_pages_summary_drops_the_heavy_fields(client: AsyncClient, app) -> None:
     repo_id, page_id = await _create_page(client, app.state.session_factory)
-    resp = await client.get(
-        "/api/pages", params={"repo_id": repo_id, "fields": "summary"}
-    )
+    resp = await client.get("/api/pages", params={"repo_id": repo_id, "fields": "summary"})
     assert resp.status_code == 200
     row = resp.json()[0]
     assert "content" not in row
@@ -84,9 +80,7 @@ async def test_list_pages_summary_drops_the_heavy_fields(
 
 
 @pytest.mark.asyncio
-async def test_list_pages_summary_keeps_the_layer_stamp(
-    client: AsyncClient, app
-) -> None:
+async def test_list_pages_summary_keeps_the_layer_stamp(client: AsyncClient, app) -> None:
     """Which layer a page belongs to survives the summary trim.
 
     The docs tree groups modules under their layer from this stamp, and it
@@ -111,9 +105,7 @@ async def test_list_pages_summary_keeps_the_layer_stamp(
             metadata={"layer_id": "layer:api", "layer_name": "API Surface"},
         )
 
-    resp = await client.get(
-        "/api/pages", params={"repo_id": repo_id, "fields": "summary"}
-    )
+    resp = await client.get("/api/pages", params={"repo_id": repo_id, "fields": "summary"})
     assert resp.status_code == 200
     row = resp.json()[0]
     assert "metadata" not in row
@@ -127,9 +119,7 @@ async def test_list_pages_summary_has_no_layer_stamp_when_unstamped(
 ) -> None:
     """A page with no layer says so, rather than borrowing someone else's."""
     repo_id, _ = await _create_page(client, app.state.session_factory)
-    resp = await client.get(
-        "/api/pages", params={"repo_id": repo_id, "fields": "summary"}
-    )
+    resp = await client.get("/api/pages", params={"repo_id": repo_id, "fields": "summary"})
     row = resp.json()[0]
     assert row["layer_id"] is None
     assert row["layer_name"] is None
@@ -173,9 +163,7 @@ async def test_list_pages_summary_keeps_the_chapter_flag(client: AsyncClient, ap
             provider_name="mock",
         )
 
-    resp = await client.get(
-        "/api/pages", params={"repo_id": repo_id, "fields": "summary"}
-    )
+    resp = await client.get("/api/pages", params={"repo_id": repo_id, "fields": "summary"})
     assert resp.status_code == 200
     by_id = {row["id"]: row for row in resp.json()}
     assert "metadata" not in by_id["module_page:src/core"]
@@ -212,9 +200,7 @@ async def test_full_page_row_also_carries_the_chapter_flag(client: AsyncClient, 
 @pytest.mark.asyncio
 async def test_list_pages_rejects_unknown_fields(client: AsyncClient, app) -> None:
     repo_id, _ = await _create_page(client, app.state.session_factory)
-    resp = await client.get(
-        "/api/pages", params={"repo_id": repo_id, "fields": "titles"}
-    )
+    resp = await client.get("/api/pages", params={"repo_id": repo_id, "fields": "titles"})
     assert resp.status_code == 400
 
 
@@ -223,9 +209,7 @@ async def test_lookup_accepts_repo_id(client: AsyncClient, app) -> None:
     """The session is routed by repo_id, so a lookup that knows the repo says
     so — without it a workspace server searches the wrong store."""
     repo_id, page_id = await _create_page(client, app.state.session_factory)
-    resp = await client.get(
-        "/api/pages/lookup", params={"page_id": page_id, "repo_id": repo_id}
-    )
+    resp = await client.get("/api/pages/lookup", params={"page_id": page_id, "repo_id": repo_id})
     assert resp.status_code == 200
     assert resp.json()["id"] == page_id
 
@@ -246,9 +230,7 @@ async def test_lookup_reaches_a_second_workspace_store(client: AsyncClient, app)
         poolclass=StaticPool,
     )
     await init_db(other_engine)
-    other_factory = async_sessionmaker(
-        other_engine, expire_on_commit=False, class_=AsyncSession
-    )
+    other_factory = async_sessionmaker(other_engine, expire_on_commit=False, class_=AsyncSession)
     other_repo_id = "b" * 32
     app.state.workspace_sessions = {other_repo_id: other_factory}
 
@@ -275,9 +257,7 @@ async def test_lookup_reaches_a_second_workspace_store(client: AsyncClient, app)
         # never heard of this page.
         assert (await client.get("/api/pages/lookup", params=params)).status_code == 404
 
-        scoped = await client.get(
-            "/api/pages/lookup", params={**params, "repo_id": other_repo_id}
-        )
+        scoped = await client.get("/api/pages/lookup", params={**params, "repo_id": other_repo_id})
         assert scoped.status_code == 200
         assert scoped.json()["content"] == "Lives in the second store."
     finally:
@@ -457,6 +437,7 @@ async def test_regenerate_page_rejects_unknown_style(client: AsyncClient, app) -
     assert resp.status_code == 400
     assert "style" in resp.json()["detail"].lower()
 
+
 # ---------------------------------------------------------------------------
 # Retired page ids
 #
@@ -563,9 +544,7 @@ async def test_retired_layer_page_lands_on_the_overview(client: AsyncClient, app
 
 
 @pytest.mark.asyncio
-async def test_retired_layer_page_404s_when_no_overview_exists(
-    client: AsyncClient, app
-) -> None:
+async def test_retired_layer_page_404s_when_no_overview_exists(client: AsyncClient, app) -> None:
     """No successor is a refusal, not a guess."""
     await _create_page(client, app.state.session_factory)
     resp = await client.get("/api/pages/layer_page:layer:analysis")

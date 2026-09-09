@@ -32,13 +32,16 @@ def _run_hook(payload: dict, tmp_path: Path) -> str:
     """
     out = io.StringIO()
     env = {v: str(tmp_path) for v in ("TMPDIR", "TEMP", "TMP")}
-    with patch.dict(os.environ, env), patch.object(
-        sys, "stdin", io.StringIO(json.dumps(payload))
-    ), patch.object(sys, "stdout", out):
+    with (
+        patch.dict(os.environ, env),
+        patch.object(sys, "stdin", io.StringIO(json.dumps(payload))),
+        patch.object(sys, "stdout", out),
+    ):
         tempfile.tempdir = None
         _run_augment(client=None)
     tempfile.tempdir = None
     return out.getvalue()
+
 
 PATH_ERROR = (
     "<tool_use_error>Path does not exist: {path}. "
@@ -116,11 +119,9 @@ def test_the_grep_error_shape_is_read_too(tmp_path: Path) -> None:
 
 
 def test_the_read_error_shape_takes_the_path_from_tool_input(tmp_path: Path) -> None:
-    """"File does not exist." carries no path; tool_input is the only source."""
+    """ "File does not exist." carries no path; tool_input is the only source."""
     repo = _repo(tmp_path, ("a/b/widget.py",))
-    result = _fire(
-        repo, str(repo / "a" / "widget.py"), error=FILE_ERROR.format(cwd=repo)
-    )
+    result = _fire(repo, str(repo / "a" / "widget.py"), error=FILE_ERROR.format(cwd=repo))
     assert result.context is not None
     assert "a/b/widget.py" in result.context
 
@@ -135,7 +136,7 @@ def test_an_ambiguous_basename_stays_silent(tmp_path: Path) -> None:
 
 
 def test_a_directory_target_stays_silent(tmp_path: Path) -> None:
-    """"Which file did you mean" is not the question a directory asks."""
+    """ "Which file did you mean" is not the question a directory asks."""
     repo = _repo(tmp_path, ("core/hooks/handler.py",))
     assert not _fire(repo, str(repo / "cli" / "hooks"))
 
@@ -158,7 +159,7 @@ def test_a_relative_escape_to_another_checkout_stays_silent(tmp_path: Path) -> N
 
 
 def test_a_dot_directory_keeps_its_dot(tmp_path: Path) -> None:
-    """".github/ci.yml" must not be echoed back as "github/ci.yml"."""
+    """ ".github/ci.yml" must not be echoed back as "github/ci.yml"."""
     repo = _repo(tmp_path, (".github/workflows/ci.yml",))
     result = _fire(repo, ".github/ci.yml")
     assert result.context is not None
@@ -360,9 +361,7 @@ def test_the_same_rescue_twice_in_a_session_logs_once(tmp_path: Path) -> None:
     assert _fire(repo, attempted)
     assert _fire(repo, attempted)
     con = sqlite3.connect(repo / ".repowise" / "sessions" / "sessions.db")
-    (count,) = con.execute(
-        "SELECT COUNT(*) FROM injections WHERE session_id = 's1'"
-    ).fetchone()
+    (count,) = con.execute("SELECT COUNT(*) FROM injections WHERE session_id = 's1'").fetchone()
     con.close()
     assert count == 1
 

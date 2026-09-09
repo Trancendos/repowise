@@ -24,19 +24,13 @@ class GraphRecordsIndexStore(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def batch_upsert_graph_nodes(
-        self, repository_id: str, nodes: list[dict]
-    ) -> None: ...
+    async def batch_upsert_graph_nodes(self, repository_id: str, nodes: list[dict]) -> None: ...
 
     @abstractmethod
-    async def batch_upsert_graph_edges(
-        self, repository_id: str, edges: list[dict]
-    ) -> None: ...
+    async def batch_upsert_graph_edges(self, repository_id: str, edges: list[dict]) -> None: ...
 
     @abstractmethod
-    async def get_graph_node(
-        self, repository_id: str, node_id: str
-    ) -> GraphNode | None: ...
+    async def get_graph_node(self, repository_id: str, node_id: str) -> GraphNode | None: ...
 
     @abstractmethod
     async def get_graph_edges_for_node(
@@ -78,9 +72,7 @@ class GraphRecordsIndexStore(ABC):
     ) -> list[GraphNode]: ...
 
     @abstractmethod
-    async def get_node_degree_counts(
-        self, repository_id: str, node_id: str
-    ) -> dict[str, int]: ...
+    async def get_node_degree_counts(self, repository_id: str, node_id: str) -> dict[str, int]: ...
 
     # ------------------------------------------------------------------
     # external_systems
@@ -97,15 +89,11 @@ class GraphRecordsIndexStore(ABC):
     ) -> int: ...
 
     @abstractmethod
-    async def list_external_systems(
-        self, repository_id: str
-    ) -> list[ExternalSystem]: ...
+    async def list_external_systems(self, repository_id: str) -> list[ExternalSystem]: ...
 
     # ------------------------------------------------------------------
     # wiki_symbols
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def batch_upsert_symbols(
-        self, repository_id: str, symbols: list
-    ) -> None: ...
+    async def batch_upsert_symbols(self, repository_id: str, symbols: list) -> None: ...

@@ -93,11 +93,14 @@ def _verify_github_signature(request: Request, body: bytes, signature_header: st
     if not signature_header.startswith("sha256="):
         raise HTTPException(status_code=401, detail="Missing signature prefix")
 
-    expected = "sha256=" + hmac.new(
-        secret.encode(),
-        body,
-        hashlib.sha256,
-    ).hexdigest()
+    expected = (
+        "sha256="
+        + hmac.new(
+            secret.encode(),
+            body,
+            hashlib.sha256,
+        ).hexdigest()
+    )
 
     if not hmac.compare_digest(expected, signature_header):
         raise HTTPException(status_code=401, detail="Invalid signature")

@@ -124,9 +124,7 @@ async def load_coverage_for_repo(
     — but a caller that touches ``covered_lines_json`` must ask for it.
     """
     q = (
-        select(CoverageFile)
-        if include_covered_lines
-        else select(*_COVERAGE_SCALAR_COLUMNS)
+        select(CoverageFile) if include_covered_lines else select(*_COVERAGE_SCALAR_COLUMNS)
     ).where(CoverageFile.repository_id == repository_id)
     if file_paths is not None:
         q = q.where(CoverageFile.file_path.in_(file_paths))
@@ -151,9 +149,7 @@ async def get_coverage_summary(
     read, say) would silently report that subset's coverage as the repo's.
     """
     if rows is None:
-        rows = await load_coverage_for_repo(
-            session, repository_id, include_covered_lines=False
-        )
+        rows = await load_coverage_for_repo(session, repository_id, include_covered_lines=False)
     if not rows:
         return {
             "file_count": 0,

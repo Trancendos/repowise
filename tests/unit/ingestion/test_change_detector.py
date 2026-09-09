@@ -322,15 +322,11 @@ class TestAffectedPagesPagerankParam:
             "f2.py": 0.01,
             "f3.py": 0.01,
         }
-        result = d.get_affected_pages(
-            [self._diff("f0.py")], graph=g, cascade_budget=3, pagerank=pr
-        )
+        result = d.get_affected_pages([self._diff("f0.py")], graph=g, cascade_budget=3, pagerank=pr)
         assert result.regenerate == ["f5.py", "f4.py", "f0.py"]
         assert set(result.decay_only) == {"f1.py", "f2.py", "f3.py"}
 
-    def test_without_pagerank_falls_back_to_internal_computation(
-        self, tmp_path: Path
-    ) -> None:
+    def test_without_pagerank_falls_back_to_internal_computation(self, tmp_path: Path) -> None:
         """Omitting the param keeps the old self-computed ordering path:
         the candidate partition (regenerate + decay) is unchanged."""
         d = ChangeDetector(tmp_path)
@@ -342,6 +338,4 @@ class TestAffectedPagesPagerankParam:
 
         result = d.get_affected_pages([self._diff("f0.py")], graph=g, cascade_budget=3)
         assert len(result.regenerate) == 3
-        assert set(result.regenerate) | set(result.decay_only) == {
-            f"f{i}.py" for i in range(6)
-        }
+        assert set(result.regenerate) | set(result.decay_only) == {f"f{i}.py" for i in range(6)}

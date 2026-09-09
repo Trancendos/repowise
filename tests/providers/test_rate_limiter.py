@@ -136,6 +136,7 @@ class TestRateLimiterBackoff:
             waited.append(delay)
 
         import asyncio as _asyncio
+
         _asyncio.sleep = mock_sleep  # type: ignore[assignment]
         try:
             await limiter.on_rate_limit_error(attempt=10)

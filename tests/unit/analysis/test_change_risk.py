@@ -503,8 +503,18 @@ def test_merge_commit_scores_its_first_parent_diff(git_repo: Path) -> None:
     _git(["checkout", "-q", "-"], git_repo)
     _commit(git_repo, {"main.py": "m = 1\n"}, "feat: main", author="Dev")
     _git(
-        ["-c", "user.name=Dev", "-c", "user.email=t@e.com", "merge", "-q", "--no-ff", "side",
-         "-m", "merge: side"],
+        [
+            "-c",
+            "user.name=Dev",
+            "-c",
+            "user.email=t@e.com",
+            "merge",
+            "-q",
+            "--no-ff",
+            "side",
+            "-m",
+            "merge: side",
+        ],
         git_repo,
     )
 

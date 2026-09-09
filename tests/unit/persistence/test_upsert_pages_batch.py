@@ -87,9 +87,7 @@ async def test_batch_metadata_only_change_no_version_bump(async_session):
     await async_session.commit()
 
     # metadata enrichment lands after generation; content/hash/model unchanged
-    p2 = make_generated_page(
-        "file_page:a.py", metadata={"wiki_links": ["x"], "backlinks": ["y"]}
-    )
+    p2 = make_generated_page("file_page:a.py", metadata={"wiki_links": ["x"], "backlinks": ["y"]})
     await upsert_pages_from_generated(async_session, [p2], repo.id)
     await async_session.commit()
 

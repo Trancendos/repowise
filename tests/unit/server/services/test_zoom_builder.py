@@ -105,9 +105,7 @@ def test_build_tree_subgroups_and_ungrouped_files():
     # the ungrouped file attaches under the layer directly, not the group
     lid = grp.parent_id
     layer_file_paths = {
-        nodes[fid_].path
-        for cid in nodes[lid].children
-        for fid_ in _descend_files(nodes, cid)
+        nodes[fid_].path for cid in nodes[lid].children for fid_ in _descend_files(nodes, cid)
     }
     assert "svc/loose.py" in layer_file_paths
 
@@ -300,9 +298,13 @@ def test_layout_is_deterministic_and_within_unit_box():
     ]
     leaf_info = {f"pkg/f{i}.py": LeafInfo() for i in range(6)}
     root_id, nodes = build_tree("proj", layers, leaf_info)
-    nodes = score_tree(root_id, nodes, compute_file_signals(
-        [FileStat(path=f"pkg/f{i}.py", degree=i) for i in range(6)], [], [], set()
-    ))
+    nodes = score_tree(
+        root_id,
+        nodes,
+        compute_file_signals(
+            [FileStat(path=f"pkg/f{i}.py", degree=i) for i in range(6)], [], [], set()
+        ),
+    )
     a = lay_out(root_id, nodes)
     b = lay_out(root_id, nodes)
 
@@ -419,7 +421,9 @@ def _node(path: str, **over) -> ArchNode:
 
 def _view() -> ArchitectureView:
     nodes = [
-        _node("pkg/main.py", is_entry_point=True, pagerank_percentile=95.0, in_degree=1, out_degree=2),
+        _node(
+            "pkg/main.py", is_entry_point=True, pagerank_percentile=95.0, in_degree=1, out_degree=2
+        ),
         _node("pkg/core/engine.py", pagerank_percentile=80.0, in_degree=2),
         _node("pkg/core/util.py", pagerank_percentile=10.0),
     ]

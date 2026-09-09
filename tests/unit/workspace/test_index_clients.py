@@ -135,10 +135,14 @@ class TestClassMethodWrapper:
         """
         ctx = ScanContext("frontend", "src/lib/api/client.ts", ".ts", CLIENT_TS, {})
         old = JsClientsDialect().extract(ctx)
-        assert _ids(old) & {
-            "http::GET::/snapshots/{param}",
-            "http::PATCH::/snapshots/{param}/dead-code",
-        } == set()
+        assert (
+            _ids(old)
+            & {
+                "http::GET::/snapshots/{param}",
+                "http::PATCH::/snapshots/{param}/dead-code",
+            }
+            == set()
+        )
 
 
 PUBLIC_CLIENT_TS = """\
@@ -172,9 +176,7 @@ class TestModuleLevelHelper:
 
     def test_regex_dialect_yields_nothing_here(self):
         """Fails before this change: this file's yield was 0."""
-        ctx = ScanContext(
-            "frontend", "src/lib/api/public-client.ts", ".ts", PUBLIC_CLIENT_TS, {}
-        )
+        ctx = ScanContext("frontend", "src/lib/api/public-client.ts", ".ts", PUBLIC_CLIENT_TS, {})
         assert JsClientsDialect().extract(ctx) == []
 
 
@@ -289,9 +291,7 @@ class TestUnresolvedPathsAreCounted:
         Its first argument was never a URL, so counting it would inflate the
         unresolved figure with calls that were never lost.
         """
-        source = UNRESOLVED_TS + (
-            "\nexport function page(c: Client) {\n  return c.known();\n}\n"
-        )
+        source = UNRESOLVED_TS + ("\nexport function page(c: Client) {\n  return c.known();\n}\n")
         _contracts, unresolved, _c = _run(source, "src/lib/api/dyn.ts")
         assert unresolved == 2
 
@@ -324,9 +324,7 @@ class TestFallbackRemainsReachable:
         got = self._extract(tmp_path, index=None)
         assert "http::GET::/legacy/ping" in _ids(got)
 
-    def test_an_index_that_cannot_read_a_file_does_not_delete_its_contracts(
-        self, tmp_path
-    ):
+    def test_an_index_that_cannot_read_a_file_does_not_delete_its_contracts(self, tmp_path):
         """An index present but missing this file must not suppress the dialect.
 
         This is the rule that stops a bad or partial parse silently deleting
@@ -445,9 +443,7 @@ export class HostedApiClient {
         consumers, _u, _c = _run(self.SSE_CLIENT, "src/lib/api/client.ts")
         backend_ctx = ScanContext("backend", "app/routers/chat.py", ".py", "", {})
         providers = [
-            build_provider_contract(
-                backend_ctx, method="POST", path_raw=raw, framework="fastapi"
-            )
+            build_provider_contract(backend_ctx, method="POST", path_raw=raw, framework="fastapi")
             for raw in (
                 "/snapshots/{snapshot_id}/chat",
                 "/snapshots/{snapshot_id}/answer",
@@ -615,11 +611,7 @@ class TestSupersedeCannotSubtract:
     def test_duplicates_are_not_emitted_twice(self, tmp_path):
         from repowise.core.workspace.extractors.http import HttpExtractor
 
-        source = (
-            "export async function load() {\n"
-            "  return fetch('/dup');\n"
-            "}\n"
-        )
+        source = "export async function load() {\n" "  return fetch('/dup');\n" "}\n"
         parsed = _parse("src/lib/dup.ts", source)
         got = HttpExtractor().extract(
             tmp_path,

@@ -23,17 +23,13 @@ import re
 from repowise.core.ingestion.models import SYMBOL_USE_EDGE_TYPES
 from repowise.server.schemas.intelligence import SYMBOL_RELATION_GROUPS
 
-_LABELS = (
-    pathlib.Path(__file__).resolve().parents[3] / "packages/ui/src/graph/symbol-relations.ts"
-)
+_LABELS = pathlib.Path(__file__).resolve().parents[3] / "packages/ui/src/graph/symbol-relations.ts"
 
 
 def _label_table_keys() -> set[str]:
     """The edge types keyed in `RELATION_LABELS`."""
     source = _LABELS.read_text(encoding="utf-8")
-    match = re.search(
-        r"const RELATION_LABELS: [^=]+= \{(.*?)\n\};", source, re.DOTALL
-    )
+    match = re.search(r"const RELATION_LABELS: [^=]+= \{(.*?)\n\};", source, re.DOTALL)
     assert match, f"RELATION_LABELS is not declared in {_LABELS.name}"
     return set(re.findall(r"^  (\w+): \{", match.group(1), re.MULTILINE))
 

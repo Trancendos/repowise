@@ -131,9 +131,9 @@ def test_tool_modules_map_covers_every_tool_module_on_disk():
     # Modules that hold shared helpers rather than a registered tool.
     helpers_only = {"tool_search_symbols"}
     unmapped = on_disk - mapped - helpers_only
-    assert not unmapped, (
-        f"tool modules missing from _TOOL_MODULES (they would never register): {sorted(unmapped)}"
-    )
+    assert (
+        not unmapped
+    ), f"tool modules missing from _TOOL_MODULES (they would never register): {sorted(unmapped)}"
     assert mapped <= on_disk, f"_TOOL_MODULES names modules that do not exist: {mapped - on_disk}"
 
 

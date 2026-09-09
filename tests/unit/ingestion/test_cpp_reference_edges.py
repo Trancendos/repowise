@@ -55,7 +55,7 @@ class TestDispatchTable:
     def test_nested_initialiser_row(self, tmp_path: Path) -> None:
         (tmp_path / "nodes.cpp").write_text(
             "void InitAddNode() {}\n"
-            'struct Init { int type; struct { void (*fn)(); const char* cat; } v; };\n'
+            "struct Init { int type; struct { void (*fn)(); const char* cat; } v; };\n"
             'Init g_inits[] = { { 1, { InitAddNode, "math" } } };\n'
         )
         graph = _build(tmp_path)
@@ -143,8 +143,7 @@ class TestPrecision:
         # ``NodeType::Add`` parses as a qualified_identifier, so the bare
         # identifier capture never sees it.
         (tmp_path / "e.cpp").write_text(
-            "namespace NodeType { enum E { Add }; }\n"
-            "int g_t[] = { NodeType::Add };\n"
+            "namespace NodeType { enum E { Add }; }\n" "int g_t[] = { NodeType::Add };\n"
         )
         graph = _build(tmp_path)
         assert not [e for e in _reference_edges(graph) if e[1].endswith("::Add")]

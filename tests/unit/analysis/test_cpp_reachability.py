@@ -91,12 +91,14 @@ class TestCppFileReachable:
         graph = _build_graph(
             {
                 "apps/runner/main.cc": _cpp_file(
-                    symbols=[{
-                        "name": "main",
-                        "kind": "function",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "main",
+                            "kind": "function",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
         )
@@ -107,12 +109,14 @@ class TestCppFileReachable:
         graph = _build_graph(
             {
                 "src/gui/app.cpp": _cpp_file(
-                    symbols=[{
-                        "name": "WinMain",
-                        "kind": "function",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "WinMain",
+                            "kind": "function",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
         )
@@ -123,12 +127,14 @@ class TestCppFileReachable:
         graph = _build_graph(
             {
                 "fuzz/parse_fuzz.cc": _cpp_file(
-                    symbols=[{
-                        "name": "LLVMFuzzerTestOneInput",
-                        "kind": "function",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "LLVMFuzzerTestOneInput",
+                            "kind": "function",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
         )
@@ -139,55 +145,63 @@ class TestCppFileReachable:
         graph = _build_graph(
             {
                 "include/leveldb/cache.h": _cpp_file(
-                    symbols=[{
-                        "name": "Cache",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Cache",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
                 "src/consumer.cc": _cpp_file(
-                    symbols=[{
-                        "name": "use_it",
-                        "kind": "function",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "use_it",
+                            "kind": "function",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
             edges=[
-                ("src/consumer.cc::use_it", "include/leveldb/cache.h::Cache",
-                 {"edge_type": "type_use"}),
+                (
+                    "src/consumer.cc::use_it",
+                    "include/leveldb/cache.h::Cache",
+                    {"edge_type": "type_use"},
+                ),
             ],
         )
         pkgs = build_cpp_package_files(graph)
-        assert is_cpp_file_reachable(
-            "include/leveldb/cache.h", graph, pkgs
-        ) is True
+        assert is_cpp_file_reachable("include/leveldb/cache.h", graph, pkgs) is True
 
     def test_header_with_implements_edge_is_reachable(self) -> None:
         graph = _build_graph(
             {
                 "include/iface.hpp": _cpp_file(
-                    symbols=[{
-                        "name": "IFace",
-                        "kind": "interface",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "IFace",
+                            "kind": "interface",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
                 "src/impl.cc": _cpp_file(
-                    symbols=[{
-                        "name": "Impl",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Impl",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
             edges=[
-                ("src/impl.cc::Impl", "include/iface.hpp::IFace",
-                 {"edge_type": "implements"}),
+                ("src/impl.cc::Impl", "include/iface.hpp::IFace", {"edge_type": "implements"}),
             ],
         )
         pkgs = build_cpp_package_files(graph)
@@ -230,20 +244,20 @@ class TestCppFileReachable:
         graph = _build_graph(
             {
                 "apps/runner/main.cc": _cpp_file(
-                    symbols=[{
-                        "name": "main",
-                        "kind": "function",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "main",
+                            "kind": "function",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
                 "apps/runner/helper.cc": _cpp_file(),
             },
         )
         pkgs = build_cpp_package_files(graph)
-        assert is_cpp_file_reachable(
-            "apps/runner/helper.cc", graph, pkgs
-        ) is True
+        assert is_cpp_file_reachable("apps/runner/helper.cc", graph, pkgs) is True
 
     def test_orphan_unrelated_header_is_unreachable(self) -> None:
         # A pure orphan header with no symbol references and no live
@@ -251,12 +265,14 @@ class TestCppFileReachable:
         graph = _build_graph(
             {
                 "lib/legacy.h": _cpp_file(
-                    symbols=[{
-                        "name": "Legacy",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Legacy",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
         )
@@ -357,19 +373,34 @@ class TestCppNeverFlag:
 
 class TestCppContractMethods:
     def test_operator_overloads_protected(self) -> None:
-        for op in ("operator==", "operator!=", "operator<", "operator<=>",
-                   "operator+", "operator*", "operator()", "operator[]",
-                   "operator->", "operator new", "operator delete"):
+        for op in (
+            "operator==",
+            "operator!=",
+            "operator<",
+            "operator<=>",
+            "operator+",
+            "operator*",
+            "operator()",
+            "operator[]",
+            "operator->",
+            "operator new",
+            "operator delete",
+        ):
             assert is_contract_method(op, "method", "cpp"), op
 
     def test_stl_customization_points_protected(self) -> None:
-        for n in ("begin", "end", "cbegin", "cend", "swap", "size",
-                  "empty", "data", "hash_value"):
+        for n in ("begin", "end", "cbegin", "cend", "swap", "size", "empty", "data", "hash_value"):
             assert is_contract_method(n, "method", "cpp"), n
 
     def test_coroutine_machinery_protected(self) -> None:
-        for n in ("await_ready", "await_suspend", "await_resume",
-                  "get_return_object", "initial_suspend", "final_suspend"):
+        for n in (
+            "await_ready",
+            "await_suspend",
+            "await_resume",
+            "get_return_object",
+            "initial_suspend",
+            "final_suspend",
+        ):
             assert is_contract_method(n, "method", "cpp"), n
 
     def test_constructor_destructor_protected(self) -> None:
@@ -418,24 +449,27 @@ class TestCppEndToEnd:
         graph = _build_graph(
             {
                 "src/runner.cc": _cpp_file(
-                    symbols=[{
-                        "name": "main",
-                        "kind": "function",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "main",
+                            "kind": "function",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
         )
         analyzer = DeadCodeAnalyzer(graph)
-        report = analyzer.analyze({
-            "detect_unused_exports": False,
-            "detect_unused_internals": False,
-            "detect_zombie_packages": False,
-        })
+        report = analyzer.analyze(
+            {
+                "detect_unused_exports": False,
+                "detect_unused_internals": False,
+                "detect_zombie_packages": False,
+            }
+        )
         assert not any(
-            f.kind == DeadCodeKind.UNREACHABLE_FILE
-            and f.file_path == "src/runner.cc"
+            f.kind == DeadCodeKind.UNREACHABLE_FILE and f.file_path == "src/runner.cc"
             for f in report.findings
         )
 
@@ -443,36 +477,40 @@ class TestCppEndToEnd:
         graph = _build_graph(
             {
                 "include/proj/api.h": _cpp_file(
-                    symbols=[{
-                        "name": "Api",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "Api",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
                 "src/use.cc": _cpp_file(
-                    symbols=[{
-                        "name": "client",
-                        "kind": "function",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "client",
+                            "kind": "function",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
             edges=[
-                ("src/use.cc::client", "include/proj/api.h::Api",
-                 {"edge_type": "type_use"}),
+                ("src/use.cc::client", "include/proj/api.h::Api", {"edge_type": "type_use"}),
             ],
         )
         analyzer = DeadCodeAnalyzer(graph)
-        report = analyzer.analyze({
-            "detect_unused_exports": False,
-            "detect_unused_internals": False,
-            "detect_zombie_packages": False,
-        })
+        report = analyzer.analyze(
+            {
+                "detect_unused_exports": False,
+                "detect_unused_internals": False,
+                "detect_zombie_packages": False,
+            }
+        )
         unreachable_paths = {
-            f.file_path for f in report.findings
-            if f.kind == DeadCodeKind.UNREACHABLE_FILE
+            f.file_path for f in report.findings if f.kind == DeadCodeKind.UNREACHABLE_FILE
         }
         assert "include/proj/api.h" not in unreachable_paths
 
@@ -483,12 +521,14 @@ class TestCppEndToEnd:
         graph = _build_graph(
             {
                 "lib/widget.cc": _cpp_file(
-                    symbols=[{
-                        "name": "operator==",
-                        "kind": "method",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "operator==",
+                            "kind": "method",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
             edges=[("driver.cc", "lib/widget.cc", {"edge_type": "imports"})],
@@ -497,7 +537,8 @@ class TestCppEndToEnd:
         analyzer = DeadCodeAnalyzer(graph)
         report = analyzer.analyze({"min_confidence": 0.0})
         unused_export_safe = [
-            f for f in report.findings
+            f
+            for f in report.findings
             if f.kind == DeadCodeKind.UNUSED_EXPORT
             and f.symbol_name == "operator=="
             and f.safe_to_delete
@@ -508,12 +549,14 @@ class TestCppEndToEnd:
         graph = _build_graph(
             {
                 "apps/io_tester/io_tester.cc": _cpp_file(
-                    symbols=[{
-                        "name": "context",
-                        "kind": "class",
-                        "visibility": "public",
-                        "language": "cpp",
-                    }],
+                    symbols=[
+                        {
+                            "name": "context",
+                            "kind": "class",
+                            "visibility": "public",
+                            "language": "cpp",
+                        }
+                    ],
                 ),
             },
         )

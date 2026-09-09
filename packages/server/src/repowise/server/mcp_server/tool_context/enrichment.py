@@ -468,9 +468,7 @@ async def _resolve_metrics(
             # Degree is "how connected is this symbol", so it stays over every
             # use edge type even though `callers` narrowed to calls. Matching
             # `routers/graph/intelligence.py`, which reports the same number.
-            _SYMBOL_USE_EDGE_TYPES
-            if node.node_type == "symbol"
-            else _FILE_DEPENDENCY_EDGE_TYPES
+            _SYMBOL_USE_EDGE_TYPES if node.node_type == "symbol" else _FILE_DEPENDENCY_EDGE_TYPES
         ),
     )
 

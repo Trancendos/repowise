@@ -41,8 +41,17 @@ Warmup = Callable[["ResolverContext"], None]
 # the header that declares it, and missing it leaves the symbol marked
 # non-exported, which is what the dead-code pass then acts on.
 _CPP_MACRO_SCAN_EXTS: tuple[str, ...] = (
-    ".h", ".hpp", ".hxx", ".hh", ".h++", ".inc",
-    ".c", ".cc", ".cpp", ".cxx", ".c++",
+    ".h",
+    ".hpp",
+    ".hxx",
+    ".hh",
+    ".h++",
+    ".inc",
+    ".c",
+    ".cc",
+    ".cpp",
+    ".cxx",
+    ".c++",
     *sorted(INCLUDE_FRAGMENT_EXTENSIONS),
 )
 

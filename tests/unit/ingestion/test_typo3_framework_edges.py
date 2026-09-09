@@ -53,9 +53,7 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 def _graph_with_nodes(parsed: dict[str, ParsedFile]) -> nx.DiGraph:
@@ -145,15 +143,9 @@ class TestTypo3ConventionFiles:
         graph = _graph_with_nodes(parsed)
         ctx = _ctx(tmp_path, parsed)
         add_framework_edges(graph, parsed, ctx, tech_stack=[])
-        assert graph.has_edge(
-            "framework:typo3-core", "Configuration/TCA/tx_my_ext_item.php"
-        )
-        assert graph.has_edge(
-            "framework:typo3-core", "Configuration/TCA/Overrides/tt_content.php"
-        )
-        assert graph.has_edge(
-            "framework:typo3-core", "Configuration/Backend/Routes.php"
-        )
+        assert graph.has_edge("framework:typo3-core", "Configuration/TCA/tx_my_ext_item.php")
+        assert graph.has_edge("framework:typo3-core", "Configuration/TCA/Overrides/tt_content.php")
+        assert graph.has_edge("framework:typo3-core", "Configuration/Backend/Routes.php")
 
     def test_v14_extension_without_legacy_files_works(self, tmp_path: Path) -> None:
         # v14: no ext_emconf.php, no ext_tables.php, just composer.json + Configuration/.
@@ -190,15 +182,11 @@ class TestTypo3ConventionFiles:
         ctx = _ctx(tmp_path, parsed)
         add_framework_edges(graph, parsed, ctx, tech_stack=[])
         assert graph.has_edge("framework:typo3-core", "Configuration/Services.yaml")
-        assert graph.has_edge(
-            "framework:typo3-core", "Configuration/RTE/Default.yaml"
-        )
+        assert graph.has_edge("framework:typo3-core", "Configuration/RTE/Default.yaml")
 
 
 class TestTypo3JavaScriptModules:
-    def test_registered_js_files_get_edges_from_js_modules(
-        self, tmp_path: Path
-    ) -> None:
+    def test_registered_js_files_get_edges_from_js_modules(self, tmp_path: Path) -> None:
         _make_extension(
             tmp_path,
             extension_key="my_ext",
@@ -253,15 +241,11 @@ class TestTypo3JavaScriptModules:
         ctx = _ctx(tmp_path, parsed)
         add_framework_edges(graph, parsed, ctx, tech_stack=[])
         # No edge to a file under a foreign extension key.
-        assert not any(
-            target.startswith("EXT:other_ext/") for _, target in graph.edges()
-        )
+        assert not any(target.startswith("EXT:other_ext/") for _, target in graph.edges())
 
 
 class TestTypo3TechStackHint:
-    def test_tech_stack_alone_triggers_when_files_match(
-        self, tmp_path: Path
-    ) -> None:
+    def test_tech_stack_alone_triggers_when_files_match(self, tmp_path: Path) -> None:
         # No composer.json, no ext_emconf.php — pure tech-stack hint.
         # Without an extension root we still add zero edges (correct behaviour:
         # we need a discoverable extension).
@@ -314,9 +298,7 @@ class TestTypo3ProjectMode:
         graph = _graph_with_nodes(parsed)
         ctx = _ctx(tmp_path, parsed)
         add_framework_edges(graph, parsed, ctx, tech_stack=[])
-        assert graph.has_edge(
-            "framework:typo3-core", "vendor/myvendor/my-ext/ext_localconf.php"
-        )
+        assert graph.has_edge("framework:typo3-core", "vendor/myvendor/my-ext/ext_localconf.php")
         assert graph.has_edge(
             "framework:typo3-core",
             "vendor/myvendor/my-ext/Configuration/Icons.php",
@@ -327,13 +309,9 @@ class TestTypo3ProjectMode:
         # those as TYPO3 extensions.
         bogus = tmp_path / "node_modules" / "evil" / "composer.json"
         bogus.parent.mkdir(parents=True)
-        bogus.write_text(
-            json.dumps({"name": "evil/pkg", "type": "typo3-cms-extension"})
-        )
+        bogus.write_text(json.dumps({"name": "evil/pkg", "type": "typo3-cms-extension"}))
         # Need any TYPO3 marker for detection to even fire.
-        (tmp_path / "composer.json").write_text(
-            json.dumps({"type": "typo3-cms-extension"})
-        )
+        (tmp_path / "composer.json").write_text(json.dumps({"type": "typo3-cms-extension"}))
         (tmp_path / "ext_localconf.php").write_text("<?php\n")
         parsed = _build_parsed(tmp_path)
         graph = _graph_with_nodes(parsed)
@@ -341,7 +319,5 @@ class TestTypo3ProjectMode:
         add_framework_edges(graph, parsed, ctx, tech_stack=[])
         # The bogus path should never become an edge target.
         assert not any(
-            "node_modules/" in target
-            for _, target in graph.edges()
-            if isinstance(target, str)
+            "node_modules/" in target for _, target in graph.edges() if isinstance(target, str)
         )

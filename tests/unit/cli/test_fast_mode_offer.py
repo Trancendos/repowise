@@ -112,10 +112,7 @@ def test_next_steps_headless_run_gets_manual_mcp_row():
     assert cmds[1] == "repowise mcp ."
 
     # Fast mode too, for the same reason.
-    fast = [
-        c
-        for c, _ in build_contextual_next_steps(index_only=True, fast_mode=True, setup=setup)
-    ]
+    fast = [c for c, _ in build_contextual_next_steps(index_only=True, fast_mode=True, setup=setup)]
     assert fast[1] == "repowise mcp ."
     # A skip-setup run opted out of all wiring, so it is never nagged to install
     # hooks even though it is non-interactive with none present.

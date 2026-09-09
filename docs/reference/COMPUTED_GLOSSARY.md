@@ -417,4 +417,3 @@ For a file `src/auth/session.py`, a typical Repowise index can compute:
 6. Analysis rows: maybe a security finding `hardcoded_secret`, or a decision record from `# DECISION: store sessions in Redis`.
 7. Generated docs: `file_page:src/auth/session.py`, source hash, token counts, summary, freshness, and vector/FTS entries.
 8. Risk output: `hotspot_score=0.88`, trend `increasing`, risk type `churn-heavy`, co-change partners, test-gap flag, and an impact surface.
-

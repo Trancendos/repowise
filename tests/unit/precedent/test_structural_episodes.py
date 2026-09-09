@@ -44,9 +44,7 @@ def _kinds(episodes: list) -> set[str]:
 class TestSilence:
     def test_plain_repo_emits_nothing(self, tmp_path: Path) -> None:
         repo = _repo(tmp_path)
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert episodes == []
 
     def test_plain_repo_leaves_an_empty_store(self, tmp_path: Path) -> None:
@@ -69,9 +67,7 @@ class TestNestedRepos:
         repo = _repo(tmp_path)
         for name in ("backend", "frontend"):
             (repo / name / ".git").mkdir(parents=True)
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         [nested] = [ep for ep in episodes if ep.kind == KIND_NESTED_REPOS]
         assert set(nested.nodes) == {"backend", "frontend"}
         assert "backend" in nested.body and "frontend" in nested.body
@@ -83,9 +79,7 @@ class TestNestedRepos:
         (repo / "linked" / ".git").write_text(
             "gitdir: C:/elsewhere/other-project/.git", encoding="utf-8"
         )
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_NESTED_REPOS in _kinds(episodes)
 
     def test_linked_worktree_is_not_a_separate_repo(self, tmp_path: Path) -> None:
@@ -95,9 +89,7 @@ class TestNestedRepos:
         (repo / "wt-feature" / ".git").write_text(
             "gitdir: C:/repo/.git/worktrees/wt-feature\n", encoding="utf-8"
         )
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_NESTED_REPOS not in _kinds(episodes)
 
     def test_nested_submodule_is_not_a_separate_repo(self, tmp_path: Path) -> None:
@@ -107,9 +99,7 @@ class TestNestedRepos:
         (repo / "vendored" / ".git").write_text(
             "gitdir: ../.git/modules/outer/modules/vendored\n", encoding="utf-8"
         )
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_NESTED_REPOS not in _kinds(episodes)
 
     def test_declared_submodule_is_not_a_separate_repo(self, tmp_path: Path) -> None:
@@ -120,9 +110,7 @@ class TestNestedRepos:
             '[submodule "vendored"]\n\tpath = vendored\n\turl = https://example.invalid/x\n',
             encoding="utf-8",
         )
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_NESTED_REPOS not in _kinds(episodes)
 
 
@@ -143,9 +131,7 @@ class TestEditableShadow:
         scripts = repo / ".venv" / "Scripts"
         scripts.mkdir()
         (scripts / "mytool.exe").write_bytes(b"MZ")
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         [shadow] = [ep for ep in episodes if ep.kind == KIND_EDITABLE_SHADOW]
         assert shadow.subject == "mytool"
         assert "__editable__.x-0.pth" in shadow.evidence
@@ -153,9 +139,7 @@ class TestEditableShadow:
     def test_no_launcher_means_no_episode(self, tmp_path: Path) -> None:
         repo = _repo(tmp_path)
         self._venv_with_editable_install(repo, script="mytool")
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_EDITABLE_SHADOW not in _kinds(episodes)
 
     def test_editable_install_of_another_distribution_means_no_episode(
@@ -174,9 +158,7 @@ class TestEditableShadow:
         scripts = repo / ".venv" / "Scripts"
         scripts.mkdir()
         (scripts / "mytool.exe").write_bytes(b"MZ")
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_EDITABLE_SHADOW not in _kinds(episodes)
 
     def test_distribution_spelling_does_not_matter(self, tmp_path: Path) -> None:
@@ -193,9 +175,7 @@ class TestEditableShadow:
         scripts = repo / ".venv" / "Scripts"
         scripts.mkdir()
         (scripts / "mytool.exe").write_bytes(b"MZ")
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_EDITABLE_SHADOW in _kinds(episodes)
 
     def test_launcher_without_editable_install_means_no_episode(self, tmp_path: Path) -> None:
@@ -207,9 +187,7 @@ class TestEditableShadow:
         scripts = repo / ".venv" / "Scripts"
         scripts.mkdir(parents=True)
         (scripts / "mytool.exe").write_bytes(b"MZ")
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_EDITABLE_SHADOW not in _kinds(episodes)
 
 
@@ -219,9 +197,7 @@ class TestConfigOverrides:
         (repo / ".repowise" / "config.yaml").write_text(
             "exclude_patterns:\n  - vendor/**\n", encoding="utf-8"
         )
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         [cfg] = [ep for ep in episodes if ep.kind == KIND_CONFIG_OVERRIDE]
         assert cfg.subject == "exclude_patterns"
         assert "vendor/**" in cfg.evidence
@@ -231,9 +207,7 @@ class TestConfigOverrides:
         (repo / ".repowise" / "config.yaml").write_text(
             "hooks:\n  read_skeleton: false\n  search_digest: false\n", encoding="utf-8"
         )
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         [cfg] = [ep for ep in episodes if ep.kind == KIND_CONFIG_OVERRIDE]
         assert cfg.subject == "hooks"
         assert "read_skeleton" in cfg.body and "search_digest" in cfg.body
@@ -243,9 +217,7 @@ class TestConfigOverrides:
         (repo / ".repowise" / "config.yaml").write_text(
             "provider: openai\nhooks:\n  read_skeleton: true\n", encoding="utf-8"
         )
-        episodes = derive_structural_episodes(
-            repo, _traverser(repo), allow_formatter_check=False
-        )
+        episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=False)
         assert KIND_CONFIG_OVERRIDE not in _kinds(episodes)
 
 
@@ -261,9 +233,7 @@ class TestFormatterDrift:
         )
         return repo
 
-    def test_not_run_when_the_repo_declares_no_formatter(
-        self, tmp_path: Path, monkeypatch
-    ) -> None:
+    def test_not_run_when_the_repo_declares_no_formatter(self, tmp_path: Path, monkeypatch) -> None:
         repo = _repo(tmp_path)
         monkeypatch.setattr(
             "repowise.core.precedent.structural._ruff_executable",
@@ -355,7 +325,9 @@ class TestFormatterDrift:
         monkeypatch.setattr(
             subprocess,
             "run",
-            lambda *a, **k: SimpleNamespace(returncode=0, stdout="12 files already formatted\n", stderr=""),
+            lambda *a, **k: SimpleNamespace(
+                returncode=0, stdout="12 files already formatted\n", stderr=""
+            ),
         )
         episodes = derive_structural_episodes(repo, _traverser(repo), allow_formatter_check=True)
         assert KIND_FORMATTER_DRIFT not in _kinds(episodes)

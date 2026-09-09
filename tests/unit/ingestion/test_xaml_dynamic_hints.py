@@ -38,10 +38,7 @@ class TestPrefixCollection:
         assert _collect_prefix_namespaces(text) == {"m": "Acme.Models"}
 
     def test_multiple(self) -> None:
-        text = (
-            '<Page xmlns:vm="using:Acme.ViewModels" '
-            'xmlns:m="clr-namespace:Acme.Models">'
-        )
+        text = '<Page xmlns:vm="using:Acme.ViewModels" ' 'xmlns:m="clr-namespace:Acme.Models">'
         result = _collect_prefix_namespaces(text)
         assert result["vm"] == "Acme.ViewModels"
         assert result["m"] == "Acme.Models"
@@ -66,13 +63,13 @@ class TestTypeReferenceExtraction:
 
     def test_element_tag_property_syntax_skipped(self) -> None:
         """``<Grid.Resources>`` is property-element syntax, not a type reference."""
-        text = '<Grid><Grid.Resources/></Grid>'
+        text = "<Grid><Grid.Resources/></Grid>"
         refs = _extract_type_references(text, {})
         assert "Resources" not in refs
 
     def test_bare_xaml_element_not_a_type_reference(self) -> None:
         """Built-in XAML elements (``<Grid>``, ``<TextBlock>``) must not bind."""
-        text = '<Page><Grid><TextBlock/></Grid></Page>'
+        text = "<Page><Grid><TextBlock/></Grid></Page>"
         refs = _extract_type_references(text, {})
         assert "Grid" not in refs
         assert "TextBlock" not in refs
@@ -95,8 +92,7 @@ class TestEndToEnd:
         )
         (tmp_path / "App" / "Views").mkdir()
         (tmp_path / "App" / "Views" / "GeneralPage.xaml").write_text(
-            '<Page xmlns:vm="using:App.ViewModels" x:DataType="vm:GeneralViewModel">\n'
-            "</Page>\n"
+            '<Page xmlns:vm="using:App.ViewModels" x:DataType="vm:GeneralViewModel">\n' "</Page>\n"
         )
 
         edges = XamlDynamicHints().extract(tmp_path)
@@ -111,9 +107,7 @@ class TestEndToEnd:
         # bind against; type-binding edges silently produce nothing.
         # ResourceDictionary edges remain xaml→xaml and don't need the
         # type map — they're tested separately.
-        (tmp_path / "View.xaml").write_text(
-            '<Page xmlns:vm="using:Foo" x:DataType="vm:Bar"/>'
-        )
+        (tmp_path / "View.xaml").write_text('<Page xmlns:vm="using:Foo" x:DataType="vm:Bar"/>')
         edges = XamlDynamicHints().extract(tmp_path)
         # No binding edges should fire — and with no other xaml in the
         # tree the list is empty.
@@ -130,10 +124,10 @@ class TestResourceDictionaryEdges:
         )
         (tmp_path / "Themes" / "App.xaml").write_text(
             '<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">\n'
-            '  <ResourceDictionary.MergedDictionaries>\n'
+            "  <ResourceDictionary.MergedDictionaries>\n"
             '    <ResourceDictionary Source="Light.xaml"/>\n'
-            '  </ResourceDictionary.MergedDictionaries>\n'
-            '</ResourceDictionary>\n'
+            "  </ResourceDictionary.MergedDictionaries>\n"
+            "</ResourceDictionary>\n"
         )
         edges = {(e.source, e.target) for e in XamlDynamicHints().extract(tmp_path)}
         assert ("Themes/App.xaml", "Themes/Light.xaml") in edges
@@ -154,18 +148,18 @@ class TestResourceDictionaryEdges:
         (tmp_path / "Styles").mkdir()
         (tmp_path / "Styles" / "Buttons.xaml").write_text("<ResourceDictionary/>")
         (tmp_path / "App.xaml").write_text(
-            '<ResourceDictionary>\n'
+            "<ResourceDictionary>\n"
             '  <ResourceDictionary Source="ms-appx:///Styles/Buttons.xaml"/>\n'
-            '</ResourceDictionary>'
+            "</ResourceDictionary>"
         )
         edges = {(e.source, e.target) for e in XamlDynamicHints().extract(tmp_path)}
         assert ("App.xaml", "Styles/Buttons.xaml") in edges
 
     def test_self_reference_dropped(self, tmp_path: Path) -> None:
         (tmp_path / "Self.xaml").write_text(
-            '<ResourceDictionary>\n'
+            "<ResourceDictionary>\n"
             '  <ResourceDictionary Source="Self.xaml"/>\n'
-            '</ResourceDictionary>'
+            "</ResourceDictionary>"
         )
         edges = XamlDynamicHints().extract(tmp_path)
         assert edges == []
@@ -215,8 +209,7 @@ class TestPrebuiltIndexReuse:
         )
         (tmp_path / "App" / "Views").mkdir()
         (tmp_path / "App" / "Views" / "GeneralPage.xaml").write_text(
-            '<Page xmlns:vm="using:App.ViewModels" x:DataType="vm:GeneralViewModel">\n'
-            "</Page>\n"
+            '<Page xmlns:vm="using:App.ViewModels" x:DataType="vm:GeneralViewModel">\n' "</Page>\n"
         )
 
     def test_provided_index_used_without_rebuild(self, tmp_path: Path, monkeypatch) -> None:

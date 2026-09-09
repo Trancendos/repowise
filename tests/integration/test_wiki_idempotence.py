@@ -73,9 +73,7 @@ async def _generate(parsed_files, source_map, tmp) -> list[GeneratedPage]:
     builder.build()
 
     packages = [
-        PackageInfo(
-            name=d.name, path=d.name, language="unknown", entry_points=[], manifest_file=""
-        )
+        PackageInfo(name=d.name, path=d.name, language="unknown", entry_points=[], manifest_file="")
         for d in SAMPLE_REPO.iterdir()
         if d.is_dir()
     ]
@@ -346,9 +344,7 @@ class TestTreeOnRealOutput:
         deepest this fixture can go, and it is the rung that was broken.
         """
         depths = [
-            p.section_number.count(".")
-            for p in two_indexes["second_pages"]
-            if p.section_number
+            p.section_number.count(".") for p in two_indexes["second_pages"] if p.section_number
         ]
         assert depths, "generation produced no tree"
         assert max(depths) >= 1, f"tree is only {max(depths) + 1} levels deep"
@@ -358,17 +354,13 @@ class TestTreeOnRealOutput:
         this only passes if placement uses the recorded member list rather
         than a path prefix. It was zero before members were recorded."""
         files = [p for p in two_indexes["second_pages"] if p.page_type == "file_page"]
-        under_module = [
-            p for p in files if (p.parent_page_id or "").startswith("module_page:")
-        ]
-        assert len(under_module) >= len(files) // 3, (
-            f"only {len(under_module)} of {len(files)} file pages found a module"
-        )
+        under_module = [p for p in files if (p.parent_page_id or "").startswith("module_page:")]
+        assert (
+            len(under_module) >= len(files) // 3
+        ), f"only {len(under_module)} of {len(files)} file pages found a module"
 
     async def test_module_pages_have_children(self, two_indexes):
-        modules = {
-            p.page_id for p in two_indexes["second_pages"] if p.page_type == "module_page"
-        }
+        modules = {p.page_id for p in two_indexes["second_pages"] if p.page_type == "module_page"}
         assert modules
         parented = {p.parent_page_id for p in two_indexes["second_pages"]}
         assert modules & parented, "no page sits under any module"
@@ -408,9 +400,7 @@ class TestTreeOnRealOutput:
         place its pages exactly where the previous run did."""
 
         def placement(pages):
-            return {
-                p.page_id: (p.parent_page_id, p.display_order, p.section_number) for p in pages
-            }
+            return {p.page_id: (p.parent_page_id, p.display_order, p.section_number) for p in pages}
 
         assert placement(two_indexes["second_pages"]) == placement(two_indexes["first_pages"])
 
@@ -423,9 +413,9 @@ class TestTreeOnRealOutput:
         sf = two_indexes["sf"]
         async with sf() as session:
             rows = await session.execute(
-                select(
-                    Page.id, Page.parent_page_id, Page.display_order, Page.section_number
-                ).where(Page.repository_id == two_indexes["repo_id"])
+                select(Page.id, Page.parent_page_id, Page.display_order, Page.section_number).where(
+                    Page.repository_id == two_indexes["repo_id"]
+                )
             )
             stored = {pid: (parent, order, section) for pid, parent, order, section in rows.all()}
         assert stored == expected

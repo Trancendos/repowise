@@ -62,7 +62,12 @@ def _make_repo_structure(entry_points: list[str] | None = None):
 def _make_kg_skeleton(layers: list[dict] | None = None, nodes: list[dict] | None = None):
     if layers is None:
         layers = [
-            {"id": "layer:core", "name": "src/core", "description": "", "nodeIds": ["file:src/core.py", "file:src/utils.py"]},
+            {
+                "id": "layer:core",
+                "name": "src/core",
+                "description": "",
+                "nodeIds": ["file:src/core.py", "file:src/utils.py"],
+            },
             {"id": "layer:cli", "name": "cli", "description": "", "nodeIds": ["file:src/main.py"]},
         ]
     if nodes is None:
@@ -120,8 +125,12 @@ class TestEnrichLayers:
         # Eight layers → two batches of five and three. Batch 2's response
         # echoes batch 1's ids; those answers must be dropped, not applied.
         layers = [
-            {"id": f"layer:l{i}", "name": f"heuristic-{i}", "description": "",
-             "nodeIds": [f"file:src/f{i}.py"]}
+            {
+                "id": f"layer:l{i}",
+                "name": f"heuristic-{i}",
+                "description": "",
+                "nodeIds": [f"file:src/f{i}.py"],
+            }
             for i in range(8)
         ]
         nodes = [
@@ -306,9 +315,16 @@ class TestSummaryBackfill:
         assert core_node["summary"] == "Core business logic module"
 
     def test_does_not_overwrite_existing(self):
-        kg = _make_kg_skeleton(nodes=[
-            {"id": "file:src/core.py", "type": "file", "filePath": "src/core.py", "summary": "Existing summary"},
-        ])
+        kg = _make_kg_skeleton(
+            nodes=[
+                {
+                    "id": "file:src/core.py",
+                    "type": "file",
+                    "filePath": "src/core.py",
+                    "summary": "Existing summary",
+                },
+            ]
+        )
         pages = [
             SimpleNamespace(target_path="src/core.py", summary="New summary"),
         ]
@@ -382,7 +398,9 @@ class TestEnrichmentSplit:
 
     def test_finalize_backfills_assigns_and_returns_skeleton(self):
         skeleton = _make_kg_skeleton()
-        enriched_layers = [{"id": "layer:core", "name": "Renamed", "description": "d", "nodeIds": []}]
+        enriched_layers = [
+            {"id": "layer:core", "name": "Renamed", "description": "d", "nodeIds": []}
+        ]
         tour = [{"order": 1, "title": "T", "description": "", "nodeIds": []}]
         pages = [SimpleNamespace(target_path="src/core.py", summary="Core logic")]
 
@@ -429,8 +447,17 @@ class TestEnrichmentSplit:
         # layers in place, so the snapshot generation holds must be a copy that
         # a later rename cannot mutate.
         result = KnowledgeGraphResult(
-            layers=[{"id": "layer:core", "name": "heuristic-core", "description": "", "nodeIds": ["file:src/core.py"]}],
-            nodes=[{"id": "file:src/core.py", "type": "file", "filePath": "src/core.py", "summary": ""}],
+            layers=[
+                {
+                    "id": "layer:core",
+                    "name": "heuristic-core",
+                    "description": "",
+                    "nodeIds": ["file:src/core.py"],
+                }
+            ],
+            nodes=[
+                {"id": "file:src/core.py", "type": "file", "filePath": "src/core.py", "summary": ""}
+            ],
         )
         snapshot = result.to_dict()
 

@@ -120,9 +120,7 @@ async def test_used_by_is_ordered_by_centrality(session, repository, many_users)
 
     ranks = {}
     for path in used_by:
-        node = await session.execute(
-            GraphNode.__table__.select().where(GraphNode.node_id == path)
-        )
+        node = await session.execute(GraphNode.__table__.select().where(GraphNode.node_id == path))
         row = node.first()
         ranks[path] = row.pagerank if row else 0.0
     assert list(ranks.values()) == sorted(ranks.values(), reverse=True)

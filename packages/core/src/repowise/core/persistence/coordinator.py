@@ -30,6 +30,7 @@ The NetworkX DiGraph is stored as ``GraphBuilder._graph`` (private attribute).
 This coordinator accesses it directly via ``getattr(builder, "_graph", None)``
 to avoid triggering a full ``build()`` call.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -164,6 +165,7 @@ class AtomicStorageCoordinator:
         existing callers that only display it are unaffected.
         """
         from sqlalchemy import text
+
         report: dict = {
             "sql_pages": None,
             "sql_decisions": None,
@@ -228,6 +230,7 @@ class AtomicStorageCoordinator:
 #   delete: delete(page_id: str) -> None  (async)
 #   count:  __len__() (sync, InMemoryVectorStore only; others return -1)
 # ---------------------------------------------------------------------------
+
 
 async def _vector_upsert(store, vid: str, record: dict) -> None:
     """Call embed_and_upsert on the store.
