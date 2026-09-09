@@ -133,9 +133,7 @@ def _module_adjacency(
     return out
 
 
-def _inherit_subtree_neighbours(
-    pages: list[Any], adjacency: dict[str, dict[str, Counter]]
-) -> None:
+def _inherit_subtree_neighbours(pages: list[Any], adjacency: dict[str, dict[str, Counter]]) -> None:
     """Give a chapter that owns no files the neighbours of its subtree.
 
     A chapter heading a subsystem whose files all belong to the pages beneath
@@ -228,9 +226,7 @@ def attach_related_pages(
     # page. Skipped entirely when no module page is present, which is the
     # common case on a scoped file-page run.
     module_of = _module_of_path(pages)
-    module_adj = (
-        _module_adjacency(module_of, import_edges, git_meta_map) if module_of else {}
-    )
+    module_adj = _module_adjacency(module_of, import_edges, git_meta_map) if module_of else {}
     if module_adj:
         _inherit_subtree_neighbours(pages, module_adj)
 

@@ -1181,9 +1181,7 @@ def test_opencode_doctor_agrees_with_detection_about_which_file_counts(
     assert opencode.TARGET.doctor().status is DoctorStatus.OK
 
 
-def test_opencode_uninstall_leaves_no_directory_of_ours_behind(
-    tmp_path: Path, monkeypatch
-) -> None:
+def test_opencode_uninstall_leaves_no_directory_of_ours_behind(tmp_path: Path, monkeypatch) -> None:
     """An empty leftover directory keeps the agent pre-ticked forever.
 
     ``is_present`` reads the config directory as evidence the user has OpenCode
@@ -1257,8 +1255,9 @@ def test_vscode_declines_a_hand_wired_remote_server(tmp_path: Path) -> None:
 
     result = vscode_target.TARGET.install(Scope.PROJECT, repo_path=repo)
 
-    assert json.loads(config.read_text(encoding="utf-8"))["servers"]["repowise"] == (
-        remote["servers"]["repowise"]
+    assert (
+        json.loads(config.read_text(encoding="utf-8"))["servers"]["repowise"]
+        == (remote["servers"]["repowise"])
     )
     assert any("remote server" in note for note in result.notes)
 
@@ -1277,7 +1276,9 @@ def test_opencode_declines_a_hand_wired_remote_server(tmp_path: Path) -> None:
     repo.mkdir()
     config = repo / "opencode.jsonc"
     remote = {
-        "mcp": {"repowise": {"type": "remote", "url": "https://mcp.repowise.dev/sse", "enabled": True}}
+        "mcp": {
+            "repowise": {"type": "remote", "url": "https://mcp.repowise.dev/sse", "enabled": True}
+        }
     }
     config.write_text(json.dumps(remote, indent=2) + "\n", encoding="utf-8")
 
@@ -1396,11 +1397,15 @@ def test_opencode_is_present_checks_each_limb_on_its_own(tmp_path: Path, monkeyp
     # Limb two: the binary, with no config directory.
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "empty"))
     assert opencode.TARGET.is_present() is False
-    monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/opencode" if name == "opencode" else None)
+    monkeypatch.setattr(
+        shutil, "which", lambda name: "/usr/bin/opencode" if name == "opencode" else None
+    )
     assert opencode.TARGET.is_present() is True
 
 
-def test_opencode_does_not_read_its_own_output_as_evidence_of_the_agent(tmp_path: Path, monkeypatch) -> None:
+def test_opencode_does_not_read_its_own_output_as_evidence_of_the_agent(
+    tmp_path: Path, monkeypatch
+) -> None:
     """A repo-local limb would make our own install the reason we keep offering.
 
     OpenCode keeps nothing repo-local of its own: the project config is a bare
@@ -1616,7 +1621,9 @@ def test_write_json_config_compares_the_bytes_it_would_land(tmp_path: Path) -> N
     assert path.read_bytes() == settled
 
     # A file whose endings do not match this platform's writer is rewritten.
-    path.write_bytes(settled.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n" if os.linesep == "\n" else b"\n"))
+    path.write_bytes(
+        settled.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n" if os.linesep == "\n" else b"\n")
+    )
     assert json_merge.write_json_config(path, {"a": 1}) is FileAction.UPDATED
     assert path.read_bytes() == settled
 
@@ -2345,9 +2352,7 @@ def test_hermes_project_scope_manages_the_agents_md_block(
     assert (repo / "AGENTS.md").read_bytes() == b"# House rules\n\nBe nice.\n"
 
 
-def test_hermes_does_not_write_the_file_the_host_prefers(
-    hermes_home: Path, tmp_path: Path
-) -> None:
+def test_hermes_does_not_write_the_file_the_host_prefers(hermes_home: Path, tmp_path: Path) -> None:
     """Hermes loads one project context file, and ``HERMES.md`` outranks ``AGENTS.md``.
 
     Writing the host-named file into a repo that already has an ``AGENTS.md``
@@ -2867,9 +2872,7 @@ def test_yaml_merge_finds_the_comment_boundary_the_way_the_parser_does() -> None
     from repowise.cli.agent_targets.formats import yaml_merge
 
     def merged(line: str) -> str:
-        return yaml_merge.set_child(
-            line + "\n", "mcp_servers", "repowise", {"command": "R"}
-        )
+        return yaml_merge.set_child(line + "\n", "mcp_servers", "repowise", {"command": "R"})
 
     # No comment here at all: the hash lives inside a quoted scalar.
     fragment = merged("mcp_servers: {a: don't, b: 'x}y # z'}")
@@ -2897,10 +2900,7 @@ def test_yaml_merge_refuses_a_wrapped_value_holding_a_comment() -> None:
         "              other: {command: o}}\n"
         "model: a\n"
     )
-    assert (
-        yaml_merge.set_child(commented, "mcp_servers", "repowise", {"command": "R"})
-        == commented
-    )
+    assert yaml_merge.set_child(commented, "mcp_servers", "repowise", {"command": "R"}) == commented
 
 
 def test_yaml_merge_matches_a_quoted_key_at_both_levels() -> None:
@@ -2963,10 +2963,7 @@ def test_yaml_merge_refuses_an_inline_value_carrying_an_anchor() -> None:
     from repowise.cli.agent_targets.formats import yaml_merge
 
     original = "mcp_servers: {a: &base {command: gh}, b: *base}\n"
-    assert (
-        yaml_merge.set_child(original, "mcp_servers", "repowise", {"command": "x"})
-        == original
-    )
+    assert yaml_merge.set_child(original, "mcp_servers", "repowise", {"command": "x"}) == original
 
     # A star inside an ordinary scalar is not an alias and must not be refused.
     shell = "mcp_servers: {a: {command: sh, args: [-c, 'ls *']}}\n"
@@ -3158,7 +3155,5 @@ def test_yaml_merge_keeps_an_inline_list_inline_and_still_findable() -> None:
 
     # The round trip has to land back on the exact bytes, which only holds if
     # the edited line is still reachable.
-    restored = yaml_merge.set_child(
-        added, "platform_toolsets", "cli", ["hermes-cli", "othersrv"]
-    )
+    restored = yaml_merge.set_child(added, "platform_toolsets", "cli", ["hermes-cli", "othersrv"])
     assert restored == text

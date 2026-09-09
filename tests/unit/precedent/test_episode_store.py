@@ -37,9 +37,7 @@ def _store(tmp_path: Path) -> EpisodeStore:
 class TestReplaceKinds:
     def test_writes_and_reads_back(self, tmp_path: Path) -> None:
         with _store(tmp_path) as store:
-            store.replace_kinds(
-                tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()]
-            )
+            store.replace_kinds(tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()])
             rows = store.list_episodes(tier=TIER_STRUCTURAL)
         assert len(rows) == 1
         assert rows[0]["kind"] == "nested_repos"
@@ -106,18 +104,14 @@ class TestPrune:
     def test_ttl_drops_only_unseen_rows(self, tmp_path: Path) -> None:
         (tmp_path / ".repowise").mkdir()
         with EpisodeStore(default_store_path(tmp_path), ttl_days=0.0) as store:
-            store.replace_kinds(
-                tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()]
-            )
+            store.replace_kinds(tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()])
             # Written with a current timestamp, so a zero TTL must not evict it.
             assert store.count() == 1
 
     def test_row_cap_never_evicts_the_last_row(self, tmp_path: Path) -> None:
         (tmp_path / ".repowise").mkdir()
         with EpisodeStore(default_store_path(tmp_path), max_rows=0) as store:
-            store.replace_kinds(
-                tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()]
-            )
+            store.replace_kinds(tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()])
             assert store.count() == 1
 
     def test_an_accumulating_tier_cannot_evict_the_cold_start_one(self, tmp_path: Path) -> None:
@@ -313,9 +307,7 @@ class TestAccumulateTier:
             # contract, and a note appended every run would still read as one
             # note if only the string were checked.
             assert noted == [1, 0, 0]
-            (two,) = [
-                r for r in store.list_episodes(tier=TIER_TRANSCRIPT) if r["subject"] == "two"
-            ]
+            (two,) = (r for r in store.list_episodes(tier=TIER_TRANSCRIPT) if r["subject"] == "two")
             assert two["evidence"].count(SOURCE_GONE_NOTE) == 1
 
     def test_a_source_that_comes_back_loses_the_note(self, tmp_path: Path) -> None:
@@ -337,9 +329,9 @@ class TestAccumulateTier:
             )
             # Assert the transition, not just the destination: without this the
             # test passes on code that never writes a note at all.
-            (gone,) = [
+            (gone,) = (
                 r for r in store.list_episodes(tier=TIER_TRANSCRIPT) if r["subject"] == "two"
-            ]
+            )
             assert SOURCE_GONE_NOTE in gone["evidence"]
 
             store.accumulate_tier(
@@ -349,9 +341,7 @@ class TestAccumulateTier:
                 present_subjects=["one", "two"],
                 now=3000.0,
             )
-            (two,) = [
-                r for r in store.list_episodes(tier=TIER_TRANSCRIPT) if r["subject"] == "two"
-            ]
+            (two,) = (r for r in store.list_episodes(tier=TIER_TRANSCRIPT) if r["subject"] == "two")
             assert SOURCE_GONE_NOTE not in two["evidence"]
 
     def test_a_run_that_enumerated_nothing_annotates_nothing(self, tmp_path: Path) -> None:
@@ -392,9 +382,7 @@ class TestAccumulateTier:
             assert len(store.list_episodes(tier=TIER_STRUCTURAL)) == 1
             assert len(store.list_episodes(tier=TIER_TRANSCRIPT)) == 1
 
-    def test_a_membership_past_the_variable_limit_annotates_nothing(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_membership_past_the_variable_limit_annotates_nothing(self, tmp_path: Path) -> None:
         """The negation is all-or-nothing: a chunk of it would annotate live rows.
 
         SQLite's per-statement variable limit is what a heavy machine's
@@ -443,9 +431,7 @@ class TestAccumulateTier:
             store.accumulate_tier(
                 tier=TIER_TRANSCRIPT,
                 kind="session",
-                episodes=[
-                    self._session(s, birth_at=float(i)) for i, s in enumerate(subjects)
-                ],
+                episodes=[self._session(s, birth_at=float(i)) for i, s in enumerate(subjects)],
                 present_subjects=subjects,
                 now=1000.0,
             )
@@ -457,12 +443,11 @@ class TestAccumulateTier:
             # it: the newest sessions are the ones worth keeping.
             assert {r["subject"] for r in kept} == {"s7", "s8", "s9"}
 
+
 class TestListFilters:
     def test_tiers_is_an_allowlist(self, tmp_path: Path) -> None:
         with _store(tmp_path) as store:
-            store.replace_kinds(
-                tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()]
-            )
+            store.replace_kinds(tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()])
             store.accumulate_tier(
                 tier=TIER_TRANSCRIPT,
                 kind="session",
@@ -483,9 +468,7 @@ class TestListFilters:
 
     def test_an_empty_allowlist_selects_nothing(self, tmp_path: Path) -> None:
         with _store(tmp_path) as store:
-            store.replace_kinds(
-                tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()]
-            )
+            store.replace_kinds(tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[_episode()])
             assert store.list_episodes(tiers=[]) == []
             assert store.list_episodes(subjects=[]) == []
 
@@ -494,9 +477,7 @@ class TestListFilters:
         assert TIER_TRANSCRIPT not in SHAREABLE_TIERS
         assert set(SHAREABLE_TIERS) == {TIER_STRUCTURAL, TIER_GIT}
 
-    def test_too_many_subjects_is_refused_rather_than_silently_paged(
-        self, tmp_path: Path
-    ) -> None:
+    def test_too_many_subjects_is_refused_rather_than_silently_paged(self, tmp_path: Path) -> None:
         from repowise.core.precedent.store import _IN_CHUNK
 
         with _store(tmp_path) as store, pytest.raises(ValueError, match="at most"):
@@ -592,7 +573,9 @@ class TestSearch:
                 present_subjects=["a.jsonl", "b.jsonl"],
             )
             assert [h["subject"] for h in store.search("submodule manifest")] == ["a.jsonl"]
-            assert not [h for h in store.search("nested git repositories") if h["subject"] == "a.jsonl"]
+            assert not [
+                h for h in store.search("nested git repositories") if h["subject"] == "a.jsonl"
+            ]
 
     def test_a_query_of_pure_punctuation_says_nothing_rather_than_raising(
         self, tmp_path: Path
@@ -603,9 +586,7 @@ class TestSearch:
             for hostile in ('" OR "', "*", "()", "  ", "NEAR(a b", 'walker"'):
                 assert isinstance(store.search(hostile), list)
 
-    def test_rows_written_before_the_index_existed_are_backfilled(
-        self, tmp_path: Path
-    ) -> None:
+    def test_rows_written_before_the_index_existed_are_backfilled(self, tmp_path: Path) -> None:
         """The upgrade path: an installed store predates its own search index."""
         import sqlite3
 
@@ -712,6 +693,7 @@ class TestSearch:
         is precisely the ceiling this tier was repaired to escape. Age decides,
         as it does for the other accumulating tier.
         """
+
         def session(subject: str, birth_at: float) -> Episode:
             return Episode(
                 tier=TIER_TRANSCRIPT,
@@ -746,6 +728,7 @@ class TestSearch:
         re-derivation, a single directory listing that missed a file would
         stamp it gone permanently while the file sat on disk.
         """
+
         def session(subject: str) -> Episode:
             return Episode(
                 tier=TIER_TRANSCRIPT,
@@ -1063,7 +1046,8 @@ class TestPatternCharactersInPaths:
     def test_star_and_question_marks_are_literal(self, tmp_path: Path) -> None:
         with _store(tmp_path) as store:
             store.append_tier(
-                tier=TIER_GIT, episodes=[_bound("s1", ("docs/aXb/deep.md",))],
+                tier=TIER_GIT,
+                episodes=[_bound("s1", ("docs/aXb/deep.md",))],
                 oldest_birth_at=None,
             )
             assert store.count_by_node(["docs/a?b"]) == {}
@@ -1075,8 +1059,14 @@ class TestPathNormalisation:
 
     @pytest.mark.parametrize(
         "target",
-        ["pkg/mod/a.py", "pkg\\mod\\a.py", "pkg//mod/a.py", "pkg/mod/../mod/a.py",
-         "./pkg/mod/a.py", "/pkg/mod/a.py"],
+        [
+            "pkg/mod/a.py",
+            "pkg\\mod\\a.py",
+            "pkg//mod/a.py",
+            "pkg/mod/../mod/a.py",
+            "./pkg/mod/a.py",
+            "/pkg/mod/a.py",
+        ],
     )
     def test_equivalent_spellings_all_match(self, tmp_path: Path, target: str) -> None:
         with _store(tmp_path) as store:
@@ -1110,9 +1100,7 @@ class TestNodeIndexRecovery:
             )
             db_path = store.db_path
             # Exactly the state an interrupted build leaves behind.
-            store._conn.executescript(
-                "DROP TRIGGER episodes_nodes_ad; DELETE FROM episode_nodes;"
-            )
+            store._conn.executescript("DROP TRIGGER episodes_nodes_ad; DELETE FROM episode_nodes;")
             store._conn.commit()
 
         with EpisodeStore(db_path) as reopened:
@@ -1126,9 +1114,7 @@ class TestNodeIndexRecovery:
                 episodes=[_bound("s1", ("pkg/a.py",)), _bound("s2", ("pkg/sub/b.py",))],
                 oldest_birth_at=None,
             )
-            store._conn.executescript(
-                "DROP TRIGGER episodes_nodes_ad; DROP TABLE episode_nodes;"
-            )
+            store._conn.executescript("DROP TRIGGER episodes_nodes_ad; DROP TABLE episode_nodes;")
             store._conn.commit()
             store.node_index_enabled = False
 
@@ -1140,12 +1126,18 @@ class TestNodeIndexRecovery:
 
     @pytest.mark.parametrize(
         "target",
-        ["pkg/a.py", "pkg", "pkg/sub", "pkg/sub/b.py", "other", "src/app/[repo]",
-         "pkg\\a.py", "pkg/x/../a.py"],
+        [
+            "pkg/a.py",
+            "pkg",
+            "pkg/sub",
+            "pkg/sub/b.py",
+            "other",
+            "src/app/[repo]",
+            "pkg\\a.py",
+            "pkg/x/../a.py",
+        ],
     )
-    def test_the_fallback_answers_what_the_index_answers(
-        self, tmp_path: Path, target: str
-    ) -> None:
+    def test_the_fallback_answers_what_the_index_answers(self, tmp_path: Path, target: str) -> None:
         """Two implementations of one question is one too many unless they agree."""
         with _store(tmp_path) as store:
             store.append_tier(
@@ -1293,9 +1285,7 @@ class TestGroupCounts:
                 "nested_repos": 1,
             }
 
-    def test_an_unlisted_column_raises_rather_than_interpolating(
-        self, tmp_path: Path
-    ) -> None:
+    def test_an_unlisted_column_raises_rather_than_interpolating(self, tmp_path: Path) -> None:
         with _seeded(tmp_path) as store:
             with pytest.raises(ValueError):
                 store.group_counts("body")
@@ -1321,9 +1311,7 @@ class TestGetEpisode:
             got = store.get_episode(want["id"], tiers=SHAREABLE_TIERS)
         assert got == want
 
-    def test_a_tier_outside_the_allowlist_is_not_reachable_by_id(
-        self, tmp_path: Path
-    ) -> None:
+    def test_a_tier_outside_the_allowlist_is_not_reachable_by_id(self, tmp_path: Path) -> None:
         """A stable hash is exactly the shape somebody guesses at."""
         with _seeded(tmp_path) as store:
             store.accumulate_tier(

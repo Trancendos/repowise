@@ -819,9 +819,7 @@ def _strip_hooks(hook_list: list, predicate) -> bool:
 
 def _has_repowise_hook(hook_list: list) -> bool:
     """Check if a repowise hook is already registered, current or legacy."""
-    return any(
-        any(_is_repowise_hook(hook) for hook in _hooks_of(entry)) for entry in hook_list
-    )
+    return any(any(_is_repowise_hook(hook) for hook in _hooks_of(entry)) for entry in hook_list)
 
 
 def _is_repowise_hook(hook: dict) -> bool:

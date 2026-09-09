@@ -189,7 +189,9 @@ def test_it_falls_back_to_an_in_memory_store_when_the_repo_has_no_lancedb(
     monkeypatch.setattr(
         "repowise.cli.providers.embedders.resolve_embedder_for_repo", lambda p: "mock"
     )
-    monkeypatch.setattr("repowise.cli.providers.embedders.build_embedder", lambda name, _p=None: object())
+    monkeypatch.setattr(
+        "repowise.cli.providers.embedders.build_embedder", lambda name, _p=None: object()
+    )
 
     import asyncio
 

@@ -99,9 +99,7 @@ def _data_events(body: str) -> list[dict]:
 async def _post(app: FastAPI, payload: dict) -> str:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:
-        response = await client.post(
-            f"/api/repos/{_REPO_ID}/chat/messages", json=payload
-        )
+        response = await client.post(f"/api/repos/{_REPO_ID}/chat/messages", json=payload)
     assert response.status_code == 200, response.text
     return response.text
 
@@ -114,9 +112,7 @@ async def test_unknown_conversation_ends_the_stream_with_a_typed_error():
         "repowise.server.routers.chat.get_chat_provider_instance",
         return_value=_SilentProvider(),
     ):
-        body = await _post(
-            app, {"message": "hi", "conversation_id": "no-such-conversation"}
-        )
+        body = await _post(app, {"message": "hi", "conversation_id": "no-such-conversation"})
 
     events = _data_events(body)
     assert events, f"stream carried no readable data events: {body!r}"

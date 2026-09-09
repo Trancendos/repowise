@@ -183,9 +183,7 @@ def rename_target(path: str) -> str:
     return new.strip()
 
 
-def change_fix_density(
-    pressure: dict[str, float], changes: Iterable[tuple[str, int]]
-) -> float:
+def change_fix_density(pressure: dict[str, float], changes: Iterable[tuple[str, int]]) -> float:
     """Churn-weighted mean fix pressure over a change's ``(path, churn)`` pairs.
 
     A ratio, deliberately: it answers "how dangerous is the ground this change

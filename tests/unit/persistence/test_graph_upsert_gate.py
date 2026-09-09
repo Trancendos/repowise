@@ -273,9 +273,7 @@ def test_node_gate_columns_account_for_every_writable_column():
         "node_id",  # the match key
         "external_system_id",  # owned by the external-systems linker
     }
-    assert set(_NODE_FIELDS) | managed_elsewhere == {
-        c.name for c in GraphNode.__table__.columns
-    }
+    assert set(_NODE_FIELDS) | managed_elsewhere == {c.name for c in GraphNode.__table__.columns}
 
 
 async def test_unknown_payload_field_disables_the_skip(async_session):
@@ -324,9 +322,7 @@ async def test_new_rows_still_insert_when_everything_else_is_unchanged(async_ses
     await batch_upsert_graph_nodes(async_session, repo.id, [file_node("a.py")])
     await async_session.commit()
 
-    await batch_upsert_graph_nodes(
-        async_session, repo.id, [file_node("a.py"), file_node("b.py")]
-    )
+    await batch_upsert_graph_nodes(async_session, repo.id, [file_node("a.py"), file_node("b.py")])
     await async_session.commit()
 
     assert set(await _nodes(async_session, repo.id)) == {"a.py", "b.py"}
@@ -372,9 +368,7 @@ async def test_membership_prune_still_runs_when_nothing_else_changed(async_sessi
     await batch_upsert_graph_node_membership(async_session, repo.id, snapshot)
     await async_session.commit()
 
-    await batch_upsert_graph_node_membership(
-        async_session, repo.id, {"a.py": snapshot["a.py"]}
-    )
+    await batch_upsert_graph_node_membership(async_session, repo.id, {"a.py": snapshot["a.py"]})
     await async_session.commit()
 
     assert set(await _membership(async_session, repo.id)) == {"a.py"}

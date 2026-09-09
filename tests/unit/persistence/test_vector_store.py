@@ -272,12 +272,22 @@ async def test_in_memory_embed_batch_searchable(in_memory_vector_store):
             (
                 "p1",
                 "Python decorator pattern",
-                {"title": "Dec", "page_type": "file_page", "target_path": "a.py", "content": "Python decorator pattern"},
+                {
+                    "title": "Dec",
+                    "page_type": "file_page",
+                    "target_path": "a.py",
+                    "content": "Python decorator pattern",
+                },
             ),
             (
                 "p2",
                 "Rust ownership model",
-                {"title": "Rust", "page_type": "file_page", "target_path": "b.py", "content": "Rust ownership model"},
+                {
+                    "title": "Rust",
+                    "page_type": "file_page",
+                    "target_path": "b.py",
+                    "content": "Rust ownership model",
+                },
             ),
         ]
     )

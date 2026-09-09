@@ -34,10 +34,10 @@ class System:
 
 @dataclass(frozen=True)
 class ExternalSystemView:
-    id: str            # stable id used in edges; e.g., "ext:react"
+    id: str  # stable id used in edges; e.g., "ext:react"
     name: str
     display_name: str
-    category: str      # framework | service | tool | library
+    category: str  # framework | service | tool | library
     ecosystem: str
     version: str | None = None
     # Boundary type in {db, network, filesystem, subprocess, lock}; None when
@@ -51,7 +51,7 @@ class Container:
     top-level directory in a non-monorepo. ``path`` is repo-relative.
     """
 
-    id: str            # "pkg:packages/core"
+    id: str  # "pkg:packages/core"
     name: str
     path: str
     language: str
@@ -67,9 +67,9 @@ class Component:
     synthetic ``(root)`` group for files that sit at the container root.
     """
 
-    id: str            # "cmp:packages/core/ingestion"
+    id: str  # "cmp:packages/core/ingestion"
     name: str
-    path: str          # repo-relative
+    path: str  # repo-relative
     container_id: str
     file_count: int
     symbol_count: int

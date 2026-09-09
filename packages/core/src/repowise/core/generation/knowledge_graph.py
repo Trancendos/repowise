@@ -90,7 +90,11 @@ async def enrich_knowledge_graph_structural(
     the skeleton via :func:`finalize_knowledge_graph` once pages are ready.
     """
     enriched_layers = await _enrich_layers(
-        kg_skeleton.layers, llm_client, graph_builder, repo_structure, tech_stack,
+        kg_skeleton.layers,
+        llm_client,
+        graph_builder,
+        repo_structure,
+        tech_stack,
         reasoning=reasoning,
     )
 
@@ -104,7 +108,11 @@ async def enrich_knowledge_graph_structural(
         tour = kg_skeleton.tour
     else:
         tour = await _generate_tour(
-            enriched_layers, llm_client, graph_builder, repo_structure, kg_skeleton,
+            enriched_layers,
+            llm_client,
+            graph_builder,
+            repo_structure,
+            kg_skeleton,
             reasoning=reasoning,
         )
 
@@ -191,12 +199,14 @@ async def _enrich_layers(
             file_paths = [p for p in (kg_file_path_of(nid) for nid in node_ids) if p]
             top_files = sorted(file_paths, key=lambda p: pagerank.get(p, 0.0), reverse=True)[:20]
 
-            batch_context.append({
-                "id": layer.get("id", ""),
-                "heuristic_label": layer["name"],
-                "file_count": len(file_paths),
-                "top_files": top_files,
-            })
+            batch_context.append(
+                {
+                    "id": layer.get("id", ""),
+                    "heuristic_label": layer["name"],
+                    "file_count": len(file_paths),
+                    "top_files": top_files,
+                }
+            )
 
         user_prompt = _build_layer_naming_prompt(batch_context, tech_stack, repo_structure)
         batch_ids = {layer.get("id") for layer in batch}
@@ -291,12 +301,14 @@ async def _generate_tour(
         node_ids = layer.get("nodeIds", [])
         file_paths = [p for p in (kg_file_path_of(nid) for nid in node_ids) if p]
         top_in_layer = sorted(file_paths, key=lambda p: pagerank.get(p, 0.0), reverse=True)[:5]
-        layer_summaries.append({
-            "name": layer["name"],
-            "description": layer.get("description", ""),
-            "file_count": len(file_paths),
-            "key_files": top_in_layer,
-        })
+        layer_summaries.append(
+            {
+                "name": layer["name"],
+                "description": layer.get("description", ""),
+                "file_count": len(file_paths),
+                "key_files": top_in_layer,
+            }
+        )
 
     user_prompt = _build_tour_prompt(layer_summaries, entry_points, top_files)
 
@@ -318,12 +330,14 @@ async def _generate_tour(
                         node_ids.append(f)
                     else:
                         node_ids.append(f"file:{f}")
-                tour.append({
-                    "order": step.get("order", len(tour) + 1),
-                    "title": step.get("title", f"Step {len(tour) + 1}"),
-                    "description": step.get("description", ""),
-                    "nodeIds": node_ids,
-                })
+                tour.append(
+                    {
+                        "order": step.get("order", len(tour) + 1),
+                        "title": step.get("title", f"Step {len(tour) + 1}"),
+                        "description": step.get("description", ""),
+                        "nodeIds": node_ids,
+                    }
+                )
             return tour
     except Exception as exc:
         logger.warning("kg_tour_generation_failed", error=str(exc))
@@ -380,12 +394,14 @@ def build_deterministic_tour(
     # Step 1: main entry point
     if entry_points:
         ep = entry_points[0]
-        steps.append({
-            "order": order,
-            "title": "Entry Point",
-            "description": f"Start with the main entry point: {ep}",
-            "nodeIds": [f"file:{ep}"],
-        })
+        steps.append(
+            {
+                "order": order,
+                "title": "Entry Point",
+                "description": f"Start with the main entry point: {ep}",
+                "nodeIds": [f"file:{ep}"],
+            }
+        )
         used_files.add(ep)
         order += 1
 
@@ -405,12 +421,14 @@ def build_deterministic_tour(
             default=None,
         )
         if top_file:
-            steps.append({
-                "order": order,
-                "title": layer["name"],
-                "description": f"Explore the {layer['name']} layer, starting with {top_file}",
-                "nodeIds": [f"file:{top_file}"],
-            })
+            steps.append(
+                {
+                    "order": order,
+                    "title": layer["name"],
+                    "description": f"Explore the {layer['name']} layer, starting with {top_file}",
+                    "nodeIds": [f"file:{top_file}"],
+                }
+            )
             used_files.add(top_file)
             order += 1
 

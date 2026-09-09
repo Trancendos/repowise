@@ -188,9 +188,7 @@ def __getattr__(name: str) -> Any:
         # has to exist by the time it is handed over.
         value: Any = ensure_full_surface()
     elif name in _TOOL_MODULES:
-        value = getattr(
-            importlib.import_module(f"{__name__}.{_TOOL_MODULES[name]}"), name
-        )
+        value = getattr(importlib.import_module(f"{__name__}.{_TOOL_MODULES[name]}"), name)
     elif name in _LAZY_ATTRS:
         module_name, attr = _LAZY_ATTRS[name]
         value = getattr(importlib.import_module(f"{__name__}.{module_name}"), attr)

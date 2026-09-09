@@ -111,8 +111,7 @@ class RepoReport:
             "repo": self.repo,
             "stats": self.stats,
             "smells": [
-                {"severity": s.severity, "code": s.code, "message": s.message}
-                for s in self.smells
+                {"severity": s.severity, "code": s.code, "message": s.message} for s in self.smells
             ],
         }
 
@@ -246,15 +245,11 @@ def run_smells(
         if "test suite" in (s.get("reason") or "").lower():
             continue  # the designated closing stop — short tours put it early
         if s.get("kind") != "overview" and looks_like_test(tp):
-            smells.append(
-                Smell("FAIL", "test_file_early_in_tour", f"step {s.get('order')} = {tp}")
-            )
+            smells.append(Smell("FAIL", "test_file_early_in_tour", f"step {s.get('order')} = {tp}"))
 
     for s in tour:
         if "Top of the stack" in (s.get("reason") or ""):
-            smells.append(
-                Smell("FAIL", "stack_position_reason", f"step {s.get('order')}")
-            )
+            smells.append(Smell("FAIL", "stack_position_reason", f"step {s.get('order')}"))
 
     targets = [s.get("target_path") for s in tour]
     dupes = sorted({t for t in targets if t and targets.count(t) > 1})
@@ -398,9 +393,7 @@ def run_smells(
         and layers
         and not (LAYER_COUNT_MIN <= len(layers) <= LAYER_COUNT_MAX)
     ):
-        smells.append(
-            Smell("WARN", "layer_count", f"{len(layers)} layers for {total_files} files")
-        )
+        smells.append(Smell("WARN", "layer_count", f"{len(layers)} layers for {total_files} files"))
 
     # -- entry-point sanity --------------------------------------------------
     eps = project.get("entry_points") or []
@@ -533,9 +526,7 @@ def _module_smells(kg: dict, code_file_count: int) -> list[Smell]:
             and name.lower() not in layer_names
             and had_alternative
         ):
-            smells.append(
-                Smell("FAIL", "module_generic_name", f"{name!r} is namespace noise only")
-            )
+            smells.append(Smell("FAIL", "module_generic_name", f"{name!r} is namespace noise only"))
 
     # Granularity: oversized modules are honest only for flat directories.
     for m in modules:
@@ -544,7 +535,8 @@ def _module_smells(kg: dict, code_file_count: int) -> list[Smell]:
             continue
         prefix = m.get("path", "")
         rels = [
-            file_paths[nid][len(prefix) + 1 :] if prefix and file_paths[nid].startswith(prefix + "/")
+            file_paths[nid][len(prefix) + 1 :]
+            if prefix and file_paths[nid].startswith(prefix + "/")
             else file_paths[nid]
             for nid in m.get("nodeIds", [])
             if nid in file_paths

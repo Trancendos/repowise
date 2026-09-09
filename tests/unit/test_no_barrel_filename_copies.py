@@ -35,7 +35,8 @@ def _check_assignment(node: ast.AST) -> list[str]:
     if (
         isinstance(node, ast.Assign)
         and any(
-            isinstance(target, ast.Name) and target.id == "BARREL_FILENAMES" for target in node.targets
+            isinstance(target, ast.Name) and target.id == "BARREL_FILENAMES"
+            for target in node.targets
         )
     ) or (
         isinstance(node, ast.AnnAssign)

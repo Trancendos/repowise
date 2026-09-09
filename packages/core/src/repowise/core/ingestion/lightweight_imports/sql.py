@@ -26,8 +26,7 @@ from ..models import Import
 # closing delimiter is not: refs are routinely piped ({{ ref('x') | … }})
 # or wrapped in further calls. Trailing kwargs (version=2) are tolerated.
 _REF_RE = re.compile(
-    r"\{[\{%][^{}]*?\bref\(\s*['\"]([^'\"]+)['\"]"
-    r"(?:\s*,\s*['\"]([^'\"]+)['\"])?"
+    r"\{[\{%][^{}]*?\bref\(\s*['\"]([^'\"]+)['\"]" r"(?:\s*,\s*['\"]([^'\"]+)['\"])?"
 )
 
 _SOURCE_RE = re.compile(r"\{[\{%][^{}]*?\bsource\(\s*['\"]([^'\"]+)['\"]\s*,\s*['\"]([^'\"]+)['\"]")

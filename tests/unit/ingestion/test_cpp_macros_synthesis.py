@@ -31,9 +31,7 @@ def _parse(tmp_path: Path, name: str, src: str, lang: str = "cpp"):
 
 
 class TestCppMacroSynthesis:
-    def test_pybind11_module_emits_synthetic_module_symbol(
-        self, tmp_path: Path
-    ) -> None:
+    def test_pybind11_module_emits_synthetic_module_symbol(self, tmp_path: Path) -> None:
         src = """\
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
@@ -84,8 +82,12 @@ int main() { return 0; }
 """
         pf = _parse(tmp_path, "plain.cc", src)
         # Only the real ``main`` symbol — no synthetic adds.
-        synth_names = {s.name for s in pf.symbols if "PYBIND11" in (s.signature or "")
-                       or "BOOST_PYTHON" in (s.signature or "")
-                       or "ABSL_FLAG" in (s.signature or "")
-                       or "DEFINE_*" in (s.signature or "")}
+        synth_names = {
+            s.name
+            for s in pf.symbols
+            if "PYBIND11" in (s.signature or "")
+            or "BOOST_PYTHON" in (s.signature or "")
+            or "ABSL_FLAG" in (s.signature or "")
+            or "DEFINE_*" in (s.signature or "")
+        }
         assert synth_names == set()

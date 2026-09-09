@@ -63,7 +63,9 @@ def _head(root) -> str:
     return out.stdout.strip()
 
 
-def _fix(subject: str, nodes: tuple[str, ...], *, birth_commit: str, body: str = "a fix") -> Episode:
+def _fix(
+    subject: str, nodes: tuple[str, ...], *, birth_commit: str, body: str = "a fix"
+) -> Episode:
     return Episode(
         tier=TIER_GIT,
         kind="code_fix",
@@ -265,10 +267,12 @@ class TestCurrency:
                 evidence="traverser",
                 nodes=("app.py",),
             )
-            store.replace_kinds(tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[ep],
-                                now=1000.0)
-            store._conn.execute("UPDATE episodes SET last_seen_at = ? WHERE id = ?",
-                                (2000.0, ep.id))
+            store.replace_kinds(
+                tier=TIER_STRUCTURAL, kinds=["nested_repos"], episodes=[ep], now=1000.0
+            )
+            store._conn.execute(
+                "UPDATE episodes SET last_seen_at = ? WHERE id = ?", (2000.0, ep.id)
+            )
             store._conn.commit()
 
         entries, _ = episode_evidence(repo, paths=["app.py"])

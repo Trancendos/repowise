@@ -22,14 +22,12 @@ def _write_fixture(repo) -> None:
 
 
 async def _ingest(repo):
-    parsed, _fis, _structure, source_map, gb, _stats, _tech = (
-        await ingestion_phase._run_ingestion(
-            repo,
-            exclude_patterns=None,
-            skip_tests=False,
-            skip_infra=False,
-            progress=None,
-        )
+    parsed, _fis, _structure, source_map, gb, _stats, _tech = await ingestion_phase._run_ingestion(
+        repo,
+        exclude_patterns=None,
+        skip_tests=False,
+        skip_infra=False,
+        progress=None,
     )
     return sorted(parsed, key=lambda p: p.file_info.path), source_map, gb.graph()
 

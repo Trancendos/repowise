@@ -171,7 +171,5 @@ async def test_summary_still_windows_and_filters_identically(client: AsyncClient
 async def test_an_unknown_fields_value_is_rejected(client: AsyncClient) -> None:
     """A typo must not silently fall through to the wide row and be paid for."""
     repo = await create_test_repo(client)
-    resp = await client.get(
-        f"/api/repos/{repo['id']}/health/files", params={"fields": "lean"}
-    )
+    resp = await client.get(f"/api/repos/{repo['id']}/health/files", params={"fields": "lean"})
     assert resp.status_code == 422

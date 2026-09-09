@@ -126,9 +126,7 @@ def export_command(
             # A reader-facing export drops tombstones so it does not write a
             # page for a file that no longer exists. --full is the archival
             # mode, so it keeps them for a complete record.
-            pages = await list_pages(
-                session, repo.id, include_tombstones=full_export, limit=10000
-            )
+            pages = await list_pages(session, repo.id, include_tombstones=full_export, limit=10000)
 
             if full_export and fmt == "json":
                 from sqlalchemy import select
@@ -141,9 +139,7 @@ def export_command(
 
                 # Decisions
                 dr = await session.execute(
-                    select(DecisionRecord).where(
-                        DecisionRecord.repository_id == repo.id
-                    )
+                    select(DecisionRecord).where(DecisionRecord.repository_id == repo.id)
                 )
                 extra_data["decisions"] = [
                     {
@@ -162,9 +158,7 @@ def export_command(
 
                 # Dead code findings
                 dc = await session.execute(
-                    select(DeadCodeFinding).where(
-                        DeadCodeFinding.repository_id == repo.id
-                    )
+                    select(DeadCodeFinding).where(DeadCodeFinding.repository_id == repo.id)
                 )
                 extra_data["dead_code"] = [
                     {

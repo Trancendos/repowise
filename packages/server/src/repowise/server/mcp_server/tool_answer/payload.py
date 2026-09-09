@@ -289,9 +289,9 @@ def _union_answer_payload(
         "; use them directly, no verification Read."
         if not union_truncated
         else ". At least one body was truncated: see "
-             "symbol_bodies[].withheld_symbols for what was not served, "
-             "and call get_symbol with the continuation before relying "
-             "on behaviour you cannot see."
+        "symbol_bodies[].withheld_symbols for what was not served, "
+        "and call get_symbol with the continuation before relying "
+        "on behaviour you cannot see."
     )
     if more_defs:
         note += (
@@ -653,8 +653,7 @@ def _high_confidence_note(grade: _Grade, tail: str) -> str:
     if grade.high_reason == "sole_hit":
         return (
             "High confidence: one page matched, so there was no competing "
-            f"candidate to be ambiguous against (top score {grade.top_score:.2f}). "
-            + tail
+            f"candidate to be ambiguous against (top score {grade.top_score:.2f}). " + tail
         )
     return (
         "High confidence: top retrieval result clearly dominates "
@@ -800,14 +799,13 @@ async def _graded_payload(
         # pipeline mandates directness and then reads its own mandate back as a
         # signal. Dominance is an independent measurement; directness is not.
         _tail = (
-            "Cite this answer; do not re-read the source unless a specific "
-            "detail is missing."
+            "Cite this answer; do not re-read the source unless a specific " "detail is missing."
             if not any(b.get("truncated") for b in symbol_bodies)
             # Never tell the consumer to skip re-reading when the payload itself
             # admits it withheld part of a cited body. The withheld names are in
             # `symbol_bodies[].withheld_symbols`.
             else "Some cited bodies were truncated; see "
-                 "symbol_bodies[].withheld_symbols for what was not served."
+            "symbol_bodies[].withheld_symbols for what was not served."
         )
         # Say which test earned the grade, and quote only the measurement that
         # test actually made. Writing one sentence for every high is how a

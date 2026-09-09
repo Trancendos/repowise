@@ -59,10 +59,7 @@ class TestKotlinCompanionAndObject:
         files = {
             "src/main/kotlin/com/foo/Caller.kt": (
                 "kotlin",
-                "package com.foo\n"
-                "class Caller {\n"
-                "  fun run() { Foo.build() }\n"
-                "}\n",
+                "package com.foo\n" "class Caller {\n" "  fun run() { Foo.build() }\n" "}\n",
             ),
             "src/main/kotlin/com/foo/Foo.kt": (
                 "kotlin",
@@ -78,32 +75,24 @@ class TestKotlinCompanionAndObject:
         parsed = _parse_all(tmp_path, files)
         edges = _resolve_calls(parsed, tmp_path)
         assert any(
-            "Caller.kt::Caller::run" in u
-            and "Foo.kt::Foo::build" in v
-            for u, v, _ in edges
+            "Caller.kt::Caller::run" in u and "Foo.kt::Foo::build" in v for u, v, _ in edges
         ), edges
 
     def test_object_singleton_method_call_resolves(self, tmp_path: Path) -> None:
         files = {
             "src/main/kotlin/com/foo/Caller.kt": (
                 "kotlin",
-                "package com.foo\n"
-                "class Caller {\n"
-                "  fun run() { Single.do_it() }\n"
-                "}\n",
+                "package com.foo\n" "class Caller {\n" "  fun run() { Single.do_it() }\n" "}\n",
             ),
             "src/main/kotlin/com/foo/Single.kt": (
                 "kotlin",
-                "package com.foo\n"
-                "object Single { fun do_it(): Int = 1 }\n",
+                "package com.foo\n" "object Single { fun do_it(): Int = 1 }\n",
             ),
         }
         parsed = _parse_all(tmp_path, files)
         edges = _resolve_calls(parsed, tmp_path)
         assert any(
-            "Caller.kt::Caller::run" in u
-            and "Single.kt::Single::do_it" in v
-            for u, v, _ in edges
+            "Caller.kt::Caller::run" in u and "Single.kt::Single::do_it" in v for u, v, _ in edges
         ), edges
 
 
@@ -122,10 +111,7 @@ class TestJavaMethodReference:
         }
         parsed = _parse_all(tmp_path, files)
         calls = parsed["src/main/java/com/foo/C.java"].calls
-        assert any(
-            c.receiver_name == "Foo" and c.target_name == "bar"
-            for c in calls
-        ), calls
+        assert any(c.receiver_name == "Foo" and c.target_name == "bar" for c in calls), calls
 
     def test_method_reference_resolves_to_target_method(self, tmp_path: Path) -> None:
         files = {
@@ -147,7 +133,4 @@ class TestJavaMethodReference:
         }
         parsed = _parse_all(tmp_path, files)
         edges = _resolve_calls(parsed, tmp_path)
-        assert any(
-            "C.java::C::m" in u and "Foo.java::Foo::bar" in v
-            for u, v, _ in edges
-        ), edges
+        assert any("C.java::C::m" in u and "Foo.java::Foo::bar" in v for u, v, _ in edges), edges

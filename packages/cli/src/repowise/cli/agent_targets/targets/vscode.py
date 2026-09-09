@@ -151,7 +151,11 @@ def _remove_server_entry(config_path: Path) -> tuple[Path, FileAction, str | Non
     except ValueError:
         # Same reason install declines: it is far more likely to be JSONC than
         # damaged, and rewriting it would silently delete the user's comments.
-        return config_path, FileAction.KEPT, "not strict JSON, so removing our entry would drop comments"
+        return (
+            config_path,
+            FileAction.KEPT,
+            "not strict JSON, so removing our entry would drop comments",
+        )
 
     servers = existing.get("servers")
     if not isinstance(servers, dict) or "repowise" not in servers:
@@ -382,7 +386,9 @@ class VSCodeTarget:
         return result
 
     def print_config(self, scope: Scope, *, repo_path: Path | None = None) -> str:
-        return json.dumps({"servers": {"repowise": server_entry(repo_path or Path.cwd())}}, indent=2)
+        return json.dumps(
+            {"servers": {"repowise": server_entry(repo_path or Path.cwd())}}, indent=2
+        )
 
     def describe_paths(self, scope: Scope, *, repo_path: Path | None = None) -> list[str]:
         if scope is not Scope.PROJECT:

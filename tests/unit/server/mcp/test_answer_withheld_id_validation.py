@@ -84,9 +84,7 @@ def _build_tree(tmp_path, monkeypatch, mcp_mod, answer_mod, *, answer_text):
 
 
 @pytest.mark.asyncio
-async def test_an_id_that_only_live_greps_is_still_advertised(
-    setup_mcp, monkeypatch, tmp_path
-):
+async def test_an_id_that_only_live_greps_is_still_advertised(setup_mcp, monkeypatch, tmp_path):
     """The middle outcome. Passes at the parent, and MUST keep passing.
 
     ``ghost_helper`` is a real name on a real line with no index row behind it
@@ -120,9 +118,7 @@ async def test_an_id_that_only_live_greps_is_still_advertised(
 
 
 @pytest.mark.asyncio
-async def test_an_id_that_resolves_to_nothing_is_not_advertised(
-    setup_mcp, monkeypatch, tmp_path
-):
+async def test_an_id_that_resolves_to_nothing_is_not_advertised(setup_mcp, monkeypatch, tmp_path):
     """FAILS at the parent: a name absent from the file is still promoted.
 
     The scanner is monkeypatched to emit a name that is nowhere in the live
@@ -174,9 +170,7 @@ async def test_an_id_that_resolves_to_nothing_is_not_advertised(
 
 
 @pytest.mark.asyncio
-async def test_an_unreadable_file_does_not_disqualify_its_id(
-    setup_mcp, monkeypatch, tmp_path
-):
+async def test_an_unreadable_file_does_not_disqualify_its_id(setup_mcp, monkeypatch, tmp_path):
     """Absence of evidence is not evidence of fabrication.
 
     If the file behind an id cannot be read, the guard has learned nothing and

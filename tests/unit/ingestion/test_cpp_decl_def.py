@@ -174,9 +174,7 @@ class TestTypeDeclarationFlag:
             "namespace geo {\nclass Shape {\n public:\n  int Area();\n};\nclass Shape;\n}\n"
         )
         graph = _build(tmp_path)
-        assert graph.get_edge_data("def_first.h", "def_first.h::Shape") == {
-            "edge_type": "defines"
-        }
+        assert graph.get_edge_data("def_first.h", "def_first.h::Shape") == {"edge_type": "defines"}
 
     def test_bodiless_template_type_is_marked(self, tmp_path: Path) -> None:
         # ``template <typename T> class Foo;`` — the wrapper node carries no

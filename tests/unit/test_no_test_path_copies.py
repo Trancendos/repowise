@@ -189,8 +189,7 @@ def test_known_copies_still_exist() -> None:
 def test_a_wrapper_is_not_a_copy() -> None:
     """The check must not push call sites into re-deriving to dodge it."""
     wrapper = ast.parse(
-        "def _is_test_path(p):\n"
-        "    return is_test_related_path(p) or p.endswith('.fixture')\n"
+        "def _is_test_path(p):\n" "    return is_test_related_path(p) or p.endswith('.fixture')\n"
     ).body[0]
     copy = ast.parse("def _is_test_path(p):\n    return '/tests/' in p\n").body[0]
     assert _delegates(wrapper)

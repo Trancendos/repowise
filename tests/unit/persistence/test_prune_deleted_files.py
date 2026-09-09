@@ -196,9 +196,7 @@ async def test_mass_deletion_is_refused_not_applied(async_session, repo_with_kep
     """A prune that would take most of a table reads as a broken run, and is refused."""
     repo = await insert_repo(async_session)
     for i in range(40):
-        async_session.add(
-            GitMetadata(repository_id=repo.id, file_path=f"src/module_{i}.js")
-        )
+        async_session.add(GitMetadata(repository_id=repo.id, file_path=f"src/module_{i}.js"))
     await async_session.flush()
 
     pruned, refusals = await prune_deleted_file_rows(
@@ -235,9 +233,7 @@ async def test_prune_is_scoped_to_one_repo(async_session, repo_with_kept_file):
     await _seed(async_session, repo_a.id)
     await _seed(async_session, repo_b.id)
 
-    await prune_deleted_file_rows(
-        async_session, repo_a.id, repo_with_kept_file, live_hint={KEPT}
-    )
+    await prune_deleted_file_rows(async_session, repo_a.id, repo_with_kept_file, live_hint={KEPT})
     await async_session.commit()
 
     assert await _paths(async_session, GitMetadata, GitMetadata.file_path, repo_b.id) == {

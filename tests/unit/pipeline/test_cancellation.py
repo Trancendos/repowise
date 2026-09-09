@@ -91,6 +91,10 @@ def test_detect_clones_bails_when_cancelled():
     token.cancel()
     set_active_token(token)
 
-    files = [SimpleNamespace(file_info=SimpleNamespace(path="a.py", abs_path="a.py", language="python"), symbols=[])]
+    files = [
+        SimpleNamespace(
+            file_info=SimpleNamespace(path="a.py", abs_path="a.py", language="python"), symbols=[]
+        )
+    ]
     with pytest.raises(PipelineCancelled):
         detect_clones(files)

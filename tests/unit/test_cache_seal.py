@@ -86,9 +86,7 @@ def test_empty_key_file_is_replaced_not_trusted(monkeypatch, tmp_path):
     # Empty-key forgeries must not verify under the replaced key.
     forged = (
         b"RWCH1"
-        + __import__("hmac")
-        .new(b"", b"\x00" + b"payload", __import__("hashlib").sha256)
-        .digest()
+        + __import__("hmac").new(b"", b"\x00" + b"payload", __import__("hashlib").sha256).digest()
         + b"payload"
     )
     with pytest.raises(ValueError, match="HMAC"):

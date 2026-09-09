@@ -119,9 +119,7 @@ def test_hotspot_health_is_not_the_top_quartile_by_nloc() -> None:
     # imported, so deleting it cannot make this test vacuous.
     by_nloc = sorted(rows, key=lambda m: m.nloc, reverse=True)
     top_q = by_nloc[: max(1, len(by_nloc) // 4)]
-    quartile = sum(m.score * max(m.nloc, 1) for m in top_q) / sum(
-        max(m.nloc, 1) for m in top_q
-    )
+    quartile = sum(m.score * max(m.nloc, 1) for m in top_q) / sum(max(m.nloc, 1) for m in top_q)
     assert quartile == 2.0
 
     assert hotspot_health(rows, {"small-but-churny.py"}) == 9.0

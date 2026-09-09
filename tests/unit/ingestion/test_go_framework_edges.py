@@ -44,9 +44,7 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 class TestGinRoutes:
@@ -55,14 +53,14 @@ class TestGinRoutes:
         users_dir = tmp_path / "users"
         users_dir.mkdir()
         (users_dir / "handler.go").write_text(
-            "package users\n\nimport \"github.com/gin-gonic/gin\"\n\n"
+            'package users\n\nimport "github.com/gin-gonic/gin"\n\n'
             "func Index(c *gin.Context) {}\n"
         )
         (tmp_path / "main.go").write_text(
-            "package main\n\nimport (\n  \"github.com/gin-gonic/gin\"\n  \"example.com/app/users\"\n)\n\n"
+            'package main\n\nimport (\n  "github.com/gin-gonic/gin"\n  "example.com/app/users"\n)\n\n'
             "func main() {\n"
             "  r := gin.Default()\n"
-            "  r.GET(\"/users\", users.Index)\n"
+            '  r.GET("/users", users.Index)\n'
             "  r.Run()\n"
             "}\n"
         )
@@ -76,10 +74,10 @@ class TestGinRoutes:
 
     def test_lambda_handler_ignored(self, tmp_path: Path) -> None:
         (tmp_path / "main.go").write_text(
-            "package main\n\nimport \"github.com/gin-gonic/gin\"\n\n"
+            'package main\n\nimport "github.com/gin-gonic/gin"\n\n'
             "func main() {\n"
             "  r := gin.Default()\n"
-            "  r.GET(\"/ping\", func(c *gin.Context) {})\n"
+            '  r.GET("/ping", func(c *gin.Context) {})\n'
             "}\n"
         )
         parsed = _build_parsed(tmp_path)
@@ -99,14 +97,14 @@ class TestNetHTTP:
         h = tmp_path / "handlers"
         h.mkdir()
         (h / "users.go").write_text(
-            "package handlers\n\nimport \"net/http\"\n\n"
+            'package handlers\n\nimport "net/http"\n\n'
             "func Index(w http.ResponseWriter, r *http.Request) {}\n"
         )
         (tmp_path / "main.go").write_text(
-            "package main\n\nimport (\n  \"net/http\"\n  \"example.com/app/handlers\"\n)\n\n"
+            'package main\n\nimport (\n  "net/http"\n  "example.com/app/handlers"\n)\n\n'
             "func main() {\n"
-            "  http.HandleFunc(\"/users\", handlers.Index)\n"
-            "  http.ListenAndServe(\":8080\", nil)\n"
+            '  http.HandleFunc("/users", handlers.Index)\n'
+            '  http.ListenAndServe(":8080", nil)\n'
             "}\n"
         )
         parsed = _build_parsed(tmp_path)
@@ -121,13 +119,13 @@ class TestNetHTTP:
     def test_mux_handle_local_function(self, tmp_path: Path) -> None:
         (tmp_path / "go.mod").write_text("module example.com/app\n\ngo 1.21\n")
         (tmp_path / "routes.go").write_text(
-            "package main\n\nimport \"net/http\"\n\n"
+            'package main\n\nimport "net/http"\n\n'
             "func register(mux *http.ServeMux) {\n"
-            "  mux.Handle(\"/health\", health)\n"
+            '  mux.Handle("/health", health)\n'
             "}\n"
         )
         (tmp_path / "health.go").write_text(
-            "package main\n\nimport \"net/http\"\n\n"
+            'package main\n\nimport "net/http"\n\n'
             "var health http.Handler\n\n"
             "func HealthHandler(w http.ResponseWriter, r *http.Request) {}\n"
         )
@@ -146,10 +144,10 @@ class TestGoGRPC:
         (tmp_path / "server.go").write_text(
             "package main\n\n"
             "type greeterServer struct{}\n\n"
-            "func (s *greeterServer) SayHello() string { return \"hi\" }\n"
+            'func (s *greeterServer) SayHello() string { return "hi" }\n'
         )
         (tmp_path / "main.go").write_text(
-            "package main\n\nimport \"google.golang.org/grpc\"\n\n"
+            'package main\n\nimport "google.golang.org/grpc"\n\n'
             "func main() {\n"
             "  s := grpc.NewServer()\n"
             "  RegisterGreeterServer(s, &greeterServer{})\n"
@@ -166,9 +164,7 @@ class TestGoGRPC:
 
 class TestGoRouterGate:
     def test_non_router_unaffected(self, tmp_path: Path) -> None:
-        (tmp_path / "main.go").write_text(
-            "package main\n\nfunc main() {}\n"
-        )
+        (tmp_path / "main.go").write_text("package main\n\nfunc main() {}\n")
         parsed = _build_parsed(tmp_path)
         graph = nx.DiGraph()
         for p in parsed:

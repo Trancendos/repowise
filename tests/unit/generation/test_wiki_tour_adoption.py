@@ -39,14 +39,26 @@ def _run_stub(kg_ctx) -> SimpleNamespace:
 
 
 CURATED_TOUR = [
-    {"order": 1, "target_path": "README.md", "page_type": "repo_overview",
-     "title": "README.md", "depth": 0, "kind": "overview",
-     "reason": "Start here for the end-to-end picture before diving into the code.",
-     "layer_id": "layer:app"},
-    {"order": 2, "target_path": "src/main.py", "page_type": "file_page",
-     "title": "main.py", "depth": 1, "kind": "code",
-     "reason": "An entry point — execution and imports fan out from here.",
-     "layer_id": "layer:app"},
+    {
+        "order": 1,
+        "target_path": "README.md",
+        "page_type": "repo_overview",
+        "title": "README.md",
+        "depth": 0,
+        "kind": "overview",
+        "reason": "Start here for the end-to-end picture before diving into the code.",
+        "layer_id": "layer:app",
+    },
+    {
+        "order": 2,
+        "target_path": "src/main.py",
+        "page_type": "file_page",
+        "title": "main.py",
+        "depth": 1,
+        "kind": "code",
+        "reason": "An entry point — execution and imports fan out from here.",
+        "layer_id": "layer:app",
+    },
 ]
 
 
@@ -55,7 +67,9 @@ def test_curated_tour_adopted_verbatim(tmp_path):
         tmp_path,
         {
             "project": {"name": "test", "graph_mode": "flow"},
-            "nodes": [], "edges": [], "layers": [],
+            "nodes": [],
+            "edges": [],
+            "layers": [],
             "tour": CURATED_TOUR,
         },
     )
@@ -72,9 +86,10 @@ def test_uncurated_kg_falls_back_to_computed_tour(tmp_path):
         tmp_path,
         {
             "project": {"name": "test"},
-            "nodes": [], "edges": [], "layers": [],
-            "tour": [{"order": 1, "title": "old-style", "description": "x",
-                      "nodeIds": []}],
+            "nodes": [],
+            "edges": [],
+            "layers": [],
+            "tour": [{"order": 1, "title": "old-style", "description": "x", "nodeIds": []}],
         },
     )
     run = _run_stub(KnowledgeGraphContext(kg_path))

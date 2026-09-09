@@ -617,7 +617,6 @@ class TestQueryRepoStats:
 
         assert stats["hotspot_count"] == 0
 
-    
     def test_file_count_excludes_symbol_nodes(self, tmp_path: Path) -> None:
         """Regression: graph_nodes stores file *and* symbol rows.
 
@@ -1131,9 +1130,7 @@ class TestRepoQueryBudget:
         return statements, connections
 
     @pytest.mark.asyncio
-    async def test_per_repo_cost_does_not_grow_with_repo_count(
-        self, tmp_path: Path
-    ) -> None:
+    async def test_per_repo_cost_does_not_grow_with_repo_count(self, tmp_path: Path) -> None:
         two_stmts, two_conns = await self._measure(tmp_path, 2)
         six_stmts, six_conns = await self._measure(tmp_path, 6)
 
@@ -1141,9 +1138,9 @@ class TestRepoQueryBudget:
             f"per-repo statements moved from {two_stmts / 2} (2 repos) to "
             f"{six_stmts / 6} (6 repos) — the loop is doing more work per repo"
         )
-        assert two_conns / 2 == six_conns / 6, (
-            f"per-repo connections moved from {two_conns / 2} to {six_conns / 6}"
-        )
+        assert (
+            two_conns / 2 == six_conns / 6
+        ), f"per-repo connections moved from {two_conns / 2} to {six_conns / 6}"
 
     @pytest.mark.asyncio
     async def test_per_repo_cost_is_pinned(self, tmp_path: Path) -> None:

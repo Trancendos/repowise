@@ -115,9 +115,7 @@ class TestCapabilityGate:
 
     def test_old_client_build_falls_back_to_appending(self, opted_in) -> None:
         """Protocol yes, installed build no. Both questions are the adapter's."""
-        with patch.object(
-            ClaudeCodeAdapter, "supports_updated_output", return_value=False
-        ):
+        with patch.object(ClaudeCodeAdapter, "supports_updated_output", return_value=False):
             result = _fire(opted_in)
         assert result.replacement is None
         assert result.context is not None

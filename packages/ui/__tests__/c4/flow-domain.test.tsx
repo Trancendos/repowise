@@ -75,4 +75,3 @@ describe("ExecutionFlowOverlay", () => {
     expect(screen.getByText("⚠ Cross-boundary")).toBeTruthy();
   });
 });
-

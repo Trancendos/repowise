@@ -35,7 +35,9 @@ def _names(tmp_path: Path, name: str, lang: str, src: str) -> list[str]:
 class TestJavaRecord:
     def test_record_accessors_synthesized(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "Pt.java", "java",
+            tmp_path,
+            "Pt.java",
+            "java",
             "public record Pt(int x, int y) {}\n",
         )
         assert "x" in names, names
@@ -58,7 +60,9 @@ class TestJavaRecord:
 class TestKotlinDataClass:
     def test_data_class_emits_componentN_and_copy(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "P.kt", "kotlin",
+            tmp_path,
+            "P.kt",
+            "kotlin",
             "data class P(val x: Int, val y: Int)\n",
         )
         assert "component1" in names, names
@@ -70,7 +74,9 @@ class TestKotlinDataClass:
 
     def test_enum_emits_values_valueOf(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "Color.kt", "kotlin",
+            tmp_path,
+            "Color.kt",
+            "kotlin",
             "enum class Color { RED, GREEN, BLUE }\n",
         )
         assert "values" in names, names
@@ -78,14 +84,18 @@ class TestKotlinDataClass:
 
     def test_object_emits_INSTANCE(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "S.kt", "kotlin",
+            tmp_path,
+            "S.kt",
+            "kotlin",
             "object S { fun work() {} }\n",
         )
         assert "INSTANCE" in names, names
 
     def test_plain_class_no_componentN(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "C.kt", "kotlin",
+            tmp_path,
+            "C.kt",
+            "kotlin",
             "class C(val x: Int)\n",
         )
         assert "component1" not in names, names
@@ -94,7 +104,9 @@ class TestKotlinDataClass:
 class TestJvmCodegen:
     def test_mapstruct_mapper_emits_impl(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "Mapper.java", "java",
+            tmp_path,
+            "Mapper.java",
+            "java",
             "import org.mapstruct.Mapper;\n"
             "@Mapper public interface UserMapper { String map(String s); }\n",
         )
@@ -102,15 +114,18 @@ class TestJvmCodegen:
 
     def test_autovalue_emits_subclass(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "Box.java", "java",
-            "import com.google.auto.value.AutoValue;\n"
-            "@AutoValue public abstract class Box {}\n",
+            tmp_path,
+            "Box.java",
+            "java",
+            "import com.google.auto.value.AutoValue;\n" "@AutoValue public abstract class Box {}\n",
         )
         assert "AutoValue_Box" in names, names
 
     def test_immutables_emits_subclass(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "Person.java", "java",
+            tmp_path,
+            "Person.java",
+            "java",
             "import org.immutables.value.Value;\n"
             "@Value.Immutable public interface Person { String name(); }\n",
         )
@@ -118,7 +133,9 @@ class TestJvmCodegen:
 
     def test_no_annotation_no_synthesis(self, tmp_path: Path) -> None:
         names = _names(
-            tmp_path, "Plain.java", "java",
+            tmp_path,
+            "Plain.java",
+            "java",
             "public class Plain {}\n",
         )
         assert "PlainImpl" not in names, names

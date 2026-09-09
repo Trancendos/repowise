@@ -354,9 +354,7 @@ class TestPayload:
         from repowise.core.generation.concept_tree.grouping import ConceptGroup
 
         group = ConceptGroup(members=["src/main.py"], dirs=["src"], target_path="src")
-        payload, _ = build_payload(
-            [group], entry_points={"src/main.py", "other/cli.py"}
-        )
+        payload, _ = build_payload([group], entry_points={"src/main.py", "other/cli.py"})
         assert payload["groups"][0]["entry_points"] == ["main.py"]
 
     def test_sibling_directories_are_shown_relative_to_what_they_share(self):

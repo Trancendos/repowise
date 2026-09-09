@@ -5,6 +5,7 @@ The gate lives at packages/ui/scripts/contrast-check.py so downstream
 consumers run the same check from node_modules. This wrapper keeps the
 historical invocation (`python3 docs/design/contrast_check.py`) working.
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -13,7 +14,10 @@ import sys
 
 GATE = (
     pathlib.Path(__file__).resolve().parents[2]
-    / "packages" / "ui" / "scripts" / "contrast-check.py"
+    / "packages"
+    / "ui"
+    / "scripts"
+    / "contrast-check.py"
 )
 
 if __name__ == "__main__":

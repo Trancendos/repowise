@@ -29,17 +29,13 @@ def _ctx(repo: Path, paths: list[str]) -> ResolverContext:
 
 def _write_workspace(repo: Path, members: list[str]) -> None:
     members_str = ", ".join(f'"{m}"' for m in members)
-    (repo / "Cargo.toml").write_text(
-        f"[workspace]\nmembers = [{members_str}]\n"
-    )
+    (repo / "Cargo.toml").write_text(f"[workspace]\nmembers = [{members_str}]\n")
 
 
 def _write_member_crate(repo: Path, member_dir: str, name: str) -> None:
     crate_dir = repo / member_dir
     crate_dir.mkdir(parents=True, exist_ok=True)
-    (crate_dir / "Cargo.toml").write_text(
-        f"[package]\nname = \"{name}\"\nversion = \"0.1.0\"\n"
-    )
+    (crate_dir / "Cargo.toml").write_text(f'[package]\nname = "{name}"\nversion = "0.1.0"\n')
     src_dir = crate_dir / "src"
     src_dir.mkdir(exist_ok=True)
     (src_dir / "lib.rs").write_text("// crate root\n")
@@ -50,10 +46,13 @@ class TestCargoWorkspaceIndex:
         _write_workspace(tmp_path, ["crates/foo", "crates/bar"])
         _write_member_crate(tmp_path, "crates/foo", "foo")
         _write_member_crate(tmp_path, "crates/bar", "bar-utils")
-        ctx = _ctx(tmp_path, [
-            "crates/foo/src/lib.rs",
-            "crates/bar/src/lib.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/foo/src/lib.rs",
+                "crates/bar/src/lib.rs",
+            ],
+        )
         idx = get_or_build_cargo_workspace_index(ctx)
         assert idx is not None
         assert idx.lookup("foo") == "crates/foo/src"
@@ -73,10 +72,13 @@ class TestCargoWorkspaceGlobExpansion:
         _write_workspace(tmp_path, ["crates/*"])
         _write_member_crate(tmp_path, "crates/foo", "foo")
         _write_member_crate(tmp_path, "crates/bar", "bar-utils")
-        ctx = _ctx(tmp_path, [
-            "crates/foo/src/lib.rs",
-            "crates/bar/src/lib.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/foo/src/lib.rs",
+                "crates/bar/src/lib.rs",
+            ],
+        )
         idx = get_or_build_cargo_workspace_index(ctx)
         assert idx is not None
         assert idx.lookup("foo") == "crates/foo/src"
@@ -89,10 +91,13 @@ class TestCargoWorkspaceGlobExpansion:
         )
         _write_member_crate(tmp_path, "crates/foo", "foo")
         _write_member_crate(tmp_path, "crates/ignored", "ignored")
-        ctx = _ctx(tmp_path, [
-            "crates/foo/src/lib.rs",
-            "crates/ignored/src/lib.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/foo/src/lib.rs",
+                "crates/ignored/src/lib.rs",
+            ],
+        )
         idx = get_or_build_cargo_workspace_index(ctx)
         assert idx is not None
         assert idx.lookup("foo") == "crates/foo/src"
@@ -112,10 +117,13 @@ class TestCargoWorkspaceGlobExpansion:
         _write_member_crate(tmp_path, "crates/foo", "foo")
         (tmp_path / "src").mkdir(exist_ok=True)
         (tmp_path / "src" / "lib.rs").write_text("// root crate\n")
-        ctx = _ctx(tmp_path, [
-            "src/lib.rs",
-            "crates/foo/src/lib.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "src/lib.rs",
+                "crates/foo/src/lib.rs",
+            ],
+        )
         idx = get_or_build_cargo_workspace_index(ctx)
         assert idx is not None
         assert idx.lookup("root_crate") == "src"
@@ -130,10 +138,13 @@ class TestCargoWorkspaceGlobExpansion:
         _write_member_crate(tmp_path, "crates/foo", "foo")
         (tmp_path / "src").mkdir(exist_ok=True)
         (tmp_path / "src" / "lib.rs").write_text("// root crate\n")
-        ctx = _ctx(tmp_path, [
-            "src/lib.rs",
-            "crates/foo/src/lib.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "src/lib.rs",
+                "crates/foo/src/lib.rs",
+            ],
+        )
         idx = get_or_build_cargo_workspace_index(ctx)
         assert idx is not None
         assert idx.lookup("foo") == "crates/foo/src"
@@ -141,6 +152,7 @@ class TestCargoWorkspaceGlobExpansion:
 
 def test_rust_visibility_levels():
     from repowise.core.ingestion.extractors.visibility import rust_visibility
+
     assert rust_visibility("foo", ["pub"]) == "public"
     assert rust_visibility("foo", ["pub(crate)"]) == "internal"
     assert rust_visibility("foo", ["pub(super)"]) == "protected"
@@ -156,12 +168,15 @@ class TestRustWorkspaceResolution:
         # Add a module under bar to import
         (tmp_path / "crates/bar/src/baz.rs").write_text("pub fn hello(){}")
 
-        ctx = _ctx(tmp_path, [
-            "crates/foo/src/lib.rs",
-            "crates/foo/src/main.rs",
-            "crates/bar/src/lib.rs",
-            "crates/bar/src/baz.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/foo/src/lib.rs",
+                "crates/foo/src/main.rs",
+                "crates/bar/src/lib.rs",
+                "crates/bar/src/baz.rs",
+            ],
+        )
         ctx.parsed_files = {p: None for p in ctx.path_set}
         result = resolve_rust_import("bar::baz", "crates/foo/src/main.rs", ctx)
         assert result == "crates/bar/src/baz.rs"
@@ -171,11 +186,14 @@ class TestRustWorkspaceResolution:
         _write_member_crate(tmp_path, "crates/foo", "foo")
         _write_member_crate(tmp_path, "crates/bar", "bar")
 
-        ctx = _ctx(tmp_path, [
-            "crates/foo/src/lib.rs",
-            "crates/foo/src/main.rs",
-            "crates/bar/src/lib.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/foo/src/lib.rs",
+                "crates/foo/src/main.rs",
+                "crates/bar/src/lib.rs",
+            ],
+        )
         ctx.parsed_files = {p: None for p in ctx.path_set}
         result = resolve_rust_import("bar::SomeType", "crates/foo/src/main.rs", ctx)
         assert result == "crates/bar/src/lib.rs"
@@ -204,19 +222,18 @@ class TestAliasedAndBraceImports:
         _write_member_crate(tmp_path, "crates/typst", "typst")
         _write_member_crate(tmp_path, "crates/typst-syntax", "typst-syntax")
 
-        ctx = _ctx(tmp_path, [
-            "crates/typst/src/lib.rs",
-            "crates/typst-syntax/src/lib.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/typst/src/lib.rs",
+                "crates/typst-syntax/src/lib.rs",
+            ],
+        )
         ctx.parsed_files = {p: None for p in ctx.path_set}
 
         # Aliased form should resolve to the same target as the bare form
-        aliased = resolve_rust_import(
-            "typst_syntax as syntax", "crates/typst/src/lib.rs", ctx
-        )
-        bare = resolve_rust_import(
-            "typst_syntax", "crates/typst/src/lib.rs", ctx
-        )
+        aliased = resolve_rust_import("typst_syntax as syntax", "crates/typst/src/lib.rs", ctx)
+        bare = resolve_rust_import("typst_syntax", "crates/typst/src/lib.rs", ctx)
         assert aliased == bare
         assert aliased == "crates/typst-syntax/src/lib.rs"
 
@@ -269,9 +286,7 @@ class TestSuperChainedResolution:
 
 class TestCargoDependencyParsing:
     def test_dependencies_parsed(self, tmp_path: Path) -> None:
-        (tmp_path / "Cargo.toml").write_text(
-            '[workspace]\nmembers = ["crates/foo"]\n'
-        )
+        (tmp_path / "Cargo.toml").write_text('[workspace]\nmembers = ["crates/foo"]\n')
         crate_dir = tmp_path / "crates" / "foo"
         crate_dir.mkdir(parents=True)
         (crate_dir / "Cargo.toml").write_text(
@@ -288,19 +303,15 @@ class TestCargoDependencyParsing:
         foo = next(c for c in idx.crates if c.name == "foo")
         assert any(d.name == "serde" and not d.is_path for d in foo.dependencies)
         assert any(
-            d.name == "bar" and d.is_path and d.package == "bar-impl"
-            for d in foo.dependencies
+            d.name == "bar" and d.is_path and d.package == "bar-impl" for d in foo.dependencies
         )
 
     def test_dev_dependencies_parsed(self, tmp_path: Path) -> None:
-        (tmp_path / "Cargo.toml").write_text(
-            '[workspace]\nmembers = ["crates/foo"]\n'
-        )
+        (tmp_path / "Cargo.toml").write_text('[workspace]\nmembers = ["crates/foo"]\n')
         crate_dir = tmp_path / "crates" / "foo"
         crate_dir.mkdir(parents=True)
         (crate_dir / "Cargo.toml").write_text(
-            '[package]\nname = "foo"\nversion = "0.1.0"\n\n'
-            '[dev-dependencies]\ntokio = "1.0"\n'
+            '[package]\nname = "foo"\nversion = "0.1.0"\n\n' '[dev-dependencies]\ntokio = "1.0"\n'
         )
         (crate_dir / "src").mkdir()
         (crate_dir / "src" / "lib.rs").write_text("// root\n")
@@ -312,8 +323,7 @@ class TestCargoDependencyParsing:
 
     def test_workspace_dependencies(self, tmp_path: Path) -> None:
         (tmp_path / "Cargo.toml").write_text(
-            '[workspace]\nmembers = []\n\n'
-            '[workspace.dependencies]\nserde = "1.0"\n'
+            "[workspace]\nmembers = []\n\n" '[workspace.dependencies]\nserde = "1.0"\n'
         )
         ctx = _ctx(tmp_path, [])
         idx = get_or_build_cargo_workspace_index(ctx)
@@ -323,14 +333,11 @@ class TestCargoDependencyParsing:
 
     def test_workspace_dependencies_with_member(self, tmp_path: Path) -> None:
         (tmp_path / "Cargo.toml").write_text(
-            '[workspace]\nmembers = ["crates/foo"]\n\n'
-            '[workspace.dependencies]\nserde = "1.0"\n'
+            '[workspace]\nmembers = ["crates/foo"]\n\n' '[workspace.dependencies]\nserde = "1.0"\n'
         )
         crate_dir = tmp_path / "crates" / "foo"
         crate_dir.mkdir(parents=True)
-        (crate_dir / "Cargo.toml").write_text(
-            '[package]\nname = "foo"\nversion = "0.1.0"\n'
-        )
+        (crate_dir / "Cargo.toml").write_text('[package]\nname = "foo"\nversion = "0.1.0"\n')
         (crate_dir / "src").mkdir()
         (crate_dir / "src" / "lib.rs").write_text("// root\n")
         ctx = _ctx(tmp_path, ["crates/foo/src/lib.rs"])
@@ -387,12 +394,15 @@ class TestBareIdentifierProbesImporterDir:
         # Also create foo.rs at crate root so both candidates exist
         (tmp_path / "crates/typst/src/foo.rs").write_text("pub fn other(){}\n")
 
-        ctx = _ctx(tmp_path, [
-            "crates/typst/src/lib.rs",
-            "crates/typst/src/eval/mod.rs",
-            "crates/typst/src/eval/foo.rs",
-            "crates/typst/src/foo.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/typst/src/lib.rs",
+                "crates/typst/src/eval/mod.rs",
+                "crates/typst/src/eval/foo.rs",
+                "crates/typst/src/foo.rs",
+            ],
+        )
         ctx.parsed_files = {p: None for p in ctx.path_set}
         result = resolve_rust_import("foo", "crates/typst/src/eval/mod.rs", ctx)
         assert result == "crates/typst/src/eval/foo.rs"
@@ -404,10 +414,13 @@ class TestBareIdentifierProbesImporterDir:
         (tmp_path / "crates/typst/src/lib.rs").write_text("mod foo;\n")
         (tmp_path / "crates/typst/src/foo.rs").write_text("pub fn hello(){}\n")
 
-        ctx = _ctx(tmp_path, [
-            "crates/typst/src/lib.rs",
-            "crates/typst/src/foo.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/typst/src/lib.rs",
+                "crates/typst/src/foo.rs",
+            ],
+        )
         ctx.parsed_files = {p: None for p in ctx.path_set}
         result = resolve_rust_import("foo", "crates/typst/src/lib.rs", ctx)
         assert result == "crates/typst/src/foo.rs"
@@ -418,10 +431,13 @@ class TestBareIdentifierProbesImporterDir:
         (tmp_path / "src/lib.rs").write_text("mod foo;\n")
         (tmp_path / "src/foo/mod.rs").write_text("pub fn hello(){}\n")
 
-        ctx = _ctx(tmp_path, [
-            "src/lib.rs",
-            "src/foo/mod.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "src/lib.rs",
+                "src/foo/mod.rs",
+            ],
+        )
         ctx.parsed_files = {p: None for p in ctx.path_set}
         result = resolve_rust_import("foo", "src/lib.rs", ctx)
         assert result == "src/foo/mod.rs"
@@ -436,10 +452,13 @@ class TestPathAttributeResolution:
         (tmp_path / "crates/foo/src/lib.rs").write_text("// root\n")
         (tmp_path / "crates/foo/src/custom.rs").write_text("pub fn hello(){}\n")
 
-        ctx = _ctx(tmp_path, [
-            "crates/foo/src/lib.rs",
-            "crates/foo/src/custom.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "crates/foo/src/lib.rs",
+                "crates/foo/src/custom.rs",
+            ],
+        )
         ctx.parsed_files = {p: None for p in ctx.path_set}
         result = resolve_rust_import("custom.rs", "crates/foo/src/lib.rs", ctx)
         assert result == "crates/foo/src/custom.rs"
@@ -457,11 +476,14 @@ class TestPathAttributeResolution:
         (tmp_path / "src/sub/mod.rs").write_text("// mod\n")
         (tmp_path / "src/sub/impl_file.rs").write_text("pub fn run(){}\n")
 
-        ctx = _ctx(tmp_path, [
-            "src/lib.rs",
-            "src/sub/mod.rs",
-            "src/sub/impl_file.rs",
-        ])
+        ctx = _ctx(
+            tmp_path,
+            [
+                "src/lib.rs",
+                "src/sub/mod.rs",
+                "src/sub/impl_file.rs",
+            ],
+        )
         ctx.parsed_files = {p: None for p in ctx.path_set}
         result = resolve_rust_import("impl_file.rs", "src/sub/mod.rs", ctx)
         assert result == "src/sub/impl_file.rs"
@@ -518,9 +540,7 @@ class TestTrailingUnderscoreFallback:
 
         ctx = _ctx(tmp_path, ["src/lib.rs", "src/export.rs"])
         ctx.parsed_files = {p: None for p in ctx.path_set}
-        result = resolve_rust_import(
-            "self::export_::{BundleOptions, export}", "src/lib.rs", ctx
-        )
+        result = resolve_rust_import("self::export_::{BundleOptions, export}", "src/lib.rs", ctx)
         assert result == "src/export.rs"
 
 
@@ -530,14 +550,14 @@ class TestWorkspaceDepInheritance:
     def test_member_inherits_workspace_dep(self, tmp_path: Path) -> None:
         (tmp_path / "Cargo.toml").write_text(
             '[workspace]\nmembers = ["crates/foo"]\n\n'
-            '[workspace.dependencies]\n'
+            "[workspace.dependencies]\n"
             'bar = { path = "../bar", package = "bar-impl" }\n'
         )
         crate_dir = tmp_path / "crates" / "foo"
         crate_dir.mkdir(parents=True)
         (crate_dir / "Cargo.toml").write_text(
             '[package]\nname = "foo"\nversion = "0.1.0"\n\n'
-            '[dependencies]\nbar = { workspace = true }\n'
+            "[dependencies]\nbar = { workspace = true }\n"
         )
         (crate_dir / "src").mkdir()
         (crate_dir / "src" / "lib.rs").write_text("// root\n")
@@ -546,20 +566,18 @@ class TestWorkspaceDepInheritance:
         assert idx is not None
         foo = next(c for c in idx.crates if c.name == "foo")
         assert any(
-            d.name == "bar" and d.is_path and d.package == "bar-impl"
-            for d in foo.dependencies
+            d.name == "bar" and d.is_path and d.package == "bar-impl" for d in foo.dependencies
         )
 
     def test_member_inherits_simple_version(self, tmp_path: Path) -> None:
         (tmp_path / "Cargo.toml").write_text(
-            '[workspace]\nmembers = ["crates/foo"]\n\n'
-            '[workspace.dependencies]\nserde = "1.0"\n'
+            '[workspace]\nmembers = ["crates/foo"]\n\n' '[workspace.dependencies]\nserde = "1.0"\n'
         )
         crate_dir = tmp_path / "crates" / "foo"
         crate_dir.mkdir(parents=True)
         (crate_dir / "Cargo.toml").write_text(
             '[package]\nname = "foo"\nversion = "0.1.0"\n\n'
-            '[dependencies]\nserde = { workspace = true }\n'
+            "[dependencies]\nserde = { workspace = true }\n"
         )
         (crate_dir / "src").mkdir()
         (crate_dir / "src" / "lib.rs").write_text("// root\n")
@@ -574,9 +592,7 @@ class TestBinTargetDiscovery:
     """``[[bin]]`` section parsing in Cargo.toml."""
 
     def test_bin_paths_parsed(self, tmp_path: Path) -> None:
-        (tmp_path / "Cargo.toml").write_text(
-            '[workspace]\nmembers = ["crates/foo"]\n'
-        )
+        (tmp_path / "Cargo.toml").write_text('[workspace]\nmembers = ["crates/foo"]\n')
         crate_dir = tmp_path / "crates" / "foo"
         crate_dir.mkdir(parents=True)
         (crate_dir / "Cargo.toml").write_text(
@@ -621,9 +637,7 @@ class TestPubUseReexportFollowing:
         paths = ["src/lib.rs", "src/engine.rs", "src/app.rs"]
         ctx = _ctx(tmp_path, paths)
         ctx.parsed_files = {
-            "src/lib.rs": _parsed_with_imports(
-                [("crate::engine::Engine", True, ["Engine"])]
-            ),
+            "src/lib.rs": _parsed_with_imports([("crate::engine::Engine", True, ["Engine"])]),
             "src/engine.rs": _parsed_with_imports([]),
             "src/app.rs": _parsed_with_imports([]),
         }
@@ -681,9 +695,7 @@ class TestPubUseReexportFollowing:
         paths = ["src/lib.rs", "src/engine.rs", "src/app.rs"]
         ctx = _ctx(tmp_path, paths)
         ctx.parsed_files = {
-            "src/lib.rs": _parsed_with_imports(
-                [("crate::engine::Engine", False, ["Engine"])]
-            ),
+            "src/lib.rs": _parsed_with_imports([("crate::engine::Engine", False, ["Engine"])]),
             "src/engine.rs": _parsed_with_imports([]),
             "src/app.rs": _parsed_with_imports([]),
         }

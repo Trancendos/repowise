@@ -60,9 +60,9 @@ def test_nothing_returns_an_undeclared_termination() -> None:
 
 def test_every_declared_termination_has_a_producer() -> None:
     orphans = FLOW_TERMINATION_VALUES - _returned_reasons()
-    assert not orphans, (
-        f"termination reason(s) declared with no branch returning them: {sorted(orphans)}"
-    )
+    assert (
+        not orphans
+    ), f"termination reason(s) declared with no branch returning them: {sorted(orphans)}"
 
 
 def test_the_hop_budget_outranks_everything_about_the_successors() -> None:
@@ -103,9 +103,7 @@ def test_a_cut_callee_set_outranks_a_claim_about_all_successors() -> None:
 
 def test_no_successors_at_all_reports_no_callees() -> None:
     assert (
-        classify_termination(
-            hops_taken=2, max_depth=8, revisited=0, low_confidence=0, excluded=0
-        )
+        classify_termination(hops_taken=2, max_depth=8, revisited=0, low_confidence=0, excluded=0)
         == "no_callees"
     )
 

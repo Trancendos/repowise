@@ -75,7 +75,7 @@ class TestFullRescoreDue:
 
     @pytest.mark.parametrize("stamp", [None, "", "not-a-number"])
     def test_a_missing_or_unusable_stamp_is_due(self, stamp):
-        """"Never re-scored" has to establish the baseline rather than skip it.
+        """ "Never re-scored" has to establish the baseline rather than skip it.
 
         This is why ``init`` stamps: the branch is correct, and a fresh index
         that left it unset walked straight into it (see

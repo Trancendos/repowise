@@ -54,7 +54,9 @@ async def test_instrument_emits_one_event(monkeypatch: pytest.MonkeyPatch):
     from repowise.core.platform import telemetry
 
     calls: list[tuple[str, dict]] = []
-    monkeypatch.setattr(telemetry, "record_event", lambda event, props: calls.append((event, props)))
+    monkeypatch.setattr(
+        telemetry, "record_event", lambda event, props: calls.append((event, props))
+    )
 
     async def get_answer(question: str) -> dict:
         return {"answer": "x", "confidence": "medium", "_meta": {}}

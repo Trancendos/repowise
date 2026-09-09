@@ -46,16 +46,13 @@ def _ctx(repo: Path, parsed: dict[str, ParsedFile]) -> ResolverContext:
     for p in path_set:
         stem = Path(p).stem.lower()
         stem_map.setdefault(stem, []).append(p)
-    return ResolverContext(
-        path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo
-    )
+    return ResolverContext(path_set=path_set, stem_map=stem_map, graph=nx.DiGraph(), repo_path=repo)
 
 
 class TestExpress:
     def test_app_use_router_links_to_router_file(self, tmp_path: Path) -> None:
         (tmp_path / "users.router.ts").write_text(
-            "import { Router } from 'express';\n"
-            "export const usersRouter = Router();\n"
+            "import { Router } from 'express';\n" "export const usersRouter = Router();\n"
         )
         (tmp_path / "app.ts").write_text(
             "import express from 'express';\n"
@@ -211,9 +208,7 @@ class TestExpressLocalMiddlewareReads:
         assert not graph.has_edge("svc.ts::__module__", "svc.ts::cleanup")
 
     def test_non_express_file_no_reads_edge(self, tmp_path: Path) -> None:
-        (tmp_path / "app.ts").write_text(
-            "import express from 'express';\nconst app = express();\n"
-        )
+        (tmp_path / "app.ts").write_text("import express from 'express';\nconst app = express();\n")
         (tmp_path / "cache.ts").write_text(
             "export function helper() { return 1; }\n"
             "const store = new Map();\n"
@@ -241,10 +236,6 @@ class TestExpressDeadCodeRegression:
         )
         graph = _build_graph_with_framework_edges(tmp_path)
         report = DeadCodeAnalyzer(graph, git_meta_map={}).analyze({"min_confidence": 0.0})
-        unused = {
-            f.symbol_name
-            for f in report.findings
-            if f.kind == DeadCodeKind.UNUSED_EXPORT
-        }
+        unused = {f.symbol_name for f in report.findings if f.kind == DeadCodeKind.UNUSED_EXPORT}
         assert "logRequest" not in unused
         assert "handler" not in unused

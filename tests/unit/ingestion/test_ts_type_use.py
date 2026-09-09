@@ -51,8 +51,9 @@ def _file_info(path: str, abs_path: str, language: str = "typescript") -> FileIn
 
 class TestTsTypeRefExtraction:
     def _parse(self, body: str, language: str = "typescript") -> list:
-        info = _file_info("p/f.ts" if language == "typescript" else "p/f.js",
-                          "/repo/p/f", language=language)
+        info = _file_info(
+            "p/f.ts" if language == "typescript" else "p/f.js", "/repo/p/f", language=language
+        )
         return _PARSER.parse_file(info, body.encode("utf-8")).type_refs
 
     def test_param_field_return_captured(self) -> None:
@@ -70,14 +71,10 @@ class TestTsTypeRefExtraction:
             "function f(s: string, n: number, p: Promise<number>): Date { return new Date() }\n"
         )
         names = {r.type_name for r in refs}
-        assert names.isdisjoint(
-            {"string", "number", "Promise", "Date", "void", "any"}
-        )
+        assert names.isdisjoint({"string", "number", "Promise", "Date", "void", "any"})
 
     def test_array_and_generic_unwrapped(self) -> None:
-        refs = self._parse(
-            "interface I { items: Item[]; promised: Promise<PValue> }\n"
-        )
+        refs = self._parse("interface I { items: Item[]; promised: Promise<PValue> }\n")
         names = {r.type_name for r in refs}
         # Item[] → Item, Promise<...> → filtered (builtin). PValue is
         # only captured if the grammar walks into generic arguments; we
@@ -88,8 +85,7 @@ class TestTsTypeRefExtraction:
 
     def test_heritage_extends_and_implements_captured(self) -> None:
         refs = self._parse(
-            "interface IA extends IB, IC { }\n"
-            "class Derived extends Base implements Iface { }\n"
+            "interface IA extends IB, IC { }\n" "class Derived extends Base implements Iface { }\n"
         )
         names_by_origin = {(r.type_name, r.origin) for r in refs}
         assert ("IB", "extends") in names_by_origin
@@ -110,10 +106,7 @@ class TestTsTypeRefExtraction:
         assert ("OtherType", "type_alias") in names_by_origin
 
     def test_namespace_qualified_type_dropped_to_head(self) -> None:
-        refs = self._parse(
-            "import * as ns from './x'\n"
-            "function f(x: ns.Inner): void {}\n"
-        )
+        refs = self._parse("import * as ns from './x'\n" "function f(x: ns.Inner): void {}\n")
         names = {r.type_name for r in refs}
         assert "Inner" in names
         assert "ns" not in names
@@ -132,9 +125,7 @@ def _build_graph(repo: Path, sources: dict[str, str]) -> nx.DiGraph:
     builder = GraphBuilder(repo_path=repo)
     for rel in sources:
         abs_path = str((repo / rel).resolve())
-        parsed = _PARSER.parse_file(
-            _file_info(rel, abs_path), (repo / rel).read_bytes()
-        )
+        parsed = _PARSER.parse_file(_file_info(rel, abs_path), (repo / rel).read_bytes())
         builder.add_file(parsed)
     return builder.build()
 
@@ -167,9 +158,7 @@ _TYPE_ONLY_SOURCES = {
 
 
 class TestTsTypeUseEdges:
-    def test_type_only_import_produces_type_use_provenance(
-        self, tmp_path: Path
-    ) -> None:
+    def test_type_only_import_produces_type_use_provenance(self, tmp_path: Path) -> None:
         graph = _build_graph(tmp_path, _TYPE_ONLY_SOURCES)
         edge = graph.get_edge_data("consumer.ts", "types.ts", {})
         assert edge, "consumer.ts should connect to types.ts"
@@ -197,15 +186,9 @@ class TestTsDeadCodeOutcome:
             }
         )
 
-    def test_types_referenced_only_as_annotations_not_flagged(
-        self, tmp_path: Path
-    ) -> None:
+    def test_types_referenced_only_as_annotations_not_flagged(self, tmp_path: Path) -> None:
         report = self._report(_build_graph(tmp_path, _TYPE_ONLY_SOURCES))
-        unused = {
-            f.symbol_name
-            for f in report.findings
-            if f.kind == DeadCodeKind.UNUSED_EXPORT
-        }
+        unused = {f.symbol_name for f in report.findings if f.kind == DeadCodeKind.UNUSED_EXPORT}
         # Each interface/class is consumed cross-file only as a TS type —
         # without type_use edges every one of these would be flagged.
         assert {
@@ -218,11 +201,7 @@ class TestTsDeadCodeOutcome:
 
     def test_genuinely_dead_interface_still_flagged(self, tmp_path: Path) -> None:
         report = self._report(_build_graph(tmp_path, _TYPE_ONLY_SOURCES))
-        unused = {
-            f.symbol_name
-            for f in report.findings
-            if f.kind == DeadCodeKind.UNUSED_EXPORT
-        }
+        unused = {f.symbol_name for f in report.findings if f.kind == DeadCodeKind.UNUSED_EXPORT}
         assert "GenuinelyDead" in unused
 
 

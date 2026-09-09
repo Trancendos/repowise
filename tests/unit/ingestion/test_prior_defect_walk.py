@@ -172,9 +172,7 @@ class TestExistingConsumersAreUnchanged:
         repo.index.add(["a.py", "b.py"])
         repo.index.commit(f"fix: correct both\n\n{_PROSE_BODY}")
 
-        (events, blanked_events), (counts, blanked_counts) = self._both(
-            tmp_path, ["a.py", "b.py"]
-        )
+        (events, blanked_events), (counts, blanked_counts) = self._both(tmp_path, ["a.py", "b.py"])
 
         assert events == blanked_events
         assert counts == blanked_counts

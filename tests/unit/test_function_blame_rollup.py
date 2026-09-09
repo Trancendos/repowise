@@ -92,8 +92,6 @@ def test_rollup_empty_when_no_blame() -> None:
     assert build_function_blame_rows([(pf, fcx)], {"a.py": {}}, now_ts=_NOW) == []
     # Empty blame index also yields nothing.
     assert (
-        build_function_blame_rows(
-            [(pf, fcx)], {"a.py": {"blame_index": BlameIndex()}}, now_ts=_NOW
-        )
+        build_function_blame_rows([(pf, fcx)], {"a.py": {"blame_index": BlameIndex()}}, now_ts=_NOW)
         == []
     )

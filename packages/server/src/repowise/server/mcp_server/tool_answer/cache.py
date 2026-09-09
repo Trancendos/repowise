@@ -153,9 +153,7 @@ async def _serve_cached_answer(
     with contextlib.suppress(Exception):
         payload = _json.loads(cached.payload_json)
         cached_paths = _cached_payload_paths(payload)
-        if _cache_bypass_reason(
-            payload, cached.created_at, repository, exclude_spec, cached_paths
-        ):
+        if _cache_bypass_reason(payload, cached.created_at, repository, exclude_spec, cached_paths):
             return None
         # Cache-internal fields never reach the consumer (response keys must not
         # start with "_" except _meta).

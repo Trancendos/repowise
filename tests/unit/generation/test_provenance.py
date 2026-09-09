@@ -125,8 +125,20 @@ def test_fallback_layer_id_matches_the_id_curation_would_mint():
     from repowise.core.analysis.knowledge_graph import _slugify
     from repowise.core.generation.layers import DEFAULT_LAYER, DOCS_TOOLING_LAYER
 
-    for name in ("UI", "CLI", "API", "Service", "Data", "Types", "Config",
-                 "Utility", "Test", "Middleware", DEFAULT_LAYER, DOCS_TOOLING_LAYER):
+    for name in (
+        "UI",
+        "CLI",
+        "API",
+        "Service",
+        "Data",
+        "Types",
+        "Config",
+        "Utility",
+        "Test",
+        "Middleware",
+        DEFAULT_LAYER,
+        DOCS_TOOLING_LAYER,
+    ):
         page = _page()
         _attach_file_provenance(page, _ctx(kg_layer_name=name))
         assert page.metadata["layer_id"] == f"layer:{_slugify(name)}"

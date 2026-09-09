@@ -267,17 +267,11 @@ def episode_currency(row: dict, *, root: Path) -> Currency:
 
     if not birth_commit:
         return Currency(f"recorded {recorded}; a standing claim about this checkout", True)
-    moved = commits_since(
-        root, since_commit=birth_commit, nodes=[], timeout=EPISODE_GIT_TIMEOUT_S
-    )
+    moved = commits_since(root, since_commit=birth_commit, nodes=[], timeout=EPISODE_GIT_TIMEOUT_S)
     if moved is None:
-        return Currency(
-            f"recorded {recorded} at {short(birth_commit)}; not re-checked since", True
-        )
+        return Currency(f"recorded {recorded} at {short(birth_commit)}; not re-checked since", True)
     if moved == 0:
-        return Currency(
-            f"recorded {recorded} at {short(birth_commit)}, the current commit", True
-        )
+        return Currency(f"recorded {recorded} at {short(birth_commit)}, the current commit", True)
     plural = "commit" if moved == 1 else "commits"
     return Currency(
         f"recorded {recorded} at {short(birth_commit)}; the tree has moved "

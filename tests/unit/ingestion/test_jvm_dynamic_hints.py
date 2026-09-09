@@ -16,12 +16,10 @@ class TestClassForName:
         (tmp_path / "Loader.java").write_text(
             "package com.x;\n"
             "public class Loader {\n"
-            "  void load() { Class.forName(\"com.x.Plugin\"); }\n"
+            '  void load() { Class.forName("com.x.Plugin"); }\n'
             "}\n"
         )
-        (tmp_path / "Plugin.java").write_text(
-            "package com.x;\npublic class Plugin {}\n"
-        )
+        (tmp_path / "Plugin.java").write_text("package com.x;\npublic class Plugin {}\n")
         edges = JvmDynamicHints().extract(tmp_path)
         assert ("Loader.java", "Plugin.java", "class_forname") in _edges_to_pairs(edges)
 
@@ -39,18 +37,13 @@ class TestMockito:
         )
 
     def test_mockito_resolves_in_java(self, tmp_path: Path) -> None:
-        (tmp_path / "Svc.java").write_text(
-            "package x;\npublic class Svc {}\n"
-        )
+        (tmp_path / "Svc.java").write_text("package x;\npublic class Svc {}\n")
         (tmp_path / "SvcTest.java").write_text(
             "package x;\nimport static org.mockito.Mockito.mock;\n"
             "public class SvcTest {\n  Svc s = Mockito.mock(Svc.class);\n}\n"
         )
         edges = JvmDynamicHints().extract(tmp_path)
-        assert any(
-            e.source == "SvcTest.java" and e.target == "Svc.java"
-            for e in edges
-        )
+        assert any(e.source == "SvcTest.java" and e.target == "Svc.java" for e in edges)
 
 
 class TestSpringBootRun:
@@ -61,7 +54,8 @@ class TestSpringBootRun:
         )
         edges = JvmDynamicHints().extract(tmp_path)
         assert any(
-            e.source == "Main.kt" and e.target == "MyApp.kt"
+            e.source == "Main.kt"
+            and e.target == "MyApp.kt"
             and e.hint_source.endswith("spring_boot_run")
             for e in edges
         )
@@ -69,9 +63,7 @@ class TestSpringBootRun:
 
 class TestMapStruct:
     def test_mappers_getmapper(self, tmp_path: Path) -> None:
-        (tmp_path / "UserMapper.java").write_text(
-            "package x;\npublic interface UserMapper {}\n"
-        )
+        (tmp_path / "UserMapper.java").write_text("package x;\npublic interface UserMapper {}\n")
         (tmp_path / "Caller.java").write_text(
             "package x;\nimport org.mapstruct.factory.Mappers;\n"
             "public class Caller {\n"
@@ -79,10 +71,7 @@ class TestMapStruct:
             "}\n"
         )
         edges = JvmDynamicHints().extract(tmp_path)
-        assert any(
-            e.source == "Caller.java" and e.target == "UserMapper.java"
-            for e in edges
-        )
+        assert any(e.source == "Caller.java" and e.target == "UserMapper.java" for e in edges)
 
 
 class TestJacksonReadValue:
@@ -95,7 +84,4 @@ class TestJacksonReadValue:
             "}\n"
         )
         edges = JvmDynamicHints().extract(tmp_path)
-        assert any(
-            e.source == "Parser.java" and e.target == "Dto.java"
-            for e in edges
-        )
+        assert any(e.source == "Parser.java" and e.target == "Dto.java" for e in edges)

@@ -61,7 +61,15 @@ SHARED = ROOT / "plugins" / "shared"
 #: copy that actually reaches a user, and it follows the precedent already set by
 #: the bundled ``repowise.core.upgrade`` changelog.
 CODEX_PROMPT_DATA = (
-    ROOT / "packages" / "cli" / "src" / "repowise" / "cli" / "agent_targets" / "_data" / "codex_prompts"
+    ROOT
+    / "packages"
+    / "cli"
+    / "src"
+    / "repowise"
+    / "cli"
+    / "agent_targets"
+    / "_data"
+    / "codex_prompts"
 )
 
 

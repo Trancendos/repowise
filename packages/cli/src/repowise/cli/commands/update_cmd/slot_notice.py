@@ -95,13 +95,17 @@ async def _persisted_slots(repo_path: Path) -> set[str]:
                 # path, so it holds no evidence either way.
                 raise LookupError(f"no repository row for {repo_path}")
             rows = (
-                await session.execute(
-                    select(Page.target_path).where(
-                        Page.repository_id == repo_id,
-                        Page.page_type == "onboarding",
+                (
+                    await session.execute(
+                        select(Page.target_path).where(
+                            Page.repository_id == repo_id,
+                            Page.page_type == "onboarding",
+                        )
                     )
                 )
-            ).scalars().all()
+                .scalars()
+                .all()
+            )
     finally:
         await engine.dispose()
     return {by_target[target] for target in rows if target in by_target}

@@ -136,9 +136,7 @@ class ExtractionDiagnostics:
         genuine ratio over calls extraction *saw*: it says nothing about calls
         no dialect recognised, and must not be presented as total recall.
         """
-        http_consumers = sum(
-            r.consumers_by_type.get("http", 0) for r in self.repo_breakdown
-        )
+        http_consumers = sum(r.consumers_by_type.get("http", 0) for r in self.repo_breakdown)
         denominator = http_consumers + self.http_consumers_unresolved
         if denominator == 0:
             return None

@@ -20,9 +20,9 @@ from repowise.server.services.c4_builder.labels import _EDGE_VERB, _VERB_PRIORIT
 
 def test_every_edge_type_has_a_verb() -> None:
     missing = sorted(EDGE_TYPE_VALUES - _EDGE_VERB.keys())
-    assert not missing, (
-        f"edge type(s) with no C4 verb — they render as the vague 'depends on': {missing}"
-    )
+    assert (
+        not missing
+    ), f"edge type(s) with no C4 verb — they render as the vague 'depends on': {missing}"
 
 
 def test_no_verb_is_keyed_on_a_type_nothing_emits() -> None:

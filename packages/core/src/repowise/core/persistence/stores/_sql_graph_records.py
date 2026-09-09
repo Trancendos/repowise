@@ -18,19 +18,13 @@ class _SqlGraphRecordsMixin(GraphRecordsIndexStore):
 
     _session: AsyncSession
 
-    async def batch_upsert_graph_nodes(
-        self, repository_id: str, nodes: list[dict]
-    ) -> None:
+    async def batch_upsert_graph_nodes(self, repository_id: str, nodes: list[dict]) -> None:
         await crud.batch_upsert_graph_nodes(self._session, repository_id, nodes)
 
-    async def batch_upsert_graph_edges(
-        self, repository_id: str, edges: list[dict]
-    ) -> None:
+    async def batch_upsert_graph_edges(self, repository_id: str, edges: list[dict]) -> None:
         await crud.batch_upsert_graph_edges(self._session, repository_id, edges)
 
-    async def get_graph_node(
-        self, repository_id: str, node_id: str
-    ) -> GraphNode | None:
+    async def get_graph_node(self, repository_id: str, node_id: str) -> GraphNode | None:
         return await crud.get_graph_node(self._session, repository_id, node_id)
 
     async def get_graph_edges_for_node(
@@ -54,9 +48,7 @@ class _SqlGraphRecordsMixin(GraphRecordsIndexStore):
     async def get_graph_nodes_by_ids(
         self, repository_id: str, node_ids: list[str]
     ) -> dict[str, GraphNode]:
-        return await crud.get_graph_nodes_by_ids(
-            self._session, repository_id, node_ids
-        )
+        return await crud.get_graph_nodes_by_ids(self._session, repository_id, node_ids)
 
     async def get_all_file_metrics(self, repository_id: str) -> list[GraphNode]:
         return await crud.get_all_file_metrics(self._session, repository_id)
@@ -77,12 +69,8 @@ class _SqlGraphRecordsMixin(GraphRecordsIndexStore):
             limit=limit,
         )
 
-    async def get_cross_community_edges(
-        self, repository_id: str, community_id: int
-    ) -> list[dict]:
-        return await crud.get_cross_community_edges(
-            self._session, repository_id, community_id
-        )
+    async def get_cross_community_edges(self, repository_id: str, community_id: int) -> list[dict]:
+        return await crud.get_cross_community_edges(self._session, repository_id, community_id)
 
     async def get_top_entry_points(
         self,
@@ -95,19 +83,13 @@ class _SqlGraphRecordsMixin(GraphRecordsIndexStore):
             self._session, repository_id, min_score=min_score, limit=limit
         )
 
-    async def get_node_degree_counts(
-        self, repository_id: str, node_id: str
-    ) -> dict[str, int]:
-        return await crud.get_node_degree_counts(
-            self._session, repository_id, node_id
-        )
+    async def get_node_degree_counts(self, repository_id: str, node_id: str) -> dict[str, int]:
+        return await crud.get_node_degree_counts(self._session, repository_id, node_id)
 
     async def bulk_upsert_external_systems(
         self, repository_id: str, systems: list[dict]
     ) -> dict[tuple[str, str], int]:
-        return await crud.bulk_upsert_external_systems(
-            self._session, repository_id, systems
-        )
+        return await crud.bulk_upsert_external_systems(self._session, repository_id, systems)
 
     async def link_graph_nodes_to_external_systems(
         self, repository_id: str, name_to_id: dict[str, int]
@@ -116,12 +98,8 @@ class _SqlGraphRecordsMixin(GraphRecordsIndexStore):
             self._session, repository_id, name_to_id
         )
 
-    async def list_external_systems(
-        self, repository_id: str
-    ) -> list[ExternalSystem]:
+    async def list_external_systems(self, repository_id: str) -> list[ExternalSystem]:
         return await crud.list_external_systems(self._session, repository_id)
 
-    async def batch_upsert_symbols(
-        self, repository_id: str, symbols: list
-    ) -> None:
+    async def batch_upsert_symbols(self, repository_id: str, symbols: list) -> None:
         await crud.batch_upsert_symbols(self._session, repository_id, symbols)

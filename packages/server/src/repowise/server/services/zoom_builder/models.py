@@ -52,15 +52,15 @@ class ZoomMetrics:
 class ZoomNode:
     """One node in the containment tree."""
 
-    id: str                       # "zm:sys" | "zm:layer:<id>" | "zm:<path>" ...
-    parent_id: str | None         # None only for the system root
-    level: int                    # 0 system, 1 layer, 2 group, 3+ folder, leaf file
-    kind: str                     # one of NODE_KINDS
-    name: str                     # display label (may be "a/b" for compressed dirs)
-    path: str = ""                # repo-relative path for folder/file nodes; "" otherwise
+    id: str  # "zm:sys" | "zm:layer:<id>" | "zm:<path>" ...
+    parent_id: str | None  # None only for the system root
+    level: int  # 0 system, 1 layer, 2 group, 3+ folder, leaf file
+    kind: str  # one of NODE_KINDS
+    name: str  # display label (may be "a/b" for compressed dirs)
+    path: str = ""  # repo-relative path for folder/file nodes; "" otherwise
     children: tuple[str, ...] = field(default_factory=tuple)
-    importance: float = 0.0       # 0..1, execution-aware, normalized within siblings
-    sibling_rank: int = 0         # 1 = most important among siblings
+    importance: float = 0.0  # 0..1, execution-aware, normalized within siblings
+    sibling_rank: int = 0  # 1 = most important among siblings
     metrics: ZoomMetrics = field(default_factory=ZoomMetrics)
     layout: ZoomRect | None = None
     summary: str = ""
@@ -78,7 +78,7 @@ class ZoomNode:
     is_hotspot: bool = False
     is_dead: bool = False
     is_test: bool = False
-    on_flow: bool = False         # reachable from an entry point along import edges
+    on_flow: bool = False  # reachable from an entry point along import edges
 
 
 @dataclass(frozen=True)
@@ -95,7 +95,7 @@ class ZoomRelation:
     target_id: str
     label: str = ""
     edge_count: int = 1
-    coupling: str = ""            # loose | moderate | tight
+    coupling: str = ""  # loose | moderate | tight
 
 
 @dataclass(frozen=True)
@@ -107,5 +107,5 @@ class ZoomMap:
     relations: tuple[ZoomRelation, ...]
     project_name: str
     total_files: int
-    max_depth: int                # deepest level present in this (possibly pruned) map
-    truncated: bool = False       # True when depth/focus pruning dropped deeper nodes
+    max_depth: int  # deepest level present in this (possibly pruned) map
+    truncated: bool = False  # True when depth/focus pruning dropped deeper nodes

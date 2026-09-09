@@ -1,4 +1,5 @@
 """Regression tests for _read_output_line_count edge cases."""
+
 from __future__ import annotations
 
 from repowise.cli.commands.augment_cmd.read_state import _read_output_line_count

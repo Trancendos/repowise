@@ -165,9 +165,7 @@ async def test_build_community_slice_members_and_boundary(async_session, tmp_pat
 async def test_build_community_slice_member_limit_truncates(async_session, tmp_path):
     repo_id = await _seed_two_communities(async_session, tmp_path)
 
-    payload = await build_community_slice(
-        async_session, repo_id, community_id=0, member_limit=1
-    )
+    payload = await build_community_slice(async_session, repo_id, community_id=0, member_limit=1)
 
     assert payload.truncated is True
     assert payload.member_count == 1

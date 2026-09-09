@@ -450,9 +450,7 @@ async def run_pipeline(
     # Test-run: limit to top 10 files by PageRank (shared helper with
     # ``run_generation`` so the two paths cannot drift).
     if test_run and generate_docs:
-        parsed_files = limit_to_top_pagerank(
-            parsed_files, graph_builder, n=TEST_RUN_FILE_LIMIT
-        )
+        parsed_files = limit_to_top_pagerank(parsed_files, graph_builder, n=TEST_RUN_FILE_LIMIT)
         if progress:
             progress.on_message("warning", f"Test run: limiting to {len(parsed_files)} files")
 

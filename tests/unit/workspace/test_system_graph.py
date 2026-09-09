@@ -158,7 +158,9 @@ def test_socket_contract_becomes_socket_edge():
         _provider("api", "socket::/hubs/game", ctype="socket", file="api/hub.cs"),
         _consumer("unity", "socket::/hubs/game", ctype="socket", file="unity/net.cs"),
     ]
-    links = [_link("socket::/hubs/game", "api", "api/hub.cs", "unity", "unity/net.cs", ctype="socket")]
+    links = [
+        _link("socket::/hubs/game", "api", "api/hub.cs", "unity", "unity/net.cs", ctype="socket")
+    ]
     graph = build_system_graph(contracts, links, CrossRepoOverlay(), {})
     assert graph.edges[0].kind == "socket"
 

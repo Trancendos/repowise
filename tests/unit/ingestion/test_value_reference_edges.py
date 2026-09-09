@@ -62,9 +62,7 @@ class TestKotlinCallableReferences:
         assert _inbound(graph, "handlers.kt::Handlers::onTick", "references")
         assert not _inbound(graph, "handlers.kt::Handlers::onTick", "calls")
 
-    def test_unqualified_reference_reaches_a_top_level_function(
-        self, tmp_path: Path
-    ) -> None:
+    def test_unqualified_reference_reaches_a_top_level_function(self, tmp_path: Path) -> None:
         (tmp_path / "pipeline.kt").write_text(
             "package app\n"
             "fun transform(n: Int): Int = n + 1\n"
@@ -98,9 +96,7 @@ class TestGoFunctionValues:
     def _layout(tmp_path: Path, setup_body: str) -> None:
         (tmp_path / "go.mod").write_text("module example.com/app\n\ngo 1.21\n")
         (tmp_path / "handlers").mkdir()
-        (tmp_path / "handlers" / "handlers.go").write_text(
-            "package handlers\n\nfunc Index() {}\n"
-        )
+        (tmp_path / "handlers" / "handlers.go").write_text("package handlers\n\nfunc Index() {}\n")
         (tmp_path / "server.go").write_text(
             "package app\n"
             "\n"
@@ -178,10 +174,7 @@ class TestRustFunctionValues:
         ``println!`` in the corpus.
         """
         (tmp_path / "main.rs").write_text(
-            "macro_rules! shout { () => {} }\n"
-            "fn run() {\n"
-            "    shout!();\n"
-            "}\n"
+            "macro_rules! shout { () => {} }\n" "fn run() {\n" "    shout!();\n" "}\n"
         )
         graph = _build(tmp_path)
         assert not _edges_of_type(graph, "references")
@@ -211,9 +204,7 @@ class TestReceiverDecidesWhatMayBeNamed:
         graph = _build(tmp_path)
         assert not _inbound(graph, "main.rs::Store::value", "references")
 
-    def test_qualified_kotlin_reference_does_reach_a_method(
-        self, tmp_path: Path
-    ) -> None:
+    def test_qualified_kotlin_reference_does_reach_a_method(self, tmp_path: Path) -> None:
         (tmp_path / "app.kt").write_text(
             "package app\n"
             "class Store {\n"
@@ -242,7 +233,7 @@ class TestKotlinCeilings:
         (tmp_path / "app.kt").write_text(
             "package app\n"
             "class Foo {\n"
-            "    val name: String = \"\"\n"
+            '    val name: String = ""\n'
             "}\n"
             "fun read(xs: List<Foo>) {\n"
             "    xs.map(Foo::name)\n"

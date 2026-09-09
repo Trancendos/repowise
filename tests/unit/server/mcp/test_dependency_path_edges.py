@@ -62,9 +62,10 @@ async def test_co_change_edge_is_not_a_dependency_path(setup_mcp, factory):
 
     result = await get_dependency_path(_ORPHAN, _TARGET)
 
-    assert result.get("path") in (None, []), (
-        f"co_changes edge was walked as a dependency: {result.get('path')}"
-    )
+    assert result.get("path") in (
+        None,
+        [],
+    ), f"co_changes edge was walked as a dependency: {result.get('path')}"
     # Shortest-path must be what rejected the hop. If the node had instead
     # fallen out of the graph, this would pass while silently killing the
     # no-path fallbacks below — which is exactly how an earlier version of
@@ -73,9 +74,7 @@ async def test_co_change_edge_is_not_a_dependency_path(setup_mcp, factory):
 
 
 @pytest.mark.asyncio
-async def test_a_node_with_only_temporal_edges_still_reaches_the_fallbacks(
-    setup_mcp, factory
-):
+async def test_a_node_with_only_temporal_edges_still_reaches_the_fallbacks(setup_mcp, factory):
     """Filtering edges must not delete nodes.
 
     The graph is built from edge endpoints, so a file whose only edges were

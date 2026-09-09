@@ -100,6 +100,7 @@ def emitting_build() -> str:
         _BUILD = f"{__version__}+{install[:8]}"
     return _BUILD
 
+
 _INJECTIONS_TABLE_SQL = (
     "CREATE TABLE IF NOT EXISTS injections ("
     "session_id TEXT NOT NULL, decision_id TEXT NOT NULL, "
@@ -267,7 +268,15 @@ def _record_injections(
             "(session_id, decision_id, node_id, shown_at, surface, category, duration_ms, "
             "build, chars) VALUES (?, ?, ?, ?, 'decision', 'session_start', ?, ?, ?)",
             [
-                (session_id, did, node_id, now, elapsed, build, share + (remainder if i == 0 else 0))
+                (
+                    session_id,
+                    did,
+                    node_id,
+                    now,
+                    elapsed,
+                    build,
+                    share + (remainder if i == 0 else 0),
+                )
                 for i, did in enumerate(decision_ids)
             ],
         )

@@ -432,9 +432,7 @@ def save_system_graph(graph: SystemGraph, workspace_root: Path) -> Path:
     out_path = data_dir / SYSTEM_GRAPH_FILENAME
     # Atomic: the MCP enricher reads these artifacts from a separate
     # process and must never observe a half-written file.
-    atomic_write_text(
-        out_path, json.dumps(graph.to_dict(), indent=2, ensure_ascii=False)
-    )
+    atomic_write_text(out_path, json.dumps(graph.to_dict(), indent=2, ensure_ascii=False))
     return out_path
 
 
@@ -489,9 +487,7 @@ async def run_system_graph_build(
             _detect_boundaries_by_repo, ws_config, workspace_root
         )
 
-    diagnostics = build_diagnostics(
-        store.contracts, store.contract_links, store.extraction_stats
-    )
+    diagnostics = build_diagnostics(store.contracts, store.contract_links, store.extraction_stats)
     graph = build_system_graph(
         store.contracts,
         store.contract_links,

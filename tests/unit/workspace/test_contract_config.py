@@ -64,18 +64,22 @@ class TestManualContractLink:
         assert ml.from_role == "consumer"
 
     def test_default_role(self) -> None:
-        ml = ManualContractLink.from_dict({
-            "from_repo": "a",
-            "to_repo": "b",
-            "contract_type": "topic",
-            "contract_id": "topic::events",
-        })
+        ml = ManualContractLink.from_dict(
+            {
+                "from_repo": "a",
+                "to_repo": "b",
+                "contract_type": "topic",
+                "contract_id": "topic::events",
+            }
+        )
         assert ml.from_role == "consumer"
 
     def test_round_trip(self) -> None:
         ml = ManualContractLink(
-            from_repo="a", to_repo="b",
-            contract_type="grpc", contract_id="grpc::Auth/*",
+            from_repo="a",
+            to_repo="b",
+            contract_type="grpc",
+            contract_id="grpc::Auth/*",
             from_role="provider",
         )
         loaded = ManualContractLink.from_dict(ml.to_dict())

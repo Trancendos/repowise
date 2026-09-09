@@ -190,9 +190,7 @@ class TestGoTypeUseEdges:
     def test_same_package_cross_file_type_use_edge(self, tmp_path: Path) -> None:
         graph = _build_graph(tmp_path)
         # options.go references Partition (defined in dynacache.go) as a field.
-        edge = graph.get_edge_data(
-            "cache/dynacache/options.go", "cache/dynacache/dynacache.go", {}
-        )
+        edge = graph.get_edge_data("cache/dynacache/options.go", "cache/dynacache/dynacache.go", {})
         assert "Partition" in edge.get("imported_names", [])
 
 

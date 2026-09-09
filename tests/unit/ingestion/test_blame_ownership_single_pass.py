@@ -59,15 +59,19 @@ class TestSingleBlamePassOwnership:
             legacy = get_blame_ownership(r, path)
             idx = build_blame_index(r, path, repo_path=root)
             derived = ownership_from_blame(idx)
-            assert derived[0] == legacy[0], path          # name
-            assert derived[1] == legacy[1], path          # email
+            assert derived[0] == legacy[0], path  # name
+            assert derived[1] == legacy[1], path  # email
             assert derived[2] == pytest.approx(legacy[2]), path  # share
 
     def test_sparse_file_gets_ownership_but_no_blame_index(self, repo) -> None:
         r, root = repo
         meta = index_file(
-            r, "sparse.py", repo_path=root, commit_limit=500,
-            follow_renames=False, include_blame=True,
+            r,
+            "sparse.py",
+            repo_path=root,
+            commit_limit=500,
+            follow_renames=False,
+            include_blame=True,
         )
         assert meta["primary_owner_name"] == "Alice"
         assert meta["primary_owner_email"] == "alice@example.com"
@@ -77,8 +81,12 @@ class TestSingleBlamePassOwnership:
     def test_hot_file_retains_blame_index(self, repo) -> None:
         r, root = repo
         meta = index_file(
-            r, "hot.py", repo_path=root, commit_limit=500,
-            follow_renames=False, include_blame=True,
+            r,
+            "hot.py",
+            repo_path=root,
+            commit_limit=500,
+            follow_renames=False,
+            include_blame=True,
         )
         assert "blame_index" in meta
         assert meta["blame_index"].lines
@@ -87,8 +95,12 @@ class TestSingleBlamePassOwnership:
     def test_essential_tier_skips_blame_entirely(self, repo) -> None:
         r, root = repo
         meta = index_file(
-            r, "sparse.py", repo_path=root, commit_limit=500,
-            follow_renames=False, include_blame=False,
+            r,
+            "sparse.py",
+            repo_path=root,
+            commit_limit=500,
+            follow_renames=False,
+            include_blame=False,
         )
         assert "blame_index" not in meta
         # Commit-author fallback ownership still present (2 commits: alice, bob).

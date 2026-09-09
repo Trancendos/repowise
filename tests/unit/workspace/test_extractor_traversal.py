@@ -66,9 +66,7 @@ def test_iter_source_files_respects_gitignore(tmp_path: Path) -> None:
 def test_topic_extractor_skips_nested_git_repo(tmp_path: Path) -> None:
     # A NATS producer in the repo is found; an identical one inside a nested
     # repo is not (the nested repo is a hard boundary).
-    (tmp_path / "producer.py").write_text(
-        'nc.publish("events.user")', encoding="utf-8"
-    )
+    (tmp_path / "producer.py").write_text('nc.publish("events.user")', encoding="utf-8")
     nested = tmp_path / "bench"
     nested.mkdir()
     (nested / ".git").mkdir()

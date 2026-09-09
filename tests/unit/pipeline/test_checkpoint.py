@@ -41,8 +41,15 @@ class FakeJobStore:
     async def update_state(self, job_id, state, *, cursor=None, error=None) -> JobRecord:
         old = self.jobs[job_id]
         rec = JobRecord(
-            old.id, old.repository_id, old.phase, state, cursor or old.cursor,
-            old.started_at, datetime.now(UTC), error, old.metadata,
+            old.id,
+            old.repository_id,
+            old.phase,
+            state,
+            cursor or old.cursor,
+            old.started_at,
+            datetime.now(UTC),
+            error,
+            old.metadata,
         )
         self.jobs[job_id] = rec
         self.events.append(("state", f"{old.phase}:{state.value}"))

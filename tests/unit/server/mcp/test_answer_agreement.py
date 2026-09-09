@@ -224,9 +224,9 @@ async def test_grounding_earns_high_only_when_opted_in(setup_mcp, monkeypatch):
     monkeypatch.setenv("REPOWISE_ANSWER_EARN_HIGH_ON_WEAK_RETRIEVAL", "on")
     result_on = await get_answer("how are large uploads handled")
     assert result_on["confidence"] == "high"
-    assert "clearly dominates" not in result_on["note"], (
-        "the lift did not measure dominance, so the note must not claim it"
-    )
+    assert (
+        "clearly dominates" not in result_on["note"]
+    ), "the lift did not measure dominance, so the note must not claim it"
 
     monkeypatch.setenv("REPOWISE_ANSWER_EARN_HIGH_GROUNDING", "off")
     result_off = await get_answer("how are large uploads handled")
